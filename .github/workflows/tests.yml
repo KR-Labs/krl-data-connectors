@@ -23,36 +23,58 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      with:
-        path: krl-data-connectors
-    
-    - name: Checkout krl-open-core
-      uses: actions/checkout@v4
-      with:
-        repository: KR-Labs/krl-open-core
-        path: krl-open-core
     
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     
+    - name: Create stub krl-core package
+      run: |
+        mkdir -p /tmp/krl-core/src/krl_core
+        cat > /tmp/krl-core/src/krl_core/__init__.py << 'EOF'
+        """Stub krl-core for CI testing."""
+        import logging
+        
+        class ConfigManager:
+            def get(self, key, default=None):
+                return default
+        
+        class FileCache:
+            def __init__(self, *args, **kwargs):
+                pass
+            def get(self, key):
+                return None
+            def set(self, key, value, ttl=None):
+                pass
+        
+        def get_logger(name):
+            return logging.getLogger(name)
+        EOF
+        cat > /tmp/krl-core/setup.py << 'EOF'
+        from setuptools import setup, find_packages
+        setup(
+            name="krl-core",
+            version="0.1.0",
+            package_dir={"": "src"},
+            packages=find_packages(where="src"),
+        )
+        EOF
+        pip install -e /tmp/krl-core
+    
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -e ../krl-open-core
         pip install -e ".[dev,test]"
-      working-directory: krl-data-connectors
     
     - name: Run tests with coverage
       run: |
         pytest --cov=src --cov-report=xml --cov-report=term-missing
-      working-directory: krl-data-connectors
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        file: ./krl-data-connectors/coverage.xml
+        file: ./coverage.xml
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
