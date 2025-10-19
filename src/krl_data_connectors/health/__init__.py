@@ -7,4 +7,4 @@ Licensed under the Apache License, Version 2.0
 
 from .cdc_connector import CDCWonderConnector
 
-__all__ = ['CDCWonderConnector']
+__all__ = ["CDCWonderConnector"]

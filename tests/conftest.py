@@ -60,18 +60,18 @@ def test_output_dir(project_root) -> Path:
 def mock_env_vars(monkeypatch) -> Dict[str, str]:
     """
     Fixture to set mock environment variables for testing.
-    
+
     Usage:
         def test_something(mock_env_vars):
             mock_env_vars['API_KEY'] = 'test_key'
             # Your test code here
     """
     env_vars = {}
-    
+
     def set_env(key: str, value: str):
         monkeypatch.setenv(key, value)
         env_vars[key] = value
-    
+
     # Provide helper method
     env_vars.__setitem__ = set_env
     return env_vars
@@ -81,16 +81,16 @@ def mock_env_vars(monkeypatch) -> Dict[str, str]:
 def api_credentials() -> Dict[str, str]:
     """
     Provide API credentials for testing.
-    
+
     In CI/CD, these should come from GitHub Secrets.
     Locally, they come from environment variables.
     For unit tests, use mock values.
     """
     return {
-        'census_api_key': os.getenv('CENSUS_API_KEY', 'mock_census_key'),
-        'fred_api_key': os.getenv('FRED_API_KEY', 'mock_fred_key'),
-        'bls_api_key': os.getenv('BLS_API_KEY', 'mock_bls_key'),
-        'bea_api_key': os.getenv('BEA_API_KEY', 'mock_bea_key'),
+        "census_api_key": os.getenv("CENSUS_API_KEY", "mock_census_key"),
+        "fred_api_key": os.getenv("FRED_API_KEY", "mock_fred_key"),
+        "bls_api_key": os.getenv("BLS_API_KEY", "mock_bls_key"),
+        "bea_api_key": os.getenv("BEA_API_KEY", "mock_bea_key"),
     }
 
 
@@ -99,11 +99,10 @@ def sample_dataframe():
     """Return a sample pandas DataFrame for testing."""
     try:
         import pandas as pd
-        return pd.DataFrame({
-            'id': [1, 2, 3],
-            'name': ['Alice', 'Bob', 'Charlie'],
-            'value': [100, 200, 300]
-        })
+
+        return pd.DataFrame(
+            {"id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"], "value": [100, 200, 300]}
+        )
     except ImportError:
         pytest.skip("pandas not installed")
 
@@ -122,43 +121,37 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "slow: marks tests as slow (deselect with '-m \"not slow\"')"
     )
-    config.addinivalue_line(
-        "markers", "integration: marks tests as integration tests"
-    )
-    config.addinivalue_line(
-        "markers", "unit: marks tests as unit tests"
-    )
-    config.addinivalue_line(
-        "markers", "api: marks tests that require API credentials"
-    )
-    config.addinivalue_line(
-        "markers", "network: marks tests that require network access"
-    )
+    config.addinivalue_line("markers", "integration: marks tests as integration tests")
+    config.addinivalue_line("markers", "unit: marks tests as unit tests")
+    config.addinivalue_line("markers", "api: marks tests that require API credentials")
+    config.addinivalue_line("markers", "network: marks tests that require network access")
 
 
 # Test collection customization
 def pytest_collection_modifyitems(config, items):
     """
     Modify test collection to skip certain tests based on environment.
-    
+
     - Skip integration tests if running in quick mode
     - Skip API tests if no credentials available
     """
     skip_slow = pytest.mark.skip(reason="use -m 'not slow' to skip")
     skip_api = pytest.mark.skip(reason="API credentials not available")
-    
+
     for item in items:
         # Skip slow tests if --fast flag is used
         if "slow" in item.keywords and config.getoption("-m") == "not slow":
             item.add_marker(skip_slow)
-        
+
         # Skip API tests if no real credentials
         if "api" in item.keywords:
-            has_credentials = any([
-                os.getenv('CENSUS_API_KEY'),
-                os.getenv('FRED_API_KEY'),
-                os.getenv('BLS_API_KEY'),
-                os.getenv('BEA_API_KEY'),
-            ])
+            has_credentials = any(
+                [
+                    os.getenv("CENSUS_API_KEY"),
+                    os.getenv("FRED_API_KEY"),
+                    os.getenv("BLS_API_KEY"),
+                    os.getenv("BEA_API_KEY"),
+                ]
+            )
             if not has_credentials and not item.get_closest_marker("unit"):
                 item.add_marker(skip_api)
