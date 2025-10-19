@@ -1,0 +1,120 @@
+# ----------------------------------------------------------------------
+# © 2025 KR-Labs. All rights reserved.
+# KR-Labs™ is a trademark of Quipu Research Labs, LLC,
+# a subsidiary of Sudiata Giddasira, Inc.
+# ----------------------------------------------------------------------
+# SPDX-License-Identifier: MIT
+
+name: Security & IP Protection
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  copyright-check:
+    name: Verify Copyright Headers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Check copyright headers
+        run: |
+          python scripts/security/verify_copyright_headers.py --path .
+  
+  trademark-check:
+    name: Verify Trademark Notices
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Check trademark notices
+        run: |
+          python scripts/security/check_trademarks.py --path .
+  
+  secret-scanning:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for gitleaks
+      
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          config-path: .gitleaks.toml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  license-compliance:
+    name: License Compliance Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Ruby (for Licensee)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+      
+      - name: Install Licensee
+        run: gem install licensee
+      
+      - name: Run Licensee check
+        run: |
+          licensee detect --json . > licensee-report.json
+          cat licensee-report.json
+          
+          # Check if license is detected
+          if licensee detect . | grep -q "License: None"; then
+            echo "❌ No license detected!"
+            exit 1
+          fi
+          
+          # Check for GPL licenses (not allowed in our stack)
+          if licensee detect . | grep -qi "gpl"; then
+            echo "❌ GPL license detected - not compatible with our licensing strategy!"
+            exit 1
+          fi
+          
+          echo "✅ License compliance check passed"
+      
+      - name: Upload Licensee report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: licensee-report
+          path: licensee-report.json
+      
+      - name: Run FOSSA scan (if configured)
+        uses: fossas/fossa-action@v1
+        if: secrets.FOSSA_API_KEY != ''
+        with:
+          api-key: ${{ secrets.FOSSA_API_KEY }}
+        continue-on-error: true
+  
+  dependency-review:
+    name: Dependency Security Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate

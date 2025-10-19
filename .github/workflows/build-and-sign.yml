@@ -1,0 +1,92 @@
+# ----------------------------------------------------------------------
+# © 2025 KR-Labs. All rights reserved.
+# KR-Labs™ is a trademark of Quipu Research Labs, LLC,
+# a subsidiary of Sudiata Giddasira, Inc.
+# ----------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
+name: Build & Sign Package
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+      
+      - name: Inject build watermark
+        run: |
+          python scripts/security/inject_watermark.py \
+            --build-id "${{ github.run_id }}" \
+            --commit-sha "${{ github.sha }}" \
+            --repo "${{ github.repository }}" \
+            --compute-checksum
+      
+      - name: Build package
+        run: python -m build
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+  
+  sign-and-publish:
+    name: Sign & Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    environment: pypi
+    permissions:
+      id-token: write  # Required for trusted publishing
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      
+      - name: Import GPG key
+        run: |
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --import
+          gpg --list-secret-keys
+      
+      - name: Sign packages with GPG
+        run: |
+          for file in dist/*; do
+            gpg --detach-sign --armor "$file"
+          done
+      
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          skip-existing: true
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+            dist/*.asc
+          generate_release_notes: true
