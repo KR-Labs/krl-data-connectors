@@ -23,6 +23,7 @@ from .lehd_connector import LEHDConnector
 from .cbp_connector import CountyBusinessPatternsConnector
 from .bls_connector import BLSConnector
 from .bea_connector import BEAConnector
+from .health import CDCWonderConnector
 from .utils.config import find_config_file, load_api_key_from_config
 
 __all__ = [
@@ -36,6 +37,7 @@ __all__ = [
     "CountyBusinessPatternsConnector",
     "BLSConnector",
     "BEAConnector",
+    "CDCWonderConnector",
     "find_config_file",
     "load_api_key_from_config",
 ]
