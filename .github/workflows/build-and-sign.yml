@@ -19,6 +19,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: krl-data-connectors
+      
+      - name: Checkout krl-open-core
+        uses: actions/checkout@v4
+        with:
+          repository: KR-Labs/krl-open-core
+          path: krl-open-core
       
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -28,7 +36,9 @@ jobs:
       - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install -e ../krl-open-core
           pip install build twine
+        working-directory: krl-data-connectors
       
       - name: Inject build watermark
         run: |
@@ -37,15 +47,17 @@ jobs:
             --commit-sha "${{ github.sha }}" \
             --repo "${{ github.repository }}" \
             --compute-checksum
+        working-directory: krl-data-connectors
       
       - name: Build package
         run: python -m build
+        working-directory: krl-data-connectors
       
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: dist/
+          path: krl-data-connectors/dist/
   
   sign-and-publish:
     name: Sign & Publish to PyPI

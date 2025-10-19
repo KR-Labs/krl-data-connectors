@@ -23,6 +23,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        path: krl-data-connectors
+    
+    - name: Checkout krl-open-core
+      uses: actions/checkout@v4
+      with:
+        repository: KR-Labs/krl-open-core
+        path: krl-open-core
     
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
@@ -32,16 +40,19 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install -e ../krl-open-core
         pip install -e ".[dev,test]"
+      working-directory: krl-data-connectors
     
     - name: Run tests with coverage
       run: |
         pytest --cov=src --cov-report=xml --cov-report=term-missing
+      working-directory: krl-data-connectors
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        file: ./coverage.xml
+        file: ./krl-data-connectors/coverage.xml
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
