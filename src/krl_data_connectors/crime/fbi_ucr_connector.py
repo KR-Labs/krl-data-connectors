@@ -239,11 +239,15 @@ class FBIUCRConnector(BaseConnector):
         
         # Construct API endpoint
         endpoint = f"{self.base_url}/crime/state/{state}"
-        params = {'year': year}
+        params: Dict[str, Union[int, str]] = {'year': year}
+        
+        # Add API key if available (required by FBI CDE API)
+        if self.api_key:
+            params['api_key'] = self.api_key
         
         self.logger.info(
             "Fetching crime data via API",
-            extra={"state": state, "year": year}
+            extra={"state": state, "year": year, "has_api_key": bool(self.api_key)}
         )
         
         try:

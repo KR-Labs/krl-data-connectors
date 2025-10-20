@@ -256,10 +256,29 @@ class HUDFMRConnector(BaseConnector):
         
         data = response.json()
         
-        if 'data' in data:
+        # Handle nested structure from state endpoint
+        if 'data' in data and isinstance(data['data'], dict):
+            # Combine metroareas and counties into single DataFrame
+            records = []
+            if 'metroareas' in data['data']:
+                records.extend(data['data']['metroareas'])
+            if 'counties' in data['data']:
+                records.extend(data['data']['counties'])
+            df = pd.DataFrame(records)
+        elif 'data' in data:
             df = pd.DataFrame(data['data'])
         else:
             df = pd.DataFrame(data)
+        
+        # Standardize column names for FMR values
+        column_mapping = {
+            'Efficiency': 'fmr_0br',
+            'One-Bedroom': 'fmr_1br',
+            'Two-Bedroom': 'fmr_2br',
+            'Three-Bedroom': 'fmr_3br',
+            'Four-Bedroom': 'fmr_4br'
+        }
+        df = df.rename(columns=column_mapping)
         
         # Cache result
         self.cache.set(cache_key, df.to_dict('records'))
