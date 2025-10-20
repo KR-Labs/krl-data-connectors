@@ -23,7 +23,7 @@ from .cbp_connector import CountyBusinessPatternsConnector
 from .census_connector import CensusConnector
 from .environment import EJScreenConnector
 from .fred_connector import FREDConnector
-from .health import CDCWonderConnector, HRSAConnector
+from .health import CDCWonderConnector, CountyHealthRankingsConnector, HRSAConnector
 from .lehd_connector import LEHDConnector
 from .utils.config import find_config_file, load_api_key_from_config
 
@@ -39,6 +39,7 @@ __all__ = [
     "BLSConnector",
     "BEAConnector",
     "CDCWonderConnector",
+    "CountyHealthRankingsConnector",
     "HRSAConnector",
     "EJScreenConnector",
     "find_config_file",
