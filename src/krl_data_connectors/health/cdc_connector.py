@@ -8,7 +8,15 @@ CDC WONDER (Wide-ranging Online Data for Epidemiologic Research) provides access
 - Cancer statistics
 - Vaccine adverse events
 
-API Documentation: https://wonder.cdc.gov/controller/datarequest/
+⚠️ **CRITICAL LIMITATION**: CDC WONDER does NOT provide a functional programmatic API.
+   - The API endpoint (https://wonder.cdc.gov/controller/datarequest/) returns HTTP 500 errors
+   - API documentation pages return 404 errors
+   - CDC redirects API requests to web form interface
+   - This connector demonstrates the INTENDED interface design for when/if API becomes available
+   - For actual data access, use CDC WONDER web interface: https://wonder.cdc.gov/
+
+**Status**: BETA - Implementation complete but CDC API is non-functional
+**Recommendation**: Use CDC WONDER web interface for reliable data access
 
 Copyright (c) 2024-2025 KR-Labs Foundation
 Licensed under the Apache License, Version 2.0
@@ -31,15 +39,22 @@ class CDCWonderConnector(BaseConnector):
     """
     Connector for CDC WONDER API.
 
+    ⚠️ **CRITICAL**: CDC WONDER does NOT have a functional programmatic API.
+    This connector implements the intended interface but will fail with HTTP 500 errors
+    because CDC's servers do not support automated API access.
+
+    **Current Status**: BETA - Implementation complete, but CDC API is non-functional
+    **Recommendation**: Use CDC WONDER web interface (https://wonder.cdc.gov/) for actual data access
+
     CDC WONDER provides access to public health data including mortality,
-    natality, cancer, and population statistics. No API key required.
+    natality, cancer, and population statistics. No API key required (when/if API works).
 
     **Data Domains:**
     - D04: Health (primary)
     - D25: Food & Nutrition (related)
     - D28: Mental Health (related)
 
-    **Key Features:**
+    **Key Features (when API works):**
     - No authentication required
     - XML-based API requests
     - Supports mortality, natality, population data
@@ -48,11 +63,16 @@ class CDCWonderConnector(BaseConnector):
     Example:
         >>> from krl_data_connectors.health import CDCWonderConnector
         >>> cdc = CDCWonderConnector()
-        >>> mortality = cdc.get_mortality_data(
-        ...     years=[2020, 2021],
-        ...     geo_level='state',
-        ...     states=['CA', 'NY']
-        ... )
+        >>> # Note: This will likely fail with HTTP 500 error
+        >>> try:
+        ...     mortality = cdc.get_mortality_data(
+        ...         years=[2020, 2021],
+        ...         geo_level='state',
+        ...         states=['CA', 'NY']
+        ...     )
+        ... except requests.HTTPError as e:
+        ...     print(f"CDC API unavailable: {e}")
+        ...     # Use CDC WONDER web interface instead
     """
 
     BASE_URL = "https://wonder.cdc.gov/controller/datarequest"

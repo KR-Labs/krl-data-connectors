@@ -365,6 +365,20 @@ fred = FREDConnector(api_key=config.get("fred.api_key"))
 
 ### 🚧 In Development
 
+#### CDC WONDER Connector
+**Status:** ⚠️ BETA - API Non-Functional | **Tests:** 13 passing | **Coverage:** 74%
+
+- Mortality data (underlying cause of death)
+- Natality data (birth statistics)
+- Population estimates
+- **CRITICAL ISSUE:** CDC WONDER does NOT provide a functional programmatic API
+- The API endpoint returns HTTP 500 errors
+- API documentation pages return 404 errors
+- CDC redirects API requests to web form interface
+- **Recommendation:** Use CDC WONDER web interface (https://wonder.cdc.gov/)
+- **Connector Status:** Implementation complete but unusable due to CDC API limitations
+- **API:** CDC WONDER (free, no key required, BUT NON-FUNCTIONAL)
+
 #### World Bank Connector
 **Status:** 🔄 Planned | **Tests:** Not started
 
