@@ -19,7 +19,7 @@ Tests cover:
 """
 
 from datetime import datetime
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import patch
 
 import pandas as pd
 import pytest
@@ -117,7 +117,7 @@ class TestBLSSeriesRetrieval:
         mock_request.return_value = mock_bls_response
 
         connector = BLSConnector(api_key="test_key")
-        df = connector.get_series("LNS14000000")
+        connector.get_series("LNS14000000")
 
         # Should default to last 10 years
         mock_request.assert_called_once()
@@ -238,7 +238,7 @@ class TestBLSMultiSeriesRetrieval:
         connector = BLSConnector(api_key="test_key")
 
         # Should accept up to 50 series
-        valid_series = ["SERIES" + str(i) for i in range(50)]
+        ["SERIES" + str(i) for i in range(50)]
         # Don't actually call, just verify validation
 
         # Should reject >50 series
@@ -574,7 +574,7 @@ class TestBLSLogging:
         connector.logger.propagate = True
 
         with caplog.at_level("INFO", logger="BLSConnector"):
-            df = connector.get_series("LNS14000000")
+            connector.get_series("LNS14000000")
 
         assert len(caplog.records) > 0
 

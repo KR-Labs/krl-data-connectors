@@ -214,7 +214,7 @@ class TestCDCWonderConnector:
 
             df = cdc_connector.get_mortality_data(years=[2019, 2020, 2021])
             call_args = mock_request.call_args
-            parameters = call_args[0][1]
+            call_args[0][1]
 
             # Verify request was made
             assert mock_request.called
