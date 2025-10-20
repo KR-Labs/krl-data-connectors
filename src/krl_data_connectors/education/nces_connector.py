@@ -337,17 +337,26 @@ class NCESConnector(BaseConnector):
         if cached is not None:
             return pd.DataFrame(cached)
         
-        endpoint = f"{self.base_url}/schools/ccd/enrollment/{year}"
+        # Use directory endpoint instead - enrollment is already included
+        endpoint = f"{self.base_url}/schools/ccd/directory/{year}"
         params = {'fips': self._get_state_fips(state)}
         
-        self.logger.info("Fetching enrollment data", extra={"state": state, "year": year})
+        self.logger.info("Fetching enrollment data from directory", extra={"state": state, "year": year})
         
         try:
             response = requests.get(endpoint, params=params, timeout=self.timeout)
             response.raise_for_status()
             
             data = response.json()
-            df = pd.DataFrame(data.get('results', data))
+            results = data.get('results', [])
+            df = pd.DataFrame(results)
+            
+            # Extract enrollment columns
+            enrollment_cols = ['ncessch', 'school_name', 'leaid', 'lea_name']
+            enrollment_cols += [col for col in df.columns if 'enrollment' in col.lower()]
+            
+            if enrollment_cols and all(col in df.columns or col in ['ncessch', 'school_name', 'leaid', 'lea_name'] for col in enrollment_cols):
+                df = df[[col for col in enrollment_cols if col in df.columns]]
             
             self.cache.set(cache_key, df.to_dict('records'))
             
@@ -424,8 +433,9 @@ class NCESConnector(BaseConnector):
         if cached is not None:
             return pd.DataFrame(cached)
         
-        # Graduation rates endpoint
-        endpoint = f"{self.base_url}/school-districts/ccd/finance/{year}"
+        # Note: Graduation rates from EDFacts have limited recent years
+        # Try EDFacts school-level graduation rates
+        endpoint = f"{self.base_url}/schools/edfacts/grad-rates/{year}"
         params = {'fips': self._get_state_fips(state)}
         
         self.logger.info("Fetching graduation rates", extra={"state": state, "year": year})
@@ -435,7 +445,7 @@ class NCESConnector(BaseConnector):
             response.raise_for_status()
             
             data = response.json()
-            df = pd.DataFrame(data.get('results', data))
+            df = pd.DataFrame(data.get('results', []))
             
             self.cache.set(cache_key, df.to_dict('records'))
             
