@@ -127,6 +127,48 @@ class FBIUCRConnector(BaseConnector):
         """FBI UCR API does not require an API key."""
         return None
 
+    def connect(self) -> None:
+        """
+        FBI UCR connector does not require explicit connection.
+        
+        The Crime Data Explorer API is publicly accessible without
+        authentication or session management.
+        """
+        pass
+
+    def fetch(self, **kwargs: Any) -> pd.DataFrame:
+        """
+        Fetch FBI UCR crime data.
+        
+        Args:
+            state: State abbreviation (e.g., 'RI')
+            year: Year of data
+            data_type: Type of data ('state', 'violent', 'property')
+            
+        Returns:
+            DataFrame with requested crime data
+            
+        Example:
+            >>> data = connector.fetch(state='RI', year=2023, data_type='state')
+        """
+        state = kwargs.get('state')
+        year = kwargs.get('year')
+        data_type = kwargs.get('data_type', 'state')
+        
+        if not state or not year:
+            raise ValueError("Both 'state' and 'year' are required")
+        
+        if data_type == 'state':
+            return self.get_state_crime_data(state, year)
+        elif data_type == 'violent':
+            state_data = self.get_state_crime_data(state, year)
+            return self.get_violent_crime(state_data)
+        elif data_type == 'property':
+            state_data = self.get_state_crime_data(state, year)
+            return self.get_property_crime(state_data)
+        else:
+            raise ValueError(f"Unknown data_type: {data_type}. Use 'state', 'violent', or 'property'.")
+
     def load_crime_data(self, filepath: Union[str, Path]) -> pd.DataFrame:
         """
         Load crime data from downloaded CSV file.

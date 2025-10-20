@@ -126,6 +126,41 @@ class HUDFMRConnector(BaseConnector):
         """Get HUD API key from configuration."""
         return self.config.get("HUD_API_KEY")
 
+    def connect(self) -> None:
+        """
+        HUD connector does not require explicit connection.
+        
+        The HUD API is stateless and does not require session setup.
+        """
+        pass
+
+    def fetch(self, **kwargs: Any) -> pd.DataFrame:
+        """
+        Fetch HUD Fair Market Rent data.
+        
+        Args:
+            state: State abbreviation (e.g., 'RI')
+            year: Fiscal year
+            data_type: Type of data ('fmr' only for now)
+            
+        Returns:
+            DataFrame with requested data
+            
+        Example:
+            >>> data = connector.fetch(state='RI', year=2025, data_type='fmr')
+        """
+        state = kwargs.get('state')
+        year = kwargs.get('year')
+        data_type = kwargs.get('data_type', 'fmr')
+        
+        if not state or not year:
+            raise ValueError("Both 'state' and 'year' are required")
+        
+        if data_type == 'fmr':
+            return self.get_state_fmrs(state, year)
+        else:
+            raise ValueError(f"Unknown data_type: {data_type}. Use 'fmr'.")
+
     def load_fmr_data(self, filepath: Union[str, Path]) -> pd.DataFrame:
         """
         Load FMR data from downloaded CSV/Excel file.

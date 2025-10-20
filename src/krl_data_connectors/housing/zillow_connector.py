@@ -125,6 +125,53 @@ class ZillowConnector(BaseConnector):
         """Zillow Research Data does not require an API key."""
         return None
 
+    def connect(self) -> None:
+        """
+        Zillow connector does not require explicit connection.
+        
+        Zillow Research Data is accessed via downloadable CSV files,
+        not a live API connection.
+        """
+        pass
+
+    def fetch(self, **kwargs: Any) -> pd.DataFrame:
+        """
+        Fetch Zillow housing data.
+        
+        Args:
+            filepath: Path to Zillow CSV file
+            data_type: Type of data ('zhvi', 'zri', 'inventory', 'sales')
+            state: Optional state filter
+            
+        Returns:
+            DataFrame with requested data
+            
+        Example:
+            >>> data = connector.fetch(filepath='ZHVI.csv', data_type='zhvi', state='RI')
+        """
+        filepath = kwargs.get('filepath')
+        data_type = kwargs.get('data_type', 'zhvi')
+        state = kwargs.get('state')
+        
+        if not filepath:
+            raise ValueError("'filepath' is required")
+        
+        if data_type == 'zhvi':
+            df = self.load_zhvi_data(filepath)
+        elif data_type == 'zri':
+            df = self.load_zri_data(filepath)
+        elif data_type == 'inventory':
+            df = self.load_inventory_data(filepath)
+        elif data_type == 'sales':
+            df = self.load_sales_data(filepath)
+        else:
+            raise ValueError(f"Unknown data_type: {data_type}")
+        
+        if state:
+            df = self.get_state_data(df, state)
+        
+        return df
+
     def load_zhvi_data(self, filepath: Union[str, Path]) -> pd.DataFrame:
         """
         Load ZHVI (Zillow Home Value Index) data from CSV file.

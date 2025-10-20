@@ -139,6 +139,48 @@ class NCESConnector(BaseConnector):
         """NCES/Urban API does not require an API key."""
         return None
 
+    def connect(self) -> None:
+        """
+        NCES connector does not require explicit connection.
+        
+        The Urban Institute Education Data API is publicly accessible
+        without authentication.
+        """
+        pass
+
+    def fetch(self, **kwargs: Any) -> pd.DataFrame:
+        """
+        Fetch education data from NCES/Urban API.
+        
+        Args:
+            state: State abbreviation (e.g., 'RI')
+            year: School year
+            data_type: Type of data ('schools', 'enrollment', 'finance', 'graduation')
+            
+        Returns:
+            DataFrame with requested data
+            
+        Example:
+            >>> data = connector.fetch(state='RI', year=2023, data_type='schools')
+        """
+        state = kwargs.get('state')
+        year = kwargs.get('year')
+        data_type = kwargs.get('data_type', 'schools')
+        
+        if not state or not year:
+            raise ValueError("Both 'state' and 'year' are required")
+        
+        if data_type == 'schools':
+            return self.get_state_schools(state, year)
+        elif data_type == 'enrollment':
+            return self.get_enrollment_data(state, year)
+        elif data_type == 'finance':
+            return self.get_district_finance(state, year)
+        elif data_type == 'graduation':
+            return self.get_graduation_rates(state, year)
+        else:
+            raise ValueError(f"Unknown data_type: {data_type}")
+
     def load_school_data(self, filepath: Union[str, Path]) -> pd.DataFrame:
         """
         Load school data from downloaded CSV file.
