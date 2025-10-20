@@ -25,7 +25,7 @@ autodoc_mock_imports = []
 
 # -- Project information -----------------------------------------------------
 
-project = "KR-Labs"  # Update per repository
+project = "KRL Data Connectors"
 copyright = f"{datetime.now().year}, Sudiata Giddasira, Inc. d/b/a Quipu Research Labs, LLC d/b/a KR-Labs™"
 author = "KR-Labs Team"
 
@@ -145,7 +145,7 @@ html_sidebars = {
 html_context = {
     "display_github": True,
     "github_user": "KR-Labs",
-    "github_repo": "krl-repository-name",  # Update per repository
+    "github_repo": "krl-data-connectors",
     "github_version": "main",
     "conf_py_path": "/docs/",
 }

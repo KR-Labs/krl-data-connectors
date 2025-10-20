@@ -58,6 +58,32 @@ Example usage with FRED connector:
 For more examples and detailed documentation, visit the 
 `GitHub repository <https://github.com/KR-Labs/krl-data-connectors>`_.
 
+Table of Contents
+=================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Documentation
+
+   installation
+   quickstart
+   api/index
+
+Installation
+------------
+
+See :doc:`installation` for detailed installation instructions.
+
+Quick Start
+-----------
+
+See :doc:`quickstart` for getting started guides.
+
+API Reference
+-------------
+
+Complete API documentation for all connectors: :doc:`api/index`
+
 Indices and tables
 ==================
 

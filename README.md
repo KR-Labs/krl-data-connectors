@@ -380,7 +380,7 @@ KRL Data Connectors deliver reliable, scalable integration with the following da
 
 - **CDC WONDER:** Mortality and natality data (API non-functional; web interface recommended).
 - **USDA Food Environment Atlas:** Food access, insecurity, and local food systems.
-- **OECD, World Bank, College Scorecard, IPEDS, Superfund Sites, and more:** See [REMAINING_CONNECTORS_ROADMAP.md](REMAINING_CONNECTORS_ROADMAP.md) for the full roadmap.
+- **OECD, World Bank, College Scorecard, IPEDS, Superfund Sites, and more:** See [ROADMAP.md](ROADMAP.md) for the full development roadmap.
 
 ---
 
@@ -389,7 +389,7 @@ KRL Data Connectors deliver reliable, scalable integration with the following da
 KRL Data Connectors are developed according to a structured roadmap, targeting 40 connectors across all major institutional domains. Connectors are prioritized by institutional demand, API availability, and domain coverage.
 
 **Quality controls:**
-- Minimum 80% test coverage with comprehensive unit tests
+- Minimum 90% test coverage with comprehensive unit tests
 - Full type hints and validation on all public methods
 - Robust error handling and informative error messages
 - Intelligent, configurable caching
@@ -397,7 +397,7 @@ KRL Data Connectors are developed according to a structured roadmap, targeting 4
 - Docstrings, usage examples, and quickstart notebooks
 - Secure API key management and input validation
 
-For implementation schedules and API specifications, see [REMAINING_CONNECTORS_ROADMAP.md](REMAINING_CONNECTORS_ROADMAP.md).
+For implementation schedules and API specifications, see [ROADMAP.md](ROADMAP.md).
 
 ---
 
