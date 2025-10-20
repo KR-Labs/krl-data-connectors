@@ -18,7 +18,7 @@ Data Source: https://www.bea.gov/
 API Documentation: https://apps.bea.gov/api/signup/
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import pandas as pd
 

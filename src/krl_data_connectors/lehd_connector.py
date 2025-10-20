@@ -15,7 +15,7 @@ Data Source: https://lehd.ces.census.gov/data/
 API Documentation: https://lehd.ces.census.gov/data/lodes/LODES7/
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 
 import pandas as pd
 

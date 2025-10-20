@@ -97,7 +97,6 @@ class BaseConnector(ABC):
         Returns:
             API key or None if not found
         """
-        pass
 
     def _init_session(self) -> requests.Session:
         """
@@ -220,7 +219,6 @@ class BaseConnector(ABC):
         Should be implemented by subclasses to perform any necessary
         connection setup or authentication.
         """
-        pass
 
     @abstractmethod
     def fetch(self, **kwargs: Any) -> Any:
@@ -235,7 +233,6 @@ class BaseConnector(ABC):
         Returns:
             Fetched data (format depends on connector)
         """
-        pass
 
     def disconnect(self) -> None:
         """
