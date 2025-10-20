@@ -8,5 +8,6 @@ SPDX-License-Identifier: Apache-2.0
 """
 
 from .ejscreen_connector import EJScreenConnector
+from .air_quality_connector import EPAAirQualityConnector
 
-__all__ = ["EJScreenConnector"]
+__all__ = ["EJScreenConnector", "EPAAirQualityConnector"]
