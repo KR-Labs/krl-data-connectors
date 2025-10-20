@@ -1,0 +1,305 @@
+# ----------------------------------------------------------------------
+# © 2025 KR-Labs. All rights reserved.
+# KR-Labs™ is a trademark of Quipu Research Labs, LLC,
+# a subsidiary of Sudiata Giddasira, Inc.
+# ----------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
+"""
+Unit tests for Zillow connector.
+
+Tests the ZillowConnector for Zillow Research Data access.
+"""
+
+import tempfile
+from pathlib import Path
+from unittest.mock import Mock, patch
+
+import pandas as pd
+import pytest
+
+from krl_data_connectors.housing import ZillowConnector
+
+
+@pytest.fixture
+def zillow_connector():
+    """Create a ZillowConnector instance for testing."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        connector = ZillowConnector(cache_dir=tmpdir)
+        yield connector
+
+
+@pytest.fixture
+def sample_zhvi_data():
+    """Create sample ZHVI data for testing."""
+    return pd.DataFrame({
+        'RegionID': [1, 2, 3],
+        'RegionName': ['New York', 'Los Angeles', 'Chicago'],
+        'State': ['NY', 'CA', 'IL'],
+        'Metro': ['New York-Newark-Jersey City', 'Los Angeles-Long Beach-Anaheim', 'Chicago-Naperville-Elgin'],
+        'CountyName': ['New York County', 'Los Angeles County', 'Cook County'],
+        '2023-01-31': [500000, 750000, 300000],
+        '2023-02-28': [505000, 755000, 302000],
+        '2023-03-31': [510000, 760000, 305000],
+    })
+
+
+@pytest.fixture
+def sample_zri_data():
+    """Create sample ZRI data for testing."""
+    return pd.DataFrame({
+        'RegionID': [1, 2, 3],
+        'RegionName': ['New York', 'Los Angeles', 'Chicago'],
+        'State': ['NY', 'CA', 'IL'],
+        'Metro': ['New York-Newark-Jersey City', 'Los Angeles-Long Beach-Anaheim', 'Chicago-Naperville-Elgin'],
+        '2023-01-31': [2500, 3000, 1800],
+        '2023-02-28': [2520, 3020, 1820],
+        '2023-03-31': [2540, 3040, 1840],
+    })
+
+
+class TestZillowConnectorInit:
+    """Test ZillowConnector initialization."""
+
+    def test_init_default(self):
+        """Test default initialization."""
+        connector = ZillowConnector()
+        assert connector is not None
+        assert connector.cache_ttl == 2592000  # 30 days
+
+    def test_init_custom_cache(self):
+        """Test initialization with custom cache settings."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            connector = ZillowConnector(cache_dir=tmpdir, cache_ttl=3600)
+            assert connector.cache_ttl == 3600
+
+
+class TestDataLoading:
+    """Test data loading methods."""
+
+    def test_load_zhvi_data(self, zillow_connector, sample_zhvi_data, tmp_path):
+        """Test loading ZHVI data from file."""
+        # Create temporary CSV
+        filepath = tmp_path / "zhvi.csv"
+        sample_zhvi_data.to_csv(filepath, index=False)
+        
+        # Load data
+        data = zillow_connector.load_zhvi_data(filepath)
+        
+        assert isinstance(data, pd.DataFrame)
+        assert len(data) == 3
+        assert 'RegionName' in data.columns
+        assert 'State' in data.columns
+
+    def test_load_zri_data(self, zillow_connector, sample_zri_data, tmp_path):
+        """Test loading ZRI data from file."""
+        filepath = tmp_path / "zri.csv"
+        sample_zri_data.to_csv(filepath, index=False)
+        
+        data = zillow_connector.load_zri_data(filepath)
+        
+        assert isinstance(data, pd.DataFrame)
+        assert len(data) == 3
+        assert '2023-01-31' in data.columns
+
+    def test_load_inventory_data(self, zillow_connector, tmp_path):
+        """Test loading inventory data."""
+        inventory_data = pd.DataFrame({
+            'RegionID': [1, 2],
+            'RegionName': ['Boston', 'Seattle'],
+            'State': ['MA', 'WA'],
+            '2023-01-31': [500, 600],
+        })
+        
+        filepath = tmp_path / "inventory.csv"
+        inventory_data.to_csv(filepath, index=False)
+        
+        data = zillow_connector.load_inventory_data(filepath)
+        
+        assert isinstance(data, pd.DataFrame)
+        assert len(data) == 2
+
+    def test_load_sales_data(self, zillow_connector, tmp_path):
+        """Test loading sales data."""
+        sales_data = pd.DataFrame({
+            'RegionID': [1, 2],
+            'RegionName': ['Boston', 'Seattle'],
+            'State': ['MA', 'WA'],
+            '2023-01-31': [450000, 550000],
+        })
+        
+        filepath = tmp_path / "sales.csv"
+        sales_data.to_csv(filepath, index=False)
+        
+        data = zillow_connector.load_sales_data(filepath)
+        
+        assert isinstance(data, pd.DataFrame)
+        assert len(data) == 2
+
+
+class TestGeographicFiltering:
+    """Test geographic filtering methods."""
+
+    def test_get_state_data_single(self, zillow_connector, sample_zhvi_data):
+        """Test filtering by single state."""
+        result = zillow_connector.get_state_data(sample_zhvi_data, 'NY')
+        
+        assert len(result) == 1
+        assert result.iloc[0]['State'] == 'NY'
+        assert result.iloc[0]['RegionName'] == 'New York'
+
+    def test_get_state_data_multiple(self, zillow_connector, sample_zhvi_data):
+        """Test filtering by multiple states."""
+        result = zillow_connector.get_state_data(sample_zhvi_data, ['NY', 'CA'])
+        
+        assert len(result) == 2
+        assert set(result['State'].unique()) == {'NY', 'CA'}
+
+    def test_get_state_data_case_insensitive(self, zillow_connector, sample_zhvi_data):
+        """Test case-insensitive state filtering."""
+        result = zillow_connector.get_state_data(sample_zhvi_data, 'ny')
+        
+        assert len(result) == 1
+        assert result.iloc[0]['State'] == 'NY'
+
+    def test_get_metro_data(self, zillow_connector, sample_zhvi_data):
+        """Test filtering by metro area."""
+        result = zillow_connector.get_metro_data(
+            sample_zhvi_data,
+            'Los Angeles-Long Beach-Anaheim'
+        )
+        
+        assert len(result) == 1
+        assert result.iloc[0]['RegionName'] == 'Los Angeles'
+
+    def test_get_county_data(self, zillow_connector, sample_zhvi_data):
+        """Test filtering by county."""
+        result = zillow_connector.get_county_data(
+            sample_zhvi_data,
+            'Cook County'
+        )
+        
+        assert len(result) == 1
+        assert result.iloc[0]['RegionName'] == 'Chicago'
+
+    def test_get_zip_data(self, zillow_connector):
+        """Test filtering by ZIP code."""
+        zip_data = pd.DataFrame({
+            'RegionID': [1, 2, 3],
+            'RegionName': ['02903', '02906', '90210'],
+            'State': ['RI', 'RI', 'CA'],
+            '2023-01-31': [300000, 320000, 850000],
+        })
+        
+        result = zillow_connector.get_zip_data(zip_data, ['02903', '02906'])
+        
+        assert len(result) == 2
+        assert set(result['RegionName'].values) == {'02903', '02906'}
+
+
+class TestTimeSeriesOperations:
+    """Test time series conversion and analysis."""
+
+    def test_get_time_series(self, zillow_connector, sample_zhvi_data):
+        """Test converting wide format to long format time series."""
+        result = zillow_connector.get_time_series(
+            sample_zhvi_data,
+            value_name='ZHVI'
+        )
+        
+        assert 'date' in result.columns
+        assert 'ZHVI' in result.columns
+        assert len(result) == 9  # 3 regions × 3 months
+
+    def test_get_latest_values(self, zillow_connector, sample_zhvi_data):
+        """Test getting most recent N periods."""
+        result = zillow_connector.get_latest_values(sample_zhvi_data, n_periods=2)
+        
+        assert len(result.columns) > 2  # Region cols + 2 date cols
+        date_cols = [col for col in result.columns if '-' in str(col)]
+        assert len(date_cols) == 2
+
+
+class TestGrowthCalculations:
+    """Test growth rate calculations."""
+
+    def test_calculate_yoy_growth(self, zillow_connector):
+        """Test year-over-year growth calculation."""
+        data = pd.DataFrame({
+            'RegionName': ['Boston', 'Boston'],
+            'State': ['MA', 'MA'],
+            '2022-01-31': [400000, 400000],
+            '2023-01-31': [420000, 420000],
+        })
+        
+        result = zillow_connector.calculate_yoy_growth(data, '2023-01-31')
+        
+        assert 'yoy_growth_pct' in result.columns
+        assert result.iloc[0]['yoy_growth_pct'] == pytest.approx(5.0, rel=0.01)
+
+    def test_calculate_mom_growth(self, zillow_connector, sample_zhvi_data):
+        """Test month-over-month growth calculation."""
+        result = zillow_connector.calculate_mom_growth(sample_zhvi_data, '2023-03-31')
+        
+        assert 'mom_growth_pct' in result.columns
+        # NY: (510000 - 505000) / 505000 * 100 ≈ 0.99%
+        assert abs(result.iloc[0]['mom_growth_pct'] - 0.99) < 0.1
+
+
+class TestStatisticalAnalysis:
+    """Test statistical analysis methods."""
+
+    def test_calculate_summary_statistics(self, zillow_connector, sample_zhvi_data):
+        """Test summary statistics calculation."""
+        result = zillow_connector.calculate_summary_statistics(sample_zhvi_data)
+        
+        assert 'mean' in result.columns
+        assert 'median' in result.columns
+        assert 'std' in result.columns
+        assert 'min' in result.columns
+        assert 'max' in result.columns
+        assert len(result) == 3  # 3 regions
+
+
+class TestExport:
+    """Test data export functionality."""
+
+    def test_export_to_csv(self, zillow_connector, sample_zhvi_data, tmp_path):
+        """Test exporting data to CSV."""
+        output_file = tmp_path / "export.csv"
+        
+        zillow_connector.export_to_csv(sample_zhvi_data, output_file)
+        
+        assert output_file.exists()
+        
+        # Verify exported data
+        exported = pd.read_csv(output_file)
+        assert len(exported) == len(sample_zhvi_data)
+        assert list(exported.columns) == list(sample_zhvi_data.columns)
+
+
+class TestEdgeCases:
+    """Test edge cases and error handling."""
+
+    def test_empty_dataframe(self, zillow_connector):
+        """Test handling empty DataFrame."""
+        empty_df = pd.DataFrame()
+        result = zillow_connector.get_state_data(empty_df, 'NY')
+        
+        assert len(result) == 0
+
+    def test_missing_state_column(self, zillow_connector):
+        """Test handling missing State column."""
+        data = pd.DataFrame({
+            'RegionName': ['Boston'],
+            '2023-01-31': [400000],
+        })
+        
+        result = zillow_connector.get_state_data(data, 'MA')
+        assert len(result) == 0
+
+    def test_nonexistent_state(self, zillow_connector, sample_zhvi_data):
+        """Test filtering by nonexistent state."""
+        result = zillow_connector.get_state_data(sample_zhvi_data, 'ZZ')
+        
+        assert len(result) == 0

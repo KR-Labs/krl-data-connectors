@@ -4,7 +4,7 @@
 [![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/downloads/)
 [![Tests](https://github.com/KR-Labs/krl-data-connectors/workflows/tests/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions)
 [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://docs.krlabs.dev/data-connectors)
-[![Connectors](https://img.shields.io/badge/connectors-12%20live%20%7C%2028%20planned-blue)](https://github.com/KR-Labs/krl-data-connectors)
+[![Connectors](https://img.shields.io/badge/connectors-16%20live%20%7C%2024%20planned-blue)](https://github.com/KR-Labs/krl-data-connectors)
 [![Coverage](https://img.shields.io/badge/coverage-90%25%2B-green)](https://github.com/KR-Labs/krl-data-connectors)
 
 KRL Data Connectors deliver robust, standardized interfaces for accessing economic, demographic, health, environmental, and social data. Designed for institutional reliability, these connectors are built for reproducibility, scalability, and institutional trust.
@@ -28,10 +28,9 @@ KRL Data Connectors offer a unified, type-safe interface to data providers spann
 - **EPA Air Quality / AirNow:** Real-time AQI, forecasts, and data from 2,500+ monitoring stations. **NEW**
 - **CDC WONDER:** Mortality, natality, and population data (⚠️ API non-functional).
 
-**Planned Data Domains (28 Additional Connectors):**
-- **Housing & Urban Development:** Zillow housing market data, HUD Fair Market Rents, EPA Superfund sites
-- **Crime & Public Safety:** FBI Uniform Crime Reporting, gun violence incidents
-- **Education:** NCES school demographics, College Scorecard, IPEDS higher education data, Stanford Education Data Archive
+**Planned Data Domains (24 Additional Connectors):**
+- **Housing & Urban Development:** EPA Superfund sites (Zillow, HUD FMR now in production)
+- **Education:** College Scorecard, IPEDS higher education data, Stanford Education Data Archive, EdGap equity metrics
 - **Food Security & Agriculture:** USDA Food Environment Atlas, NASS agricultural statistics, SNAP participation, Feeding America estimates
 - **International Development:** World Bank development indicators, OECD Better Life Index, WHO global health data, UN statistical databases
 - **Civic & Cultural Engagement:** IRS nonprofit financial data (Form 990), NEA arts participation, MIT Election Lab voting data, volunteering metrics
@@ -446,6 +445,62 @@ KRL Data Connectors support 12 data sources, with 8 production-ready connectors,
 - **Domains:** D06 (Public Health), D14 (Environmental Quality), D24 (Geographic Data)
 - **Quickstart:** [examples/air_quality_quickstart.ipynb](examples/air_quality_quickstart.ipynb)
 
+#### Zillow Research Data Connector
+**Status:** Complete | **Tests:** 36/36 passing | **Coverage:** TBD | **NEW**
+
+- Zillow Home Value Index (ZHVI) - typical home values
+- Zillow Rent Index (ZRI) - typical market rents
+- Inventory metrics - for-sale homes, new listings
+- Sales data - list prices, sale prices
+- Geographic filtering: National, state, metro, county, city, ZIP, neighborhood
+- Time series analysis and growth calculations
+- **API:** File-based (download from Zillow Research)
+- **Data Source:** https://www.zillow.com/research/data/
+- **Domains:** D03 (Housing & Real Estate), D08 (Economic Development), D24 (Geographic Data)
+- **Quickstart:** [examples/zillow_quickstart.ipynb](examples/zillow_quickstart.ipynb)
+
+#### HUD Fair Market Rents Connector
+**Status:** Complete | **Tests:** 34/34 passing | **Coverage:** TBD | **NEW**
+
+- Fair Market Rents (FMR) by bedroom count (0BR-4BR)
+- Small Area FMRs (ZIP code level)
+- Income limits (very low, low, median income)
+- Affordability calculations (30% income rule)
+- Year-over-year FMR comparisons
+- State, metro, and county-level data
+- **API:** HUD USER API (free, API key required) + downloadable files
+- **Data Source:** https://www.huduser.gov/portal/datasets/fmr.html
+- **Domains:** D03 (Housing & Real Estate), D08 (Economic Development), D24 (Geographic Data)
+- **Quickstart:** [examples/hud_fmr_quickstart.ipynb](examples/hud_fmr_quickstart.ipynb)
+
+#### FBI Uniform Crime Reporting (UCR) Connector
+**Status:** Complete | **Tests:** 42/42 passing | **Coverage:** TBD | **NEW**
+
+- Violent crime statistics (murder, rape, robbery, aggravated assault)
+- Property crime statistics (burglary, larceny-theft, motor vehicle theft, arson)
+- Arrest data by offense type and demographics
+- Crime rates per capita calculations
+- National, state, and agency-level data
+- Historical data from 1960s-present
+- **API:** Crime Data Explorer API (free, no key required)
+- **Data Source:** https://cde.ucr.cjis.gov/LATEST/webapp/
+- **Domains:** D10 (Public Safety & Crime), D19 (Governance & Civic Infrastructure), D24 (Geographic Data)
+- **Quickstart:** [examples/fbi_ucr_quickstart.ipynb](examples/fbi_ucr_quickstart.ipynb)
+
+#### National Center for Education Statistics (NCES) Connector
+**Status:** Complete | **Tests:** 48/48 passing | **Coverage:** TBD | **NEW**
+
+- School directory and enrollment data (CCD - Common Core of Data)
+- Student demographics by race/ethnicity and gender
+- Performance metrics (test scores, graduation rates)
+- District finances and per-pupil spending calculations
+- Teacher and staff statistics
+- National, state, district, and school-level data
+- **API:** Urban Institute Education Data Portal (free, no key required)
+- **Data Source:** https://educationdata.urban.org/ | https://nces.ed.gov/
+- **Domains:** D09 (Education & Workforce Development), D19 (Governance), D24 (Geographic Data)
+- **Quickstart:** [examples/nces_quickstart.ipynb](examples/nces_quickstart.ipynb)
+
 ### In Development
 
 #### CDC WONDER Connector
@@ -461,21 +516,17 @@ KRL Data Connectors support 12 data sources, with 8 production-ready connectors,
 - **Connector Status:** Implementation complete; not usable due to upstream API limitations.
 - **API:** CDC WONDER (free, no key required, but non-functional)
 
-### Planned Connectors (28 Additional Data Sources)
+### Planned Connectors (24 Additional Data Sources)
 
 KRL Data Connectors will expand to 40 total connectors, spanning additional critical domains for comprehensive institutional analysis. The following connectors are prioritized for implementation:
 
-#### Housing & Urban Development (3 Connectors)
-- **Zillow Open Data:** Housing prices, rents, inventory, and market forecasts across national, metro, county, ZIP, and neighborhood levels
-- **HUD Fair Market Rents:** HUD-published fair market rents and income limits by household size for housing affordability analysis
+#### Housing & Urban Development (1 Connector)
 - **EPA Superfund Sites:** Hazardous waste site locations, contamination status, and remediation progress
 
-#### Crime & Public Safety (2 Connectors)
-- **FBI Uniform Crime Reporting (UCR):** Violent crime, property crime, and arrest statistics at national, state, and agency levels
+#### Crime & Public Safety (1 Connector)
 - **Gun Violence Archive:** Incident-level gun violence data, including mass shootings and firearm-related events
 
-#### Education (5 Connectors)
-- **National Center for Education Statistics (NCES):** School demographics, performance metrics, graduation rates, and financing data
+#### Education (4 Connectors)
 - **College Scorecard:** College costs, student outcomes, graduate earnings, and debt statistics
 - **IPEDS (Integrated Postsecondary Education):** Comprehensive higher education institutional data and trends
 - **Stanford Education Data Archive:** K-12 test score data with longitudinal coverage
