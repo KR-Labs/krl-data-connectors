@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2025-10-20
+
 ### Added
 - **Week 13 Housing, Crime, and Education Connectors (October 20, 2025)**:
   - Zillow Research Data Connector: ZHVI/ZRI housing market data, inventory metrics, sales data, geographic filtering
@@ -49,19 +51,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Development priorities and domain coverage table
 
 ### Changed
-- Updated connector count badges: 16 live | 24 planned
+- Updated connector count badges: 14 live | 26 planned
 - Enhanced README with complete Week 13 connector details
 - Updated planned connectors section to reflect Week 13 completions
+- Streamlined README structure for improved readability
 
-## [0.1.0] - 2025-10-19
+### Infrastructure
+- PyPI publishing workflow with trusted publisher support
+- ReadTheDocs configuration for automated documentation builds
+- GitHub issue and PR templates (bug reports, feature requests, questions)
+- License compliance automation with SBOM generation
 
-### Added
-- Initial release
-- BaseConnector with caching, logging, and error handling
-- FREDConnector for Federal Reserve Economic Data
-- CensusConnector for U.S. Census Bureau data
-- Full type hints and documentation
-- Apache 2.0 license
+### Documentation
+- Comprehensive FAQ (44 Q&A pairs across 8 categories)
+- TROUBLESHOOTING guide (30+ problems with solutions)
+- API_KEY_SETUP guide for all supported services
+- Professional README with badges and data source comparison table
 
 [Unreleased]: https://github.com/KR-Labs/krl-data-connectors/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/KR-Labs/krl-data-connectors/releases/tag/v0.1.0
