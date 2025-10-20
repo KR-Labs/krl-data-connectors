@@ -1,8 +1,3 @@
-# © 2025 KR-Labs. All rights reserved.  
-# KR-Labs™ is a trademark of Quipu Research Labs, LLC, a subsidiary of Sudiata Giddasira, Inc.
-#
-# SPDX-License-Identifier: Apache-2.0
-
 # KRL Data Connectors
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -27,10 +22,10 @@ KRL Data Connectors offer a unified, type-safe interface to data providers spann
 - **Bureau of Economic Analysis (BEA):** Access GDP, regional accounts, and personal income data.
 
 **Health & Environmental Data Sources:**
-- **EPA EJScreen:** Environmental justice screening; 13 environmental and 6 demographic indicators. ✨ **NEW**
-- **HRSA:** Health Professional Shortage Areas (HPSA), Medically Underserved Areas/Populations (MUA/P). ✨ **NEW**
-- **County Health Rankings:** Over 30 county-level health measures and rankings (2010–present). ✨ **NEW**
-- **EPA Air Quality / AirNow:** Real-time AQI, forecasts, and data from 2,500+ monitoring stations. ✨ **NEW**
+- **EPA EJScreen:** Environmental justice screening; 13 environmental and 6 demographic indicators. **NEW**
+- **HRSA:** Health Professional Shortage Areas (HPSA), Medically Underserved Areas/Populations (MUA/P). **NEW**
+- **County Health Rankings:** Over 30 county-level health measures and rankings (2010–present). **NEW**
+- **EPA Air Quality / AirNow:** Real-time AQI, forecasts, and data from 2,500+ monitoring stations. **NEW**
 - **CDC WONDER:** Mortality, natality, and population data (⚠️ API non-functional).
 
 **Planned Data Domains (28 Additional Connectors):**
@@ -47,14 +42,14 @@ KRL Data Connectors offer a unified, type-safe interface to data providers spann
 
 KRL Data Connectors are built for reproducibility, scalability, and institutional trust. Key features include:
 
-- ✨ **Unified API:** Consistent interface across all supported data sources.
-- ⚡ **Intelligent Caching:** Minimize API calls and optimize performance.
-- 🔒 **Type-Safe:** Comprehensive type hints and validation for all connectors.
-- 📊 **Rich Metadata:** Automated metadata extraction and documentation.
-- 🚀 **Production-Ready:** Robust error handling and structured logging.
-- 🧪 **Well-Tested:** 123+ tests, with over 90% coverage on new connectors.
-- 🌍 **Multi-Domain:** Seamless access to economic, health, environmental, and demographic data.
-- 📓 **Quickstart Notebooks:** Jupyter notebooks for rapid onboarding and reproducible analysis.
+- **Unified API:** Consistent interface across all supported data sources.
+- **Intelligent Caching:** Minimize API calls and optimize performance.
+- **Type-Safe:** Comprehensive type hints and validation for all connectors.
+- **Rich Metadata:** Automated metadata extraction and documentation.
+- **Production-Ready:** Robust error handling and structured logging.
+- **Well-Tested:** 123+ tests, with over 90% coverage on new connectors.
+- **Multi-Domain:** Seamless access to economic, health, environmental, and demographic data.
+- **Quickstart Notebooks:** Jupyter notebooks for rapid onboarding and reproducible analysis.
 
 ## Installation
 
@@ -398,7 +393,7 @@ KRL Data Connectors support 12 data sources, with 8 production-ready connectors,
 - **API:** Bureau of Economic Analysis (free, API key required)
 
 #### EPA EJScreen Connector
-**Status:** ✅ Complete | **Tests:** 29/29 passing | **Coverage:** 96.34% | **NEW** ✨
+**Status:** Complete | **Tests:** 29/29 passing | **Coverage:** 96.34% | **NEW**
 
 - Environmental justice screening and mapping
 - 13 environmental indicators (e.g., PM2.5, Ozone, Traffic, Hazardous Waste)
@@ -411,7 +406,7 @@ KRL Data Connectors support 12 data sources, with 8 production-ready connectors,
 - **Quickstart:** [examples/ejscreen_quickstart.ipynb](examples/ejscreen_quickstart.ipynb)
 
 #### HRSA Connector
-**Status:** ✅ Complete | **Tests:** 45/45 passing | **Coverage:** 90.51% | **NEW** ✨
+**Status:** Complete | **Tests:** 45/45 passing | **Coverage:** 90.51% | **NEW**
 
 - Health Professional Shortage Areas (HPSA): Primary Care, Dental, Mental Health
 - Medically Underserved Areas/Populations (MUA/P)
@@ -424,7 +419,7 @@ KRL Data Connectors support 12 data sources, with 8 production-ready connectors,
 - **Quickstart:** [examples/hrsa_quickstart.ipynb](examples/hrsa_quickstart.ipynb)
 
 #### County Health Rankings & Roadmaps Connector
-**Status:** ✅ Complete | **Tests:** Pending | **Coverage:** TBD | **NEW** ✨
+**Status:** Complete | **Tests:** Pending | **Coverage:** TBD | **NEW**
 
 - Health Outcomes Rankings (Length and Quality of Life)
 - Health Factors Rankings (Behaviors, Clinical Care, Social/Economic, Environment)
@@ -438,7 +433,7 @@ KRL Data Connectors support 12 data sources, with 8 production-ready connectors,
 - **Quickstart:** [examples/chr_quickstart.ipynb](examples/chr_quickstart.ipynb)
 
 #### EPA Air Quality / AirNow Connector
-**Status:** ✅ Complete | **Tests:** 49/49 passing | **Coverage:** 83.82% | **NEW** ✨
+**Status:** Complete | **Tests:** 49/49 passing | **Coverage:** 83.82% | **NEW**
 
 - Real-time Air Quality Index (AQI) and forecasts
 - Current observations by ZIP code or geocoordinates
@@ -451,10 +446,10 @@ KRL Data Connectors support 12 data sources, with 8 production-ready connectors,
 - **Domains:** D06 (Public Health), D14 (Environmental Quality), D24 (Geographic Data)
 - **Quickstart:** [examples/air_quality_quickstart.ipynb](examples/air_quality_quickstart.ipynb)
 
-### 🚧 In Development
+### In Development
 
 #### CDC WONDER Connector
-**Status:** ⚠️ BETA – API Non-Functional | **Tests:** 13 passing | **Coverage:** 74%
+**Status:** BETA – API Non-Functional | **Tests:** 13 passing | **Coverage:** 74%
 
 - Mortality and natality data
 - Population estimates
@@ -466,7 +461,7 @@ KRL Data Connectors support 12 data sources, with 8 production-ready connectors,
 - **Connector Status:** Implementation complete; not usable due to upstream API limitations.
 - **API:** CDC WONDER (free, no key required, but non-functional)
 
-### 🔄 Planned Connectors (28 Additional Data Sources)
+### Planned Connectors (28 Additional Data Sources)
 
 KRL Data Connectors will expand to 40 total connectors, spanning additional critical domains for comprehensive institutional analysis. The following connectors are prioritized for implementation:
 
@@ -655,10 +650,10 @@ All contributors are required to sign the [Contributor License Agreement (CLA)](
 KRL Data Connectors are licensed under the **Apache License 2.0**. See the [LICENSE](LICENSE) file for full details.
 
 **Apache 2.0 License Highlights:**
-- ✅ Commercial use permitted
-- ✅ Modification and redistribution allowed
-- ✅ Patent grant included
-- ✅ Compatible with proprietary software
+- Commercial use permitted
+- Modification and redistribution allowed
+- Patent grant included
+- Compatible with proprietary software
 
 ## Support
 
@@ -678,17 +673,21 @@ KRL Data Connectors are part of a broader ecosystem supporting institutional ana
 
 ## Citation
 
-Please cite KRL Data Connectors in your research or institutional work as follows:
+If you use KRL Data Connectors in your research or institutional work, please cite:
 
 ```bibtex
 @software{krl_data_connectors,
-  title = {KRL Data Connectors: Production-Ready Economic Data Integration},
-  author = {KR-Labs Foundation},
+  title = {KRL Data Connectors: Standardized Interfaces for Economic and Social Data},
+  author = {KR-Labs},
   year = {2025},
-  url = {https://github.com/KR-Labs/krl-data-connectors}
+  url = {https://github.com/KR-Labs/krl-data-connectors},
+  license = {Apache-2.0}
 }
 ```
 
 ---
 
-**Built for reproducibility, scalability, and institutional trust by [KR-Labs Foundation](https://krlabs.dev)**
+**Built for reproducibility, scalability, and institutional trust by [KR-Labs](https://krlabs.dev)**
+
+*© 2025 KR-Labs. All rights reserved.*  
+*KR-Labs is a trademark of Quipu Research Labs, LLC, a subsidiary of Sudiata Giddasira, Inc.*
