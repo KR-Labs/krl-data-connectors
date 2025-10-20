@@ -76,8 +76,11 @@ docs/_templates/
 .krl_cache/
 *.cache
 
-# Data files (don't commit API responses)
+# Data files (don't commit large CSV files or API responses)
 data/raw/*
 data/interim/*
 data/processed/*
 !data/.gitkeep
+*.csv
+examples/*.csv
+
