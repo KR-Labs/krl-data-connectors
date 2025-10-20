@@ -84,3 +84,15 @@ data/processed/*
 *.csv
 examples/*.csv
 
+# Internal planning documents (belong in private Khipu workspace)
+*_SUMMARY.md
+*_REPORT.md
+*_ROADMAP.md
+*_PLAN.md
+*_TODO.md
+*_INTERNAL*.md
+*_NOTES.md
+PHASE*.md
+WEEK*.md
+SESSION_*.md
+
