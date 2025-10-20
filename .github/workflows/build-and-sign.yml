@@ -30,6 +30,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install build twine
       
+      - name: Inject build watermark
+        run: |
+          python scripts/security/inject_watermark.py \
+            --build-id "${{ github.run_id }}" \
+            --commit-sha "${{ github.sha }}" \
+            --repo "${{ github.repository }}" \
+            --compute-checksum
+      
       - name: Build package
         run: python -m build
       
