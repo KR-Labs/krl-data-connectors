@@ -58,7 +58,7 @@ KRL Data Connectors deliver institutional access to a growing catalog of product
 | FBI UCR               | Crime          | Recommended   | Annual              | Agency-level        | ✅ Production |
 | NCES                  | Education      | No            | Annual              | School-level        | ✅ Production |
 | Zillow Research       | Housing        | No            | Monthly             | Metro/ZIP           | ✅ Production |
-| USDA Food Atlas       | Food Security  | No            | Annual              | County-level        | 🔄 Planned   |
+| USDA Food Atlas       | Agricultural   | Yes           | Annual              | County-level        | ✅ Production |
 | College Scorecard     | Education      | Yes           | Annual              | Institution         | 🔄 Planned   |
 | World Bank            | International  | No            | Annual              | Country-level       | 🔄 Planned   |
 | OECD                  | International  | No            | Varies              | Country-level       | 🔄 Planned   |

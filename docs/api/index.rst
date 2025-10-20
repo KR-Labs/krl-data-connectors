@@ -17,6 +17,7 @@ This section contains the complete API reference for all KRL Data Connectors.
    environment
    education
    crime
+   agricultural
    base
 
 Overview
@@ -62,6 +63,10 @@ Education Data
 Crime Data
 ~~~~~~~~~~
 - :doc:`crime` - FBI UCR connector
+
+Agricultural Data
+~~~~~~~~~~~~~~~~~
+- :doc:`agricultural` - USDA Food Environment Atlas connector
 
 Base Classes
 ~~~~~~~~~~~~
