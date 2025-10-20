@@ -18,10 +18,12 @@ Data Source: https://www.bls.gov/data/
 API Documentation: https://www.bls.gov/developers/api_signature_v2.htm
 """
 
-from typing import Optional, Dict, Any, List
-import pandas as pd
 import time
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
+
 from .base_connector import BaseConnector
 
 

@@ -16,7 +16,7 @@ for all KRL tests. Import these fixtures in your test files using:
 import os
 import sys
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 import pytest
 

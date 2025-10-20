@@ -18,8 +18,10 @@ Data Source: https://www.bea.gov/
 API Documentation: https://apps.bea.gov/api/signup/
 """
 
-from typing import Optional, Dict, Any, List
+from typing import Any, Dict, List, Optional
+
 import pandas as pd
+
 from .base_connector import BaseConnector
 
 

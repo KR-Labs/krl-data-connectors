@@ -18,10 +18,11 @@ Tests cover:
 - Edge cases
 """
 
-import pytest
-import pandas as pd
-from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
+from unittest.mock import MagicMock, Mock, patch
+
+import pandas as pd
+import pytest
 
 from krl_data_connectors.bls_connector import BLSConnector
 

@@ -15,8 +15,10 @@ Data Source: https://www.census.gov/programs-surveys/cbp.html
 API Documentation: https://www.census.gov/data/developers/data-sets/cbp-nonemp-zbp/cbp-api.html
 """
 
-from typing import Optional, Dict, Any, List
+from typing import Any, Dict, List, Optional
+
 import pandas as pd
+
 from .base_connector import BaseConnector
 
 

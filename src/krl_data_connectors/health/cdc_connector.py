@@ -15,11 +15,12 @@ Licensed under the Apache License, Version 2.0
 """
 
 import logging
-from typing import Dict, List, Optional, Any
-import pandas as pd
-import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
+import requests
 
 from ..base_connector import BaseConnector
 

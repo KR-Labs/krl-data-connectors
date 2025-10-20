@@ -16,11 +16,12 @@ Tests cover:
 - Edge cases
 """
 
-import pytest
-import pandas as pd
-from unittest.mock import Mock, patch, MagicMock
 import gzip
 import io
+from unittest.mock import MagicMock, Mock, patch
+
+import pandas as pd
+import pytest
 
 from krl_data_connectors.lehd_connector import LEHDConnector
 

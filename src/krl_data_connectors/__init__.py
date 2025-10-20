@@ -17,13 +17,13 @@ and demographic data providers including FRED, Census Bureau, BLS, World Bank, a
 
 from .__version__ import __author__, __license__, __version__
 from .base_connector import BaseConnector
+from .bea_connector import BEAConnector
+from .bls_connector import BLSConnector
+from .cbp_connector import CountyBusinessPatternsConnector
 from .census_connector import CensusConnector
 from .fred_connector import FREDConnector
-from .lehd_connector import LEHDConnector
-from .cbp_connector import CountyBusinessPatternsConnector
-from .bls_connector import BLSConnector
-from .bea_connector import BEAConnector
 from .health import CDCWonderConnector
+from .lehd_connector import LEHDConnector
 from .utils.config import find_config_file, load_api_key_from_config
 
 __all__ = [

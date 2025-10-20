@@ -17,9 +17,10 @@ Tests cover:
 - Edge cases
 """
 
-import pytest
+from unittest.mock import MagicMock, Mock, patch
+
 import pandas as pd
-from unittest.mock import Mock, patch, MagicMock
+import pytest
 
 from krl_data_connectors.cbp_connector import CountyBusinessPatternsConnector
 
