@@ -77,7 +77,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
 
-from krl_data_connectors.base import BaseConnector
+from krl_data_connectors.base_connector import BaseConnector
 
 
 class HRSAConnector(BaseConnector):
@@ -150,8 +150,8 @@ class HRSAConnector(BaseConnector):
             **kwargs: Additional arguments passed to BaseConnector
         """
         super().__init__(
-            source_name="HRSA",
-            cache_dir=cache_dir or Path.home() / ".krl" / "cache" / "hrsa",
+            api_key=None,
+            cache_dir=str(cache_dir or Path.home() / ".krl" / "cache" / "hrsa"),
             cache_ttl=cache_ttl,
             **kwargs
         )

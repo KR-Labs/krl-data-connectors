@@ -157,9 +157,10 @@ class TestConnect:
 
     def test_disconnect(self, connector):
         """Test disconnect functionality."""
-        connector._session = Mock()
+        mock_session = Mock()
+        connector._session = mock_session
         connector.disconnect()
-        connector._session.close.assert_called_once()
+        mock_session.close.assert_called_once()
         assert connector._session is None
 
 

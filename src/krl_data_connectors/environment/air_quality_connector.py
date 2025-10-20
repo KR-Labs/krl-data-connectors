@@ -125,6 +125,26 @@ class EPAAirQualityConnector(BaseConnector):
         
         logger.info("EPA Air Quality connector initialized")
     
+    def _get_api_key(self) -> Optional[str]:
+        """
+        Get API key from environment or configuration.
+        
+        Returns:
+            API key or None if not found
+        """
+        return os.getenv('AIRNOW_API_KEY')
+    
+    def fetch(self, endpoint: str = '', **kwargs: Any) -> Any:
+        """
+        Not used for AirNow API. Use specific methods like get_current_by_zip().
+        
+        Raises:
+            NotImplementedError: Always raised, use specific methods instead
+        """
+        raise NotImplementedError(
+            "Use specific methods like get_current_by_zip(), get_forecast_by_zip(), etc."
+        )
+    
     def connect(self) -> None:
         """
         Establish connection and verify API key.

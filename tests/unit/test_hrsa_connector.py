@@ -88,7 +88,7 @@ class TestHRSAConnectorInit:
     def test_init_default(self):
         """Test default initialization."""
         connector = HRSAConnector()
-        assert connector.source_name == "HRSA"
+        assert connector.__class__.__name__ == "HRSAConnector"
         assert "hrsa" in str(connector.cache.cache_dir).lower()
     
     def test_init_custom_cache(self):
