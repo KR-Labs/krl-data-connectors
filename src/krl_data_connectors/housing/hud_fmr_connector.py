@@ -546,22 +546,38 @@ class HUDFMRConnector(BaseConnector):
         Args:
             current_year_data: Current year FMR data
             previous_year_data: Previous year FMR data
-            bedrooms: Bedroom count to analyze
+            bedrooms: Bedroom count to analyze (0-4)
             
         Returns:
             DataFrame with YoY change metrics
         """
-        fmr_col = f'fmr_{bedrooms}'
+        fmr_col = f'fmr_{bedrooms}br'
         
         if fmr_col not in current_year_data.columns or fmr_col not in previous_year_data.columns:
             self.logger.warning(f"FMR column '{fmr_col}' not found")
             return pd.DataFrame()
         
-        # Merge on county
-        merged = current_year_data.merge(
-            previous_year_data[['county_name', fmr_col]],
-            on='county_name',
-            suffixes=('_current', '_previous')
+        # Merge on county_name (for counties) or metro_name (for metros)
+        # Create a merge key that works for both
+        current = current_year_data.copy()
+        previous = previous_year_data.copy()
+        
+        # Use county_name if available, otherwise use metro_name
+        current['merge_key'] = current.apply(
+            lambda x: x['county_name'] if pd.notna(x.get('county_name')) else x.get('metro_name', ''),
+            axis=1
+        )
+        previous['merge_key'] = previous.apply(
+            lambda x: x['county_name'] if pd.notna(x.get('county_name')) else x.get('metro_name', ''),
+            axis=1
+        )
+        
+        # Merge on the key
+        merged = current.merge(
+            previous[['merge_key', fmr_col]],
+            on='merge_key',
+            suffixes=('_current', '_previous'),
+            how='inner'
         )
         
         # Calculate change

@@ -1,0 +1,80 @@
+name: License Compliance
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday
+
+jobs:
+  license-check:
+    name: Check License Compliance
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-licenses licensecheck
+          
+      - name: Install project
+        run: pip install -e .
+        
+      - name: Check licenses
+        run: |
+          echo "## 📜 License Compliance Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Get all package licenses
+          pip-licenses --format=markdown --order=license >> $GITHUB_STEP_SUMMARY
+          
+      - name: Verify allowed licenses
+        run: |
+          # List of allowed licenses (SPDX identifiers)
+          ALLOWED_LICENSES=(
+            "MIT"
+            "Apache-2.0"
+            "BSD-3-Clause"
+            "BSD-2-Clause"
+            "ISC"
+            "Python-2.0"
+            "PSF-2.0"
+            "MPL-2.0"
+          )
+          
+          # Get licenses in JSON format
+          LICENSES=$(pip-licenses --format=json)
+          
+          # Check each license (simple grep check)
+          echo "Checking licenses..."
+          pip-licenses | while read line; do
+            # Simple verification that no GPL or AGPL licenses
+            if echo "$line" | grep -iE "(GPL|AGPL|SSPL)" > /dev/null; then
+              echo "❌ Incompatible license found: $line"
+              exit 1
+            fi
+          done
+          
+          echo "✅ All licenses are compatible"
+          
+      - name: Generate SBOM
+        run: |
+          # Create Software Bill of Materials
+          pip-licenses --format=json > sbom.json
+          
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v3
+        with:
+          name: software-bill-of-materials
+          path: sbom.json
+          retention-days: 90
