@@ -20,6 +20,9 @@ from datetime import datetime
 # Add source directory to path for autodoc
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+# Mock imports that may not be available during build
+autodoc_mock_imports = []
+
 # -- Project information -----------------------------------------------------
 
 project = "KR-Labs"  # Update per repository
