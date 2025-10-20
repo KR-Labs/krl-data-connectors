@@ -1,15 +1,69 @@
 # KRL Data Connectors
 
+<div align="center">
+
+[![PyPI version](https://img.shields.io/pypi/v/krl-data-connectors.svg)](https://pypi.org/project/krl-data-connectors/)
+[![Python Version](https://img.shields.io/pypi/pyversions/krl-data-connectors.svg)](https://pypi.org/project/krl-data-connectors/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/downloads/)
+[![Documentation Status](https://readthedocs.org/projects/krl-data-connectors/badge/?version=latest)](https://krl-data-connectors.readthedocs.io/en/latest/?badge=latest)
 [![Tests](https://github.com/KR-Labs/krl-data-connectors/workflows/tests/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions)
-[![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://docs.krlabs.dev/data-connectors)
-[![Connectors](https://img.shields.io/badge/connectors-16%20live%20%7C%2024%20planned-blue)](https://github.com/KR-Labs/krl-data-connectors)
 [![Coverage](https://img.shields.io/badge/coverage-90%25%2B-green)](https://github.com/KR-Labs/krl-data-connectors)
+[![Downloads](https://img.shields.io/pypi/dm/krl-data-connectors.svg)](https://pypi.org/project/krl-data-connectors/)
 
-KRL Data Connectors deliver robust, standardized interfaces for accessing economic, demographic, health, environmental, and social data. Designed for institutional reliability, these connectors are built for reproducibility, scalability, and institutional trust.
+**Production-ready data connectors for socioeconomic research and policy analysis**
 
-KRL Data Connectors are a core component of the [KRL Analytics Suite](https://krlabs.dev), an open-source platform supporting economic analysis, causal inference, and policy evaluation at scale.
+[Installation](#installation) •
+[Quick Start](#quick-start) •
+[Documentation](https://krl-data-connectors.readthedocs.io) •
+[Examples](./examples/) •
+[Contributing](./CONTRIBUTING.md)
+
+</div>
+
+---
+
+## 🎯 Overview
+
+KRL Data Connectors deliver **robust, standardized interfaces** for accessing 10+ socioeconomic data sources, with 30+ additional connectors planned. Designed for **institutional reliability**, these connectors are built for reproducibility, scalability, and production use.
+
+**Part of the [KRL Analytics Suite](https://krlabs.dev)** - an open-source platform supporting economic analysis, causal inference, and policy evaluation at scale.
+
+### ✨ Why KRL Data Connectors?
+
+- **🔌 Unified API:** Consistent interface across all data sources
+- **⚡ Production-Ready:** Robust error handling, retry logic, and structured logging
+- **🎯 Type-Safe:** Full type hints and validation
+- **💾 Smart Caching:** Minimize API calls, maximize performance
+- **📊 Rich Metadata:** Automatic documentation and data profiling
+- **✅ Well-Tested:** 297+ tests with 90%+ coverage
+- **📚 Quickstart Notebooks:** 10+ Jupyter notebooks for immediate use
+- **🔒 Secure:** Multiple API key management methods (env vars, config files, AWS Secrets Manager)
+
+### 📊 Supported Data Sources
+
+| Data Source | Domain | Auth Required | Update Frequency | Coverage | Status |
+|-------------|--------|---------------|------------------|----------|--------|
+| **Census ACS** | Demographics | Optional | Annual | All US geographies | ✅ Production |
+| **Census CBP** | Business | Optional | Annual | County-level | ✅ Production |
+| **Census LEHD** | Employment | No | Quarterly | County-level | ✅ Production |
+| **FRED** | Economics | Yes | Daily/Real-time | 800K+ series | ✅ Production |
+| **BLS** | Labor | Recommended | Monthly | National/State | ✅ Production |
+| **BEA** | Economics | Yes | Quarterly/Annual | National/Regional | ✅ Production |
+| **CDC WONDER** | Health | No | Varies | County-level | ✅ Production |
+| **HRSA** | Health | No | Annual | HPSA/MUA/P | ✅ Production |
+| **County Health Rankings** | Health | No | Annual | County-level | ✅ Production |
+| **EPA EJScreen** | Environment | No | Annual | Block group | ✅ Production |
+| **EPA Air Quality** | Environment | No | Hourly/Real-time | Station-level | ✅ Production |
+| **HUD Fair Market Rent** | Housing | Yes | Annual | Metro/County | ✅ Production |
+| **FBI UCR** | Crime | Recommended | Annual | Agency-level | ✅ Production |
+| **NCES** | Education | No | Annual | School-level | ✅ Production |
+| **Zillow Research** | Housing | No | Monthly | Metro/ZIP | ✅ Production |
+| **USDA Food Atlas** | Food Security | No | Annual | County-level | 🔄 Planned |
+| **College Scorecard** | Education | Yes | Annual | Institution | 🔄 Planned |
+| **World Bank** | International | No | Annual | Country-level | 🔄 Planned |
+| **OECD** | International | No | Varies | Country-level | 🔄 Planned |
+
+**Legend:** ✅ Production | 🔄 Planned | ⚠️ Beta
 
 ## Overview
 
