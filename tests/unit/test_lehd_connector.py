@@ -618,5 +618,108 @@ class TestLEHDSecurityInputValidation:
             connector.get_od_data(state="ca", year=9999)
 
 
+class TestLEHDPropertyBased:
+    """Test LEHD connector using property-based testing with Hypothesis."""
+
+    @pytest.mark.hypothesis
+    def test_year_parameter_validation_property(self):
+        """Property: Year parameter should accept valid years (2002-2020)."""
+        from hypothesis import given, strategies as st
+
+        lehd_connector = LEHDConnector()
+
+        @given(year=st.integers(min_value=2002, max_value=2020))
+        def check_year_handling(year):
+            with patch("pandas.read_csv") as mock_read_csv:
+                # Mock LEHD LODES CSV format
+                mock_df = pd.DataFrame(
+                    {
+                        "w_geocode": ["060371001001"],
+                        "h_geocode": ["060371002001"],
+                        "S000": [100],
+                        "createdate": ["20210101"],
+                    }
+                )
+                mock_read_csv.return_value = mock_df
+                df = lehd_connector.get_od_data(state="ca", year=year)
+                assert isinstance(df, pd.DataFrame)
+                assert mock_read_csv.called
+
+        check_year_handling()
+
+    @pytest.mark.hypothesis
+    def test_state_code_property(self):
+        """Property: State codes should be 2-letter strings."""
+        from hypothesis import given, strategies as st
+
+        lehd_connector = LEHDConnector()
+
+        @given(state=st.text(alphabet=st.characters(min_codepoint=97, max_codepoint=122), min_size=2, max_size=2))
+        def check_state_code_handling(state):
+            with patch("pandas.read_csv") as mock_read_csv:
+                mock_df = pd.DataFrame(
+                    {
+                        "w_geocode": ["010010201001"],
+                        "h_geocode": ["010010202001"],
+                        "S000": [50],
+                    }
+                )
+                mock_read_csv.return_value = mock_df
+                df = lehd_connector.get_od_data(state=state, year=2019)
+                assert isinstance(df, pd.DataFrame)
+                assert mock_read_csv.called
+
+        check_state_code_handling()
+
+    @pytest.mark.hypothesis
+    def test_job_type_code_property(self):
+        """Property: Job type codes should be alphanumeric strings (e.g., JT00, JT01)."""
+        from hypothesis import given, strategies as st
+
+        lehd_connector = LEHDConnector()
+
+        @given(job_type=st.from_regex(r"JT[0-9]{2}", fullmatch=True))
+        def check_job_type_handling(job_type):
+            with patch("pandas.read_csv") as mock_read_csv:
+                mock_df = pd.DataFrame(
+                    {
+                        "w_geocode": ["060371001001"],
+                        "h_geocode": ["060371002001"],
+                        "S000": [100],
+                    }
+                )
+                mock_read_csv.return_value = mock_df
+                df = lehd_connector.get_od_data(state="ca", year=2019, job_type=job_type)
+                assert isinstance(df, pd.DataFrame)
+                assert mock_read_csv.called
+
+        check_job_type_handling()
+
+    @pytest.mark.hypothesis
+    def test_segment_code_property(self):
+        """Property: Segment codes should be alphanumeric strings (e.g., S000, SA01)."""
+        from hypothesis import given, strategies as st
+
+        lehd_connector = LEHDConnector()
+
+        @given(segment=st.from_regex(r"S[A-Z0-9]{3}", fullmatch=True))
+        def check_segment_handling(segment):
+            with patch("pandas.read_csv") as mock_read_csv:
+                mock_df = pd.DataFrame(
+                    {
+                        "w_geocode": ["060371001001"],
+                        "h_geocode": ["060371002001"],
+                        "S000": [100],
+                    }
+                )
+                mock_read_csv.return_value = mock_df
+                df = lehd_connector.get_od_data(state="ca", year=2019, segment=segment)
+                assert isinstance(df, pd.DataFrame)
+                assert mock_read_csv.called
+
+        check_segment_handling()
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
+
