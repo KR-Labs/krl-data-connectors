@@ -565,5 +565,89 @@ class TestHUDFMRPropertyBased:
         check_fmr_amount_handling()
 
 
+class TestHUDFMRConnectorTypeContracts:
+    """Test type contracts and return value structures (Layer 8)."""
+
+    def test_connect_return_type(self):
+        """Test that connect returns None."""
+        hud = HUDFMRConnector()
+        result = hud.connect()
+        assert result is None
+
+    @patch("krl_data_connectors.housing.hud_fmr_connector.HUDFMRConnector.get_state_fmrs")
+    def test_fetch_return_type(self, mock_get_state_fmrs):
+        """Test that fetch returns DataFrame."""
+        mock_get_state_fmrs.return_value = pd.DataFrame({"State": ["RI"], "FMR": [1000]})
+        hud = HUDFMRConnector()
+        result = hud.fetch(state="RI", year=2025)
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pathlib.Path.exists")
+    @patch("pandas.read_csv")
+    def test_load_fmr_data_return_type(self, mock_read_csv, mock_exists):
+        """Test that load_fmr_data returns DataFrame."""
+        mock_exists.return_value = True
+        mock_read_csv.return_value = pd.DataFrame({"State": ["RI"], "FMR": [1000]})
+        hud = HUDFMRConnector()
+        result = hud.load_fmr_data("test.csv")
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pathlib.Path.exists")
+    @patch("pandas.read_csv")
+    def test_get_state_fmrs_return_type(self, mock_read_csv, mock_exists):
+        """Test that get_state_fmrs returns DataFrame."""
+        mock_exists.return_value = True
+        mock_read_csv.return_value = pd.DataFrame({
+            "State": ["RI", "RI"],
+            "Metro": ["Providence", "Newport"],
+            "FMR_0BR": [800, 850],
+            "FMR_2BR": [1200, 1300]
+        })
+        hud = HUDFMRConnector()
+        result = hud.get_state_fmrs("RI")
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_metro_fmrs_return_type(self):
+        """Test that get_metro_fmrs returns DataFrame."""
+        hud = HUDFMRConnector()
+        result = hud.get_metro_fmrs("Providence")
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_county_fmrs_return_type(self):
+        """Test that get_county_fmrs returns DataFrame."""
+        hud = HUDFMRConnector()
+        df = pd.DataFrame({
+            "state_alpha": ["RI", "RI"],
+            "county_name": ["Providence", "Kent"],
+            "fmr_2": [1200, 1100]
+        })
+        result = hud.get_county_fmrs("RI", "Providence", data=df)
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_fmr_by_bedrooms_return_type(self):
+        """Test that get_fmr_by_bedrooms returns DataFrame."""
+        hud = HUDFMRConnector()
+        df = pd.DataFrame({
+            "county_name": ["Providence"],
+            "fmr_0": [800],
+            "fmr_1": [950],
+            "fmr_2": [1200]
+        })
+        result = hud.get_fmr_by_bedrooms(df, 2)
+        assert isinstance(result, pd.DataFrame)
+
+    def test_calculate_affordability_return_type(self):
+        """Test that calculate_affordability returns Dict."""
+        hud = HUDFMRConnector()
+        result = hud.calculate_affordability(income=50000, bedrooms=2, fmr_value=1200)
+        assert isinstance(result, dict)
+
+    def test_get_income_limits_return_type(self):
+        """Test that get_income_limits returns Dict."""
+        hud = HUDFMRConnector()
+        result = hud.get_income_limits("RI", "Providence")
+        assert isinstance(result, dict)
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
