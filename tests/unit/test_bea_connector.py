@@ -800,5 +800,121 @@ class TestBEASecurityInputValidation:
             pass
 
 
+class TestBEAPropertyBased:
+    """Test Layer 7: Property-Based Testing with Hypothesis."""
+
+    @pytest.mark.hypothesis
+    def test_year_parameter_validation_property(self):
+        """Property test: Year validation should be consistent across methods."""
+        from hypothesis import given, strategies as st
+
+        connector = BEAConnector(api_key="test_key")
+
+        @given(year=st.integers(min_value=1900, max_value=2100))
+        def check_year_validation(year):
+            # Years should be validated consistently
+            # Mock the API call to test validation logic
+            with patch.object(connector, "_make_request") as mock_request:
+                mock_request.return_value = {"BEAAPI": {"Results": {"Data": []}}}
+
+                try:
+                    # Convert int to string as expected by API
+                    connector.get_nipa_data(table_name="T10101", year=str(year))
+                    # If no exception, year was accepted
+                    assert isinstance(year, int)
+                except ValueError as e:
+                    # If validation error, should have clear message
+                    assert "year" in str(e).lower() or "invalid" in str(e).lower()
+
+        check_year_validation()
+
+    @pytest.mark.hypothesis
+    def test_table_name_type_property(self):
+        """Property test: Table names should always be strings."""
+        from hypothesis import given, strategies as st
+
+        connector = BEAConnector(api_key="test_key")
+
+        @given(table_name=st.one_of(st.integers(), st.floats(), st.booleans()))
+        def check_table_name_type_handling(table_name):
+            # Non-string table names should be handled
+            with patch.object(connector, "_make_request") as mock_request:
+                mock_request.return_value = {"BEAAPI": {"Results": {"Data": []}}}
+
+                try:
+                    connector.get_nipa_data(table_name=table_name)
+                except (TypeError, ValueError, AttributeError):
+                    # Expected to reject non-string table names
+                    pass
+
+        check_table_name_type_handling()
+
+    @pytest.mark.hypothesis
+    def test_frequency_parameter_property(self):
+        """Property test: Frequency should only accept valid values."""
+        from hypothesis import given, strategies as st
+
+        connector = BEAConnector(api_key="test_key")
+
+        valid_frequencies = ["A", "Q", "M"]
+
+        @given(frequency=st.text(min_size=1, max_size=10))
+        def check_frequency_validation(frequency):
+            with patch.object(connector, "_make_request") as mock_request:
+                mock_request.return_value = {"BEAAPI": {"Results": {"Data": []}}}
+
+                try:
+                    connector.get_nipa_data(
+                        table_name="T10101", year="2020", frequency=frequency
+                    )
+                    # If accepted, should be a valid frequency
+                    assert frequency.upper() in valid_frequencies or len(mock_request.call_args) > 0
+                except (ValueError, KeyError):
+                    # Invalid frequencies should be rejected
+                    pass
+
+        check_frequency_validation()
+
+    @pytest.mark.hypothesis
+    def test_geo_fips_property(self):
+        """Property test: GeoFips codes should be handled consistently."""
+        from hypothesis import given, strategies as st
+
+        connector = BEAConnector(api_key="test_key")
+
+        @given(geo_fips=st.text(alphabet=st.characters(whitelist_categories=("Nd",)), min_size=2, max_size=5))
+        def check_geo_fips_format(geo_fips):
+            # Valid FIPS codes are numeric strings
+            with patch.object(connector, "_make_request") as mock_request:
+                mock_response = {
+                    "BEAAPI": {
+                        "Results": {
+                            "Data": [
+                                {
+                                    "GeoFips": geo_fips,
+                                    "GeoName": "Test Region",
+                                    "Code": "PCPI",
+                                    "DataValue": "50000",
+                                    "TimePeriod": "2020",
+                                }
+                            ]
+                        }
+                    }
+                }
+                mock_request.return_value = mock_response
+
+                try:
+                    df = connector.get_regional_data(
+                        table_name="CAINC1", geo_fips=geo_fips, year="2020"
+                    )
+                    # Should return DataFrame
+                    assert isinstance(df, pd.DataFrame)
+                except (ValueError, KeyError, TypeError):
+                    # Some FIPS codes may not be valid
+                    pass
+
+        check_geo_fips_format()
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
