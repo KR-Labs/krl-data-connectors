@@ -9,5 +9,6 @@
 
 from krl_data_connectors.crime.bjs_connector import BureauOfJusticeConnector
 from krl_data_connectors.crime.fbi_ucr_connector import FBIUCRConnector
+from krl_data_connectors.crime.victims_of_crime_connector import VictimsOfCrimeConnector
 
-__all__ = ["BureauOfJusticeConnector", "FBIUCRConnector"]
+__all__ = ["BureauOfJusticeConnector", "FBIUCRConnector", "VictimsOfCrimeConnector"]
