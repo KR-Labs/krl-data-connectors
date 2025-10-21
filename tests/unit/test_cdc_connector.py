@@ -232,7 +232,9 @@ class TestCDCSecurityXMLInjection:
     def test_xml_injection_in_parameters(self, cdc_connector):
         """Test XML injection attempt in parameters."""
         # Malicious XML entity attempt
-        malicious_value = "<!DOCTYPE foo [<!ENTITY xxe SYSTEM 'file:///etc/passwd'>]><foo>&xxe;</foo>"
+        malicious_value = (
+            "<!DOCTYPE foo [<!ENTITY xxe SYSTEM 'file:///etc/passwd'>]><foo>&xxe;</foo>"
+        )
 
         # Build XML with malicious content
         parameters = {"B_1": malicious_value}
@@ -421,11 +423,9 @@ class TestCDCPropertyBased:
         @given(years=st.lists(st.integers(min_value=1999, max_value=2025), min_size=1, max_size=5))
         def check_year_list_handling(years):
             with patch.object(cdc_connector, "_make_cdc_request") as mock_request:
-                mock_request.return_value = pd.DataFrame({
-                    "State": ["CA"],
-                    "Year": [years[0]],
-                    "Deaths": [100]
-                })
+                mock_request.return_value = pd.DataFrame(
+                    {"State": ["CA"], "Year": [years[0]], "Deaths": [100]}
+                )
 
                 try:
                     df = cdc_connector.get_mortality_data(years=years, geo_level="state")
@@ -446,17 +446,21 @@ class TestCDCPropertyBased:
 
         @given(
             states=st.lists(
-                st.text(alphabet=st.characters(whitelist_categories=("Lu",)), min_size=2, max_size=2),
+                st.text(
+                    alphabet=st.characters(whitelist_categories=("Lu",)), min_size=2, max_size=2
+                ),
                 min_size=1,
-                max_size=3
+                max_size=3,
             )
         )
         def check_state_list_handling(states):
             # Return XML string as CDC expects
             xml_response = """<?xml version="1.0"?><response><data-table><r>
             <c l="State" v="{}">CA</c><c l="Year" v="2020">2020</c>
-            <c l="Deaths" v="100">100</c></r></data-table></response>""".format(states[0])
-            
+            <c l="Deaths" v="100">100</c></r></data-table></response>""".format(
+                states[0]
+            )
+
             with patch.object(cdc_connector, "_make_cdc_request") as mock_request:
                 mock_request.return_value = xml_response
 
@@ -484,14 +488,12 @@ class TestCDCPropertyBased:
             xml_response = """<?xml version="1.0"?><response><data-table><r>
             <c l="Year" v="2020">2020</c><c l="Deaths" v="100">100</c>
             </r></data-table></response>"""
-            
+
             with patch.object(cdc_connector, "_make_cdc_request") as mock_request:
                 mock_request.return_value = xml_response
 
                 try:
-                    df = cdc_connector.get_mortality_data(
-                        years=[2020], geo_level=geo_level
-                    )
+                    df = cdc_connector.get_mortality_data(years=[2020], geo_level=geo_level)
                     # If accepted, should be a valid level
                     assert geo_level.lower() in valid_levels or isinstance(df, pd.DataFrame)
                 except (ValueError, KeyError, Exception):
@@ -511,22 +513,18 @@ class TestCDCPropertyBased:
             icd_codes=st.lists(
                 st.text(alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", min_size=3, max_size=7),
                 min_size=1,
-                max_size=5
+                max_size=5,
             )
         )
         def check_icd_code_handling(icd_codes):
             with patch.object(cdc_connector, "_make_cdc_request") as mock_request:
-                mock_request.return_value = pd.DataFrame({
-                    "Cause": [icd_codes[0]],
-                    "Year": [2020],
-                    "Deaths": [100]
-                })
+                mock_request.return_value = pd.DataFrame(
+                    {"Cause": [icd_codes[0]], "Year": [2020], "Deaths": [100]}
+                )
 
                 try:
                     df = cdc_connector.get_mortality_data(
-                        years=[2020],
-                        geo_level="national",
-                        cause_of_death=icd_codes
+                        years=[2020], geo_level="national", cause_of_death=icd_codes
                     )
                     assert isinstance(df, pd.DataFrame)
                 except (ValueError, KeyError, TypeError):

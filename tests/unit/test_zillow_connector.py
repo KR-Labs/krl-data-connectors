@@ -32,30 +32,42 @@ def zillow_connector():
 @pytest.fixture
 def sample_zhvi_data():
     """Create sample ZHVI data for testing."""
-    return pd.DataFrame({
-        'RegionID': [1, 2, 3],
-        'RegionName': ['New York', 'Los Angeles', 'Chicago'],
-        'State': ['NY', 'CA', 'IL'],
-        'Metro': ['New York-Newark-Jersey City', 'Los Angeles-Long Beach-Anaheim', 'Chicago-Naperville-Elgin'],
-        'CountyName': ['New York County', 'Los Angeles County', 'Cook County'],
-        '2023-01-31': [500000, 750000, 300000],
-        '2023-02-28': [505000, 755000, 302000],
-        '2023-03-31': [510000, 760000, 305000],
-    })
+    return pd.DataFrame(
+        {
+            "RegionID": [1, 2, 3],
+            "RegionName": ["New York", "Los Angeles", "Chicago"],
+            "State": ["NY", "CA", "IL"],
+            "Metro": [
+                "New York-Newark-Jersey City",
+                "Los Angeles-Long Beach-Anaheim",
+                "Chicago-Naperville-Elgin",
+            ],
+            "CountyName": ["New York County", "Los Angeles County", "Cook County"],
+            "2023-01-31": [500000, 750000, 300000],
+            "2023-02-28": [505000, 755000, 302000],
+            "2023-03-31": [510000, 760000, 305000],
+        }
+    )
 
 
 @pytest.fixture
 def sample_zri_data():
     """Create sample ZRI data for testing."""
-    return pd.DataFrame({
-        'RegionID': [1, 2, 3],
-        'RegionName': ['New York', 'Los Angeles', 'Chicago'],
-        'State': ['NY', 'CA', 'IL'],
-        'Metro': ['New York-Newark-Jersey City', 'Los Angeles-Long Beach-Anaheim', 'Chicago-Naperville-Elgin'],
-        '2023-01-31': [2500, 3000, 1800],
-        '2023-02-28': [2520, 3020, 1820],
-        '2023-03-31': [2540, 3040, 1840],
-    })
+    return pd.DataFrame(
+        {
+            "RegionID": [1, 2, 3],
+            "RegionName": ["New York", "Los Angeles", "Chicago"],
+            "State": ["NY", "CA", "IL"],
+            "Metro": [
+                "New York-Newark-Jersey City",
+                "Los Angeles-Long Beach-Anaheim",
+                "Chicago-Naperville-Elgin",
+            ],
+            "2023-01-31": [2500, 3000, 1800],
+            "2023-02-28": [2520, 3020, 1820],
+            "2023-03-31": [2540, 3040, 1840],
+        }
+    )
 
 
 class TestZillowConnectorInit:
@@ -66,15 +78,15 @@ class TestZillowConnectorInit:
         connector = ZillowConnector()
         assert connector is not None
         # Check that connector has the expected methods
-        assert hasattr(connector, 'load_zhvi_data')
-        assert hasattr(connector, 'get_time_series')
+        assert hasattr(connector, "load_zhvi_data")
+        assert hasattr(connector, "get_time_series")
 
     def test_init_custom_cache(self):
         """Test initialization with custom cache settings."""
         with tempfile.TemporaryDirectory() as tmpdir:
             connector = ZillowConnector(cache_dir=tmpdir)
             assert connector is not None
-            assert hasattr(connector, 'load_zhvi_data')
+            assert hasattr(connector, "load_zhvi_data")
 
 
 class TestDataLoading:
@@ -85,57 +97,61 @@ class TestDataLoading:
         # Create temporary CSV
         filepath = tmp_path / "zhvi.csv"
         sample_zhvi_data.to_csv(filepath, index=False)
-        
+
         # Load data
         data = zillow_connector.load_zhvi_data(filepath)
-        
+
         assert isinstance(data, pd.DataFrame)
         assert len(data) == 3
-        assert 'RegionName' in data.columns
-        assert 'State' in data.columns
+        assert "RegionName" in data.columns
+        assert "State" in data.columns
 
     def test_load_zri_data(self, zillow_connector, sample_zri_data, tmp_path):
         """Test loading ZRI data from file."""
         filepath = tmp_path / "zri.csv"
         sample_zri_data.to_csv(filepath, index=False)
-        
+
         data = zillow_connector.load_zri_data(filepath)
-        
+
         assert isinstance(data, pd.DataFrame)
         assert len(data) == 3
-        assert '2023-01-31' in data.columns
+        assert "2023-01-31" in data.columns
 
     def test_load_inventory_data(self, zillow_connector, tmp_path):
         """Test loading inventory data."""
-        inventory_data = pd.DataFrame({
-            'RegionID': [1, 2],
-            'RegionName': ['Boston', 'Seattle'],
-            'State': ['MA', 'WA'],
-            '2023-01-31': [500, 600],
-        })
-        
+        inventory_data = pd.DataFrame(
+            {
+                "RegionID": [1, 2],
+                "RegionName": ["Boston", "Seattle"],
+                "State": ["MA", "WA"],
+                "2023-01-31": [500, 600],
+            }
+        )
+
         filepath = tmp_path / "inventory.csv"
         inventory_data.to_csv(filepath, index=False)
-        
+
         data = zillow_connector.load_inventory_data(filepath)
-        
+
         assert isinstance(data, pd.DataFrame)
         assert len(data) == 2
 
     def test_load_sales_data(self, zillow_connector, tmp_path):
         """Test loading sales data."""
-        sales_data = pd.DataFrame({
-            'RegionID': [1, 2],
-            'RegionName': ['Boston', 'Seattle'],
-            'State': ['MA', 'WA'],
-            '2023-01-31': [450000, 550000],
-        })
-        
+        sales_data = pd.DataFrame(
+            {
+                "RegionID": [1, 2],
+                "RegionName": ["Boston", "Seattle"],
+                "State": ["MA", "WA"],
+                "2023-01-31": [450000, 550000],
+            }
+        )
+
         filepath = tmp_path / "sales.csv"
         sales_data.to_csv(filepath, index=False)
-        
+
         data = zillow_connector.load_sales_data(filepath)
-        
+
         assert isinstance(data, pd.DataFrame)
         assert len(data) == 2
 
@@ -145,59 +161,55 @@ class TestGeographicFiltering:
 
     def test_get_state_data_single(self, zillow_connector, sample_zhvi_data):
         """Test filtering by single state."""
-        result = zillow_connector.get_state_data(sample_zhvi_data, 'NY')
-        
+        result = zillow_connector.get_state_data(sample_zhvi_data, "NY")
+
         assert len(result) == 1
-        assert result.iloc[0]['State'] == 'NY'
-        assert result.iloc[0]['RegionName'] == 'New York'
+        assert result.iloc[0]["State"] == "NY"
+        assert result.iloc[0]["RegionName"] == "New York"
 
     def test_get_state_data_multiple(self, zillow_connector, sample_zhvi_data):
         """Test filtering by multiple states."""
-        result = zillow_connector.get_state_data(sample_zhvi_data, ['NY', 'CA'])
-        
+        result = zillow_connector.get_state_data(sample_zhvi_data, ["NY", "CA"])
+
         assert len(result) == 2
-        assert set(result['State'].unique()) == {'NY', 'CA'}
+        assert set(result["State"].unique()) == {"NY", "CA"}
 
     def test_get_state_data_case_insensitive(self, zillow_connector, sample_zhvi_data):
         """Test case-insensitive state filtering."""
-        result = zillow_connector.get_state_data(sample_zhvi_data, 'ny')
-        
+        result = zillow_connector.get_state_data(sample_zhvi_data, "ny")
+
         assert len(result) == 1
-        assert result.iloc[0]['State'] == 'NY'
+        assert result.iloc[0]["State"] == "NY"
 
     def test_get_metro_data(self, zillow_connector, sample_zhvi_data):
         """Test filtering by metro area."""
-        result = zillow_connector.get_metro_data(
-            sample_zhvi_data,
-            'Los Angeles-Long Beach-Anaheim'
-        )
-        
+        result = zillow_connector.get_metro_data(sample_zhvi_data, "Los Angeles-Long Beach-Anaheim")
+
         assert len(result) == 1
-        assert result.iloc[0]['RegionName'] == 'Los Angeles'
+        assert result.iloc[0]["RegionName"] == "Los Angeles"
 
     def test_get_county_data(self, zillow_connector, sample_zhvi_data):
         """Test filtering by county."""
-        result = zillow_connector.get_county_data(
-            sample_zhvi_data,
-            'Cook County'
-        )
-        
+        result = zillow_connector.get_county_data(sample_zhvi_data, "Cook County")
+
         assert len(result) == 1
-        assert result.iloc[0]['RegionName'] == 'Chicago'
+        assert result.iloc[0]["RegionName"] == "Chicago"
 
     def test_get_zip_data(self, zillow_connector):
         """Test filtering by ZIP code."""
-        zip_data = pd.DataFrame({
-            'RegionID': [1, 2, 3],
-            'RegionName': ['02903', '02906', '90210'],
-            'State': ['RI', 'RI', 'CA'],
-            '2023-01-31': [300000, 320000, 850000],
-        })
-        
-        result = zillow_connector.get_zip_data(zip_data, ['02903', '02906'])
-        
+        zip_data = pd.DataFrame(
+            {
+                "RegionID": [1, 2, 3],
+                "RegionName": ["02903", "02906", "90210"],
+                "State": ["RI", "RI", "CA"],
+                "2023-01-31": [300000, 320000, 850000],
+            }
+        )
+
+        result = zillow_connector.get_zip_data(zip_data, ["02903", "02906"])
+
         assert len(result) == 2
-        assert set(result['RegionName'].values) == {'02903', '02906'}
+        assert set(result["RegionName"].values) == {"02903", "02906"}
 
 
 class TestTimeSeriesOperations:
@@ -206,21 +218,21 @@ class TestTimeSeriesOperations:
     def test_get_time_series(self, zillow_connector, sample_zhvi_data):
         """Test converting wide format to long format time series."""
         result = zillow_connector.get_time_series(sample_zhvi_data)
-        
-        assert 'Date' in result.columns
-        assert 'Value' in result.columns
+
+        assert "Date" in result.columns
+        assert "Value" in result.columns
         assert len(result) == 9  # 3 regions × 3 months
 
     def test_get_latest_values(self, zillow_connector, sample_zhvi_data):
         """Test getting most recent N periods."""
         # First convert to time series format (with Date column)
         ts_data = zillow_connector.get_time_series(sample_zhvi_data)
-        
+
         # Get latest 2 periods
         result = zillow_connector.get_latest_values(ts_data, n=2)
-        
+
         assert len(result) > 0  # Should have some data
-        assert 'Date' in result.columns
+        assert "Date" in result.columns
         # With 3 regions and n=2, we expect 6 rows max
         assert len(result) <= 6
 
@@ -232,22 +244,22 @@ class TestGrowthCalculations:
         """Test year-over-year growth calculation."""
         # First convert to time series format
         ts_data = zillow_connector.get_time_series(sample_zhvi_data)
-        
+
         # Calculate YoY growth
         result = zillow_connector.calculate_yoy_growth(ts_data)
-        
-        assert 'YoY_Growth' in result.columns
+
+        assert "YoY_Growth" in result.columns
         assert len(result) > 0
 
     def test_calculate_mom_growth(self, zillow_connector, sample_zhvi_data):
         """Test month-over-month growth calculation."""
         # First convert to time series format
         ts_data = zillow_connector.get_time_series(sample_zhvi_data)
-        
+
         # Calculate MoM growth
         result = zillow_connector.calculate_mom_growth(ts_data)
-        
-        assert 'MoM_Growth' in result.columns
+
+        assert "MoM_Growth" in result.columns
         assert len(result) > 0
 
 
@@ -258,18 +270,18 @@ class TestStatisticalAnalysis:
         """Test summary statistics calculation."""
         # First convert to time series format with Date and Value columns
         ts_data = zillow_connector.get_time_series(sample_zhvi_data)
-        
+
         # Calculate summary statistics
         result = zillow_connector.calculate_summary_statistics(ts_data)
-        
+
         # Result should be a dictionary with statistical measures
         assert isinstance(result, dict)
-        assert 'mean' in result
-        assert 'median' in result
-        assert 'std' in result
-        assert 'min' in result
-        assert 'max' in result
-        assert 'count' in result
+        assert "mean" in result
+        assert "median" in result
+        assert "std" in result
+        assert "min" in result
+        assert "max" in result
+        assert "count" in result
 
 
 class TestExport:
@@ -278,11 +290,11 @@ class TestExport:
     def test_export_to_csv(self, zillow_connector, sample_zhvi_data, tmp_path):
         """Test exporting data to CSV."""
         output_file = tmp_path / "export.csv"
-        
+
         zillow_connector.export_to_csv(sample_zhvi_data, output_file)
-        
+
         assert output_file.exists()
-        
+
         # Verify exported data
         exported = pd.read_csv(output_file)
         assert len(exported) == len(sample_zhvi_data)
@@ -295,22 +307,24 @@ class TestEdgeCases:
     def test_empty_dataframe(self, zillow_connector):
         """Test handling empty DataFrame."""
         empty_df = pd.DataFrame()
-        result = zillow_connector.get_state_data(empty_df, 'NY')
-        
+        result = zillow_connector.get_state_data(empty_df, "NY")
+
         assert len(result) == 0
 
     def test_missing_state_column(self, zillow_connector):
         """Test handling missing State column."""
-        data = pd.DataFrame({
-            'RegionName': ['Boston'],
-            '2023-01-31': [400000],
-        })
-        
-        result = zillow_connector.get_state_data(data, 'MA')
+        data = pd.DataFrame(
+            {
+                "RegionName": ["Boston"],
+                "2023-01-31": [400000],
+            }
+        )
+
+        result = zillow_connector.get_state_data(data, "MA")
         assert len(result) == 0
 
     def test_nonexistent_state(self, zillow_connector, sample_zhvi_data):
         """Test filtering by nonexistent state."""
-        result = zillow_connector.get_state_data(sample_zhvi_data, 'ZZ')
-        
+        result = zillow_connector.get_state_data(sample_zhvi_data, "ZZ")
+
         assert len(result) == 0

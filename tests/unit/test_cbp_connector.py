@@ -705,7 +705,11 @@ class TestCBPPropertyBased:
 
         cbp_connector = CountyBusinessPatternsConnector()
 
-        @given(state=st.text(alphabet=st.characters(whitelist_categories=("Nd",)), min_size=2, max_size=2))
+        @given(
+            state=st.text(
+                alphabet=st.characters(whitelist_categories=("Nd",)), min_size=2, max_size=2
+            )
+        )
         def check_state_code_handling(state):
             with patch.object(cbp_connector, "_make_request") as mock_request:
                 mock_request.return_value = [
@@ -725,7 +729,11 @@ class TestCBPPropertyBased:
 
         cbp_connector = CountyBusinessPatternsConnector()
 
-        @given(county=st.text(alphabet=st.characters(whitelist_categories=("Nd",)), min_size=3, max_size=3))
+        @given(
+            county=st.text(
+                alphabet=st.characters(whitelist_categories=("Nd",)), min_size=3, max_size=3
+            )
+        )
         def check_county_code_handling(county):
             with patch.object(cbp_connector, "_make_request") as mock_request:
                 mock_request.return_value = [

@@ -864,9 +864,7 @@ class TestBEAPropertyBased:
                 mock_request.return_value = {"BEAAPI": {"Results": {"Data": []}}}
 
                 try:
-                    connector.get_nipa_data(
-                        table_name="T10101", year="2020", frequency=frequency
-                    )
+                    connector.get_nipa_data(table_name="T10101", year="2020", frequency=frequency)
                     # If accepted, should be a valid frequency
                     assert frequency.upper() in valid_frequencies or len(mock_request.call_args) > 0
                 except (ValueError, KeyError):
@@ -882,7 +880,11 @@ class TestBEAPropertyBased:
 
         connector = BEAConnector(api_key="test_key")
 
-        @given(geo_fips=st.text(alphabet=st.characters(whitelist_categories=("Nd",)), min_size=2, max_size=5))
+        @given(
+            geo_fips=st.text(
+                alphabet=st.characters(whitelist_categories=("Nd",)), min_size=2, max_size=5
+            )
+        )
         def check_geo_fips_format(geo_fips):
             # Valid FIPS codes are numeric strings
             with patch.object(connector, "_make_request") as mock_request:

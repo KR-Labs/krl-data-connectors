@@ -654,7 +654,11 @@ class TestLEHDPropertyBased:
 
         lehd_connector = LEHDConnector()
 
-        @given(state=st.text(alphabet=st.characters(min_codepoint=97, max_codepoint=122), min_size=2, max_size=2))
+        @given(
+            state=st.text(
+                alphabet=st.characters(min_codepoint=97, max_codepoint=122), min_size=2, max_size=2
+            )
+        )
         def check_state_code_handling(state):
             with patch("pandas.read_csv") as mock_read_csv:
                 mock_df = pd.DataFrame(
@@ -722,4 +726,3 @@ class TestLEHDPropertyBased:
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
-

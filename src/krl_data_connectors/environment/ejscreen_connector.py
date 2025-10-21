@@ -65,13 +65,13 @@ class EJScreenConnector(BaseConnector):
     Example:
         >>> from krl_data_connectors.environment import EJScreenConnector
         >>> ejs = EJScreenConnector()
-        >>> 
+        >>>
         >>> # Load from local CSV file
         >>> data = ejs.load_data('path/to/ejscreen_2024.csv')
-        >>> 
+        >>>
         >>> # Get data for Rhode Island
         >>> ri_data = ejs.get_state_data(data, state='RI')
-        >>> 
+        >>>
         >>> # Get high environmental burden tracts
         >>> high_burden = ejs.filter_by_threshold(
         ...     data,
@@ -82,36 +82,36 @@ class EJScreenConnector(BaseConnector):
 
     # Environmental indicators (percentiles)
     ENVIRONMENTAL_INDICATORS = {
-        'P_PM25': 'Particulate Matter 2.5 (PM2.5)',
-        'P_OZONE': 'Ozone',
-        'P_DSLPM': 'Diesel Particulate Matter',
-        'P_PTRAF': 'Traffic Proximity',
-        'P_LDPNT': 'Lead Paint',
-        'P_PNPL': 'Superfund Proximity',
-        'P_PRMP': 'RMP Facility Proximity',
-        'P_PTSDF': 'Hazardous Waste Proximity',
-        'P_UST': 'Underground Storage Tanks',
-        'P_PWDIS': 'Wastewater Discharge',
+        "P_PM25": "Particulate Matter 2.5 (PM2.5)",
+        "P_OZONE": "Ozone",
+        "P_DSLPM": "Diesel Particulate Matter",
+        "P_PTRAF": "Traffic Proximity",
+        "P_LDPNT": "Lead Paint",
+        "P_PNPL": "Superfund Proximity",
+        "P_PRMP": "RMP Facility Proximity",
+        "P_PTSDF": "Hazardous Waste Proximity",
+        "P_UST": "Underground Storage Tanks",
+        "P_PWDIS": "Wastewater Discharge",
     }
 
     # Demographic indicators (percentiles)
     DEMOGRAPHIC_INDICATORS = {
-        'P_MINORTY': 'People of Color',
-        'P_LWINCPCT': 'Low Income',
-        'P_LNGISO': 'Limited English Speaking',
-        'P_LTHS': 'Less Than High School',
-        'P_UNDER5': 'Under Age 5',
-        'P_OVER64': 'Over Age 64',
+        "P_MINORTY": "People of Color",
+        "P_LWINCPCT": "Low Income",
+        "P_LNGISO": "Limited English Speaking",
+        "P_LTHS": "Less Than High School",
+        "P_UNDER5": "Under Age 5",
+        "P_OVER64": "Over Age 64",
     }
 
     # EJ Index indicators (environmental × demographic)
     EJ_INDEX_INDICATORS = {
-        'P_D2_PM25': 'PM2.5 EJ Index',
-        'P_D5_PM25': 'PM2.5 EJ Index (supplemental)',
-        'P_D2_OZONE': 'Ozone EJ Index',
-        'P_D5_OZONE': 'Ozone EJ Index (supplemental)',
-        'P_D2_DSLPM': 'Diesel PM EJ Index',
-        'P_D5_DSLPM': 'Diesel PM EJ Index (supplemental)',
+        "P_D2_PM25": "PM2.5 EJ Index",
+        "P_D5_PM25": "PM2.5 EJ Index (supplemental)",
+        "P_D2_OZONE": "Ozone EJ Index",
+        "P_D5_OZONE": "Ozone EJ Index (supplemental)",
+        "P_D2_DSLPM": "Diesel PM EJ Index",
+        "P_D5_DSLPM": "Diesel PM EJ Index (supplemental)",
     }
 
     def __init__(
@@ -193,7 +193,7 @@ class EJScreenConnector(BaseConnector):
             raise ValueError(f"Failed to load EJScreen data: {e}")
 
     def get_state_data(
-        self, data: pd.DataFrame, state: str, state_column: str = 'ST_ABBREV'
+        self, data: pd.DataFrame, state: str, state_column: str = "ST_ABBREV"
     ) -> pd.DataFrame:
         """
         Filter EJScreen data by state.
@@ -220,7 +220,7 @@ class EJScreenConnector(BaseConnector):
         return filtered
 
     def get_county_data(
-        self, data: pd.DataFrame, county_fips: str, fips_column: str = 'CNTY_FIPS'
+        self, data: pd.DataFrame, county_fips: str, fips_column: str = "CNTY_FIPS"
     ) -> pd.DataFrame:
         """
         Filter EJScreen data by county FIPS code.
@@ -287,8 +287,8 @@ class EJScreenConnector(BaseConnector):
         data: pd.DataFrame,
         environmental_threshold: float = 80,
         demographic_threshold: float = 80,
-        environmental_indicator: str = 'P_PM25',
-        demographic_indicator: str = 'P_MINORTY',
+        environmental_indicator: str = "P_PM25",
+        demographic_indicator: str = "P_MINORTY",
     ) -> pd.DataFrame:
         """
         Identify high environmental justice burden tracts.
@@ -344,15 +344,15 @@ class EJScreenConnector(BaseConnector):
             >>> print(indicators['environmental'])
         """
         available = {
-            'environmental': [k for k in self.ENVIRONMENTAL_INDICATORS if k in data.columns],
-            'demographic': [k for k in self.DEMOGRAPHIC_INDICATORS if k in data.columns],
-            'ej_index': [k for k in self.EJ_INDEX_INDICATORS if k in data.columns],
+            "environmental": [k for k in self.ENVIRONMENTAL_INDICATORS if k in data.columns],
+            "demographic": [k for k in self.DEMOGRAPHIC_INDICATORS if k in data.columns],
+            "ej_index": [k for k in self.EJ_INDEX_INDICATORS if k in data.columns],
         }
 
         return available
 
     def summarize_by_state(
-        self, data: pd.DataFrame, indicators: List[str], state_column: str = 'ST_ABBREV'
+        self, data: pd.DataFrame, indicators: List[str], state_column: str = "ST_ABBREV"
     ) -> pd.DataFrame:
         """
         Calculate summary statistics by state for specified indicators.
@@ -379,7 +379,11 @@ class EJScreenConnector(BaseConnector):
         if missing_indicators:
             raise ValueError(f"Indicators not found in data: {missing_indicators}")
 
-        summary = data.groupby(state_column)[indicators].agg(['mean', 'median', 'min', 'max']).reset_index()
+        summary = (
+            data.groupby(state_column)[indicators]
+            .agg(["mean", "median", "min", "max"])
+            .reset_index()
+        )
 
         logger.info(f"Calculated state summary for {len(indicators)} indicators")
         return summary

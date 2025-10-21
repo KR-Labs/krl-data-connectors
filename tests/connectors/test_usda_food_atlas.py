@@ -102,9 +102,7 @@ class TestUSDAFoodAtlasConnector:
         assert "state" in result.columns
         assert "county" in result.columns
 
-    def test_get_county_data_by_category(
-        self, connector, mock_county_response, requests_mock
-    ):
+    def test_get_county_data_by_category(self, connector, mock_county_response, requests_mock):
         """Test getting county data by category."""
         requests_mock.get(
             "https://api.ers.usda.gov/data/foodatlas/county",
@@ -116,9 +114,7 @@ class TestUSDAFoodAtlasConnector:
         assert not result.empty
         # Request may come from cache, just verify data is returned
 
-    def test_get_county_data_by_state(
-        self, connector, mock_county_response, requests_mock
-    ):
+    def test_get_county_data_by_state(self, connector, mock_county_response, requests_mock):
         """Test getting county data for specific state."""
         requests_mock.get(
             "https://api.ers.usda.gov/data/foodatlas/county",
@@ -130,9 +126,7 @@ class TestUSDAFoodAtlasConnector:
         assert not result.empty
         # Request may come from cache, just verify data is returned
 
-    def test_get_county_data_by_county(
-        self, connector, mock_county_response, requests_mock
-    ):
+    def test_get_county_data_by_county(self, connector, mock_county_response, requests_mock):
         """Test getting data for specific county."""
         requests_mock.get(
             "https://api.ers.usda.gov/data/foodatlas/county",
@@ -164,34 +158,26 @@ class TestUSDAFoodAtlasConnector:
         assert "PCT_LACCESS_POP15" in result.columns
         assert "GROCERY14" in result.columns
 
-    def test_get_indicators_with_state(
-        self, connector, mock_indicators_response, requests_mock
-    ):
+    def test_get_indicators_with_state(self, connector, mock_indicators_response, requests_mock):
         """Test getting indicators for specific state."""
         requests_mock.get(
             "https://api.ers.usda.gov/data/foodatlas/indicators",
             json=mock_indicators_response,
         )
 
-        result = connector.get_indicators(
-            indicators=["PCT_LACCESS_POP15"], state_fips="06"
-        )
+        result = connector.get_indicators(indicators=["PCT_LACCESS_POP15"], state_fips="06")
 
         assert not result.empty
         # Request may come from cache, just verify data is returned
 
-    def test_get_indicators_with_county(
-        self, connector, mock_indicators_response, requests_mock
-    ):
+    def test_get_indicators_with_county(self, connector, mock_indicators_response, requests_mock):
         """Test getting indicators for specific county."""
         requests_mock.get(
             "https://api.ers.usda.gov/data/foodatlas/indicators",
             json=mock_indicators_response,
         )
 
-        result = connector.get_indicators(
-            indicators=["PCT_LACCESS_POP15"], county_fips="06037"
-        )
+        result = connector.get_indicators(indicators=["PCT_LACCESS_POP15"], county_fips="06037")
 
         assert not result.empty
         # Request may come from cache, just verify data is returned
@@ -249,7 +235,7 @@ class TestUSDAFoodAtlasConnector:
         """Test error handling for API failures."""
         # Create connector with temp cache to avoid cache hits
         connector = USDAFoodAtlasConnector(api_key="test_key", cache_dir=temp_cache_dir)
-        
+
         requests_mock.get(
             "https://api.ers.usda.gov/data/foodatlas/county",
             status_code=404,
@@ -263,7 +249,7 @@ class TestUSDAFoodAtlasConnector:
         """Test response caching."""
         # Create connector with temp cache to test caching behavior
         connector = USDAFoodAtlasConnector(api_key="test_key", cache_dir=temp_cache_dir)
-        
+
         requests_mock.get(
             "https://api.ers.usda.gov/data/foodatlas/county",
             json=mock_county_response,
