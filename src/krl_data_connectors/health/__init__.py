@@ -9,5 +9,6 @@ from .cdc_connector import CDCWonderConnector
 from .chr_connector import CountyHealthRankingsConnector
 from .fda_connector import FDAConnector
 from .hrsa_connector import HRSAConnector
+from .nih_connector import NIHConnector
 
-__all__ = ["CDCWonderConnector", "CountyHealthRankingsConnector", "FDAConnector", "HRSAConnector"]
+__all__ = ["CDCWonderConnector", "CountyHealthRankingsConnector", "FDAConnector", "HRSAConnector", "NIHConnector"]
