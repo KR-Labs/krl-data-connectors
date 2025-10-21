@@ -7,6 +7,7 @@
 
 """Crime and public safety data connectors for KRL Data Connectors."""
 
+from krl_data_connectors.crime.bjs_connector import BureauOfJusticeConnector
 from krl_data_connectors.crime.fbi_ucr_connector import FBIUCRConnector
 
-__all__ = ["FBIUCRConnector"]
+__all__ = ["BureauOfJusticeConnector", "FBIUCRConnector"]
