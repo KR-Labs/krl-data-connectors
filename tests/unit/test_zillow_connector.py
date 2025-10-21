@@ -328,3 +328,127 @@ class TestEdgeCases:
         result = zillow_connector.get_state_data(sample_zhvi_data, "ZZ")
 
         assert len(result) == 0
+
+
+class TestZillowConnectorTypeContracts:
+    """Test type contracts and return value structures (Layer 8)."""
+
+    def test_connect_return_type(self):
+        """Test that connect returns None."""
+        zillow = ZillowConnector()
+        result = zillow.connect()
+        assert result is None
+
+    @patch("pathlib.Path.exists")
+    @patch("pandas.read_csv")
+    def test_fetch_return_type(self, mock_read_csv, mock_exists):
+        """Test that fetch returns DataFrame."""
+        mock_exists.return_value = True
+        mock_read_csv.return_value = pd.DataFrame({
+            "RegionName": ["Providence"],
+            "State": ["RI"],
+            "2023-01-31": [300000]
+        })
+        zillow = ZillowConnector()
+        result = zillow.fetch(filepath="test.csv", data_type="zhvi")
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pathlib.Path.exists")
+    @patch("pandas.read_csv")
+    def test_load_zhvi_data_return_type(self, mock_read_csv, mock_exists):
+        """Test that load_zhvi_data returns DataFrame."""
+        mock_exists.return_value = True
+        mock_read_csv.return_value = pd.DataFrame({
+            "RegionName": ["Providence"],
+            "State": ["RI"],
+            "2023-01-31": [300000]
+        })
+        zillow = ZillowConnector()
+        result = zillow.load_zhvi_data("test.csv")
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pathlib.Path.exists")
+    @patch("pandas.read_csv")
+    def test_load_zri_data_return_type(self, mock_read_csv, mock_exists):
+        """Test that load_zri_data returns DataFrame."""
+        mock_exists.return_value = True
+        mock_read_csv.return_value = pd.DataFrame({
+            "RegionName": ["Providence"],
+            "State": ["RI"],
+            "2023-01-31": [1500]
+        })
+        zillow = ZillowConnector()
+        result = zillow.load_zri_data("test.csv")
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pathlib.Path.exists")
+    @patch("pandas.read_csv")
+    def test_load_inventory_data_return_type(self, mock_read_csv, mock_exists):
+        """Test that load_inventory_data returns DataFrame."""
+        mock_exists.return_value = True
+        mock_read_csv.return_value = pd.DataFrame({
+            "RegionName": ["Providence"],
+            "State": ["RI"],
+            "2023-01-31": [250]
+        })
+        zillow = ZillowConnector()
+        result = zillow.load_inventory_data("test.csv")
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_state_data_return_type(self):
+        """Test that get_state_data returns DataFrame."""
+        zillow = ZillowConnector()
+        df = pd.DataFrame({
+            "RegionName": ["Providence", "Boston"],
+            "State": ["RI", "MA"],
+            "2023-01-31": [300000, 500000]
+        })
+        result = zillow.get_state_data(df, "RI")
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_metro_data_return_type(self):
+        """Test that get_metro_data returns DataFrame."""
+        zillow = ZillowConnector()
+        df = pd.DataFrame({
+            "RegionName": ["Providence-Warwick", "Boston"],
+            "State": ["RI", "MA"],
+            "2023-01-31": [300000, 500000]
+        })
+        result = zillow.get_metro_data(df, "Providence")
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_county_data_return_type(self):
+        """Test that get_county_data returns DataFrame."""
+        zillow = ZillowConnector()
+        df = pd.DataFrame({
+            "RegionName": ["Providence County", "Kent County"],
+            "State": ["RI", "RI"],
+            "2023-01-31": [300000, 280000]
+        })
+        result = zillow.get_county_data(df, "Providence")
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_zip_data_return_type(self):
+        """Test that get_zip_data returns DataFrame."""
+        zillow = ZillowConnector()
+        df = pd.DataFrame({
+            "RegionName": [2903, 2906],
+            "State": ["RI", "RI"],
+            "2023-01-31": [320000, 290000]
+        })
+        result = zillow.get_zip_data(df, "02903")
+        assert isinstance(result, pd.DataFrame)
+
+    def test_calculate_yoy_growth_return_type(self):
+        """Test that calculate_yoy_growth returns DataFrame."""
+        zillow = ZillowConnector()
+        df = pd.DataFrame({
+            "Date": ["2022-01", "2023-01"],
+            "Value": [280000, 300000]
+        })
+        result = zillow.calculate_yoy_growth(df)
+        assert isinstance(result, pd.DataFrame)
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])
