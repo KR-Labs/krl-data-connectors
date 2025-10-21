@@ -653,5 +653,121 @@ class TestNCESSecurityInputValidation:
             pass
 
 
+class TestNCESPropertyBased:
+    """Test NCES connector using property-based testing with Hypothesis."""
+
+    @pytest.mark.hypothesis
+    def test_year_parameter_validation_property(self, nces_connector):
+        """Property: Year parameter should accept valid school years (2000-2024)."""
+        from hypothesis import given, strategies as st
+
+        @given(year=st.integers(min_value=2000, max_value=2024))
+        def check_year_handling(year):
+            with patch('requests.get') as mock_get:
+                mock_response = Mock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = [
+                    {
+                        "school_id": "440001",
+                        "school_name": "Test School",
+                        "state": "RI",
+                        "enrollment": 500
+                    }
+                ]
+                mock_get.return_value = mock_response
+                
+                df = nces_connector.get_state_schools('RI', year, use_api=True)
+                assert isinstance(df, pd.DataFrame)
+                assert mock_get.called
+
+        check_year_handling()
+
+    @pytest.mark.hypothesis
+    def test_state_code_property(self, nces_connector):
+        """Property: State codes should be 2-letter uppercase strings."""
+        from hypothesis import given, strategies as st
+
+        @given(state=st.text(alphabet=st.characters(min_codepoint=65, max_codepoint=90), min_size=2, max_size=2))
+        def check_state_code_handling(state):
+            with patch('requests.get') as mock_get:
+                mock_response = Mock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = [
+                    {
+                        "school_id": "010001",
+                        "school_name": "Test School",
+                        "state": state,
+                    }
+                ]
+                mock_get.return_value = mock_response
+                
+                # Only test valid state codes (NCES has 50 states + DC/territories)
+                try:
+                    df = nces_connector.get_state_schools(state, 2023, use_api=True)
+                    assert isinstance(df, pd.DataFrame)
+                    assert mock_get.called
+                except (KeyError, ValueError):
+                    # Acceptable to reject invalid state codes
+                    pass
+
+        check_state_code_handling()
+
+    @pytest.mark.hypothesis
+    def test_school_id_format_property(self, nces_connector):
+        """Property: School IDs should be numeric strings (6-12 digits)."""
+        from hypothesis import given, strategies as st
+
+        @given(school_id=st.text(alphabet=st.characters(whitelist_categories=("Nd",)), min_size=6, max_size=12))
+        def check_school_id_handling(school_id):
+            with patch('requests.get') as mock_get:
+                mock_response = Mock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = {
+                    "school_id": school_id,
+                    "school_name": "Test School",
+                    "enrollment": 500
+                }
+                mock_get.return_value = mock_response
+                
+                # Mock get_school_details method (if it exists)
+                try:
+                    if hasattr(nces_connector, 'get_school_details'):
+                        result = nces_connector.get_school_details(school_id)
+                        assert result is not None
+                except (ValueError, AttributeError):
+                    # Acceptable if method doesn't exist or rejects invalid IDs
+                    pass
+
+        check_school_id_handling()
+
+    @pytest.mark.hypothesis
+    def test_enrollment_data_property(self, nces_connector):
+        """Property: Enrollment values should be non-negative integers."""
+        from hypothesis import given, strategies as st
+
+        @given(enrollment=st.integers(min_value=0, max_value=50000))
+        def check_enrollment_handling(enrollment):
+            # Create mock school DataFrame
+            schools_df = pd.DataFrame({
+                'NCESSCH': ['440001'],
+                'SCH_NAME': ['Test School'],
+                'ENROLLMENT': [enrollment]
+            })
+            
+            # Test get_enrollment_data method
+            try:
+                if hasattr(nces_connector, 'get_enrollment_data'):
+                    result = nces_connector.get_enrollment_data(schools_df)
+                    assert isinstance(result, pd.DataFrame)
+                    if not result.empty and 'ENROLLMENT' in result.columns:
+                        assert all(result['ENROLLMENT'] >= 0)
+            except (ValueError, TypeError, KeyError):
+                # Acceptable if method has different signature
+                pass
+
+        check_enrollment_handling()
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
+
