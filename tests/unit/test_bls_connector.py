@@ -19,7 +19,7 @@ Tests cover:
 """
 
 from datetime import datetime
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pandas as pd
 import pytest
@@ -777,6 +777,112 @@ class TestBLSSecurityInputValidation:
         # Year 9999 is an extreme case
         with pytest.raises(ValueError):
             connector.get_series("LNS14000000", start_year=1900, end_year=9999)
+
+
+# ============================================================================
+# Layer 8: Contract Tests
+# ============================================================================
+
+
+class TestBLSConnectorTypeContracts:
+    """Test type contracts and return value structures (Layer 8)."""
+
+    def test_connect_return_type(self, temp_cache_dir):
+        """Test that connect returns None."""
+        connector = BLSConnector(api_key="test_key", cache_dir=str(temp_cache_dir))
+
+        result = connector.connect()
+
+        assert result is None
+
+    @patch("requests.Session.post")
+    def test_get_series_return_type(self, mock_post, temp_cache_dir):
+        """Test that get_series returns DataFrame."""
+        mock_response = Mock()
+        mock_response.json.return_value = {
+            "status": "REQUEST_SUCCEEDED",
+            "Results": {"series": [{"seriesID": "LNS14000000", "data": []}]},
+        }
+        mock_response.raise_for_status = Mock()
+        mock_post.return_value = mock_response
+
+        connector = BLSConnector(api_key="test_key", cache_dir=str(temp_cache_dir))
+        connector.connect()
+
+        result = connector.get_series("LNS14000000")
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("requests.Session.post")
+    def test_get_multiple_series_return_type(self, mock_post, temp_cache_dir):
+        """Test that get_multiple_series returns dict of DataFrames."""
+        mock_response = Mock()
+        mock_response.json.return_value = {
+            "status": "REQUEST_SUCCEEDED",
+            "Results": {"series": [{"seriesID": "LNS14000000", "data": []}]},
+        }
+        mock_response.raise_for_status = Mock()
+        mock_post.return_value = mock_response
+
+        connector = BLSConnector(api_key="test_key", cache_dir=str(temp_cache_dir))
+        connector.connect()
+
+        result = connector.get_multiple_series(["LNS14000000"])
+
+        assert isinstance(result, dict)
+        for key, value in result.items():
+            assert isinstance(key, str)
+            assert isinstance(value, pd.DataFrame)
+
+    @patch("requests.Session.post")
+    def test_get_unemployment_rate_return_type(self, mock_post, temp_cache_dir):
+        """Test that get_unemployment_rate returns DataFrame."""
+        mock_response = Mock()
+        mock_response.json.return_value = {
+            "status": "REQUEST_SUCCEEDED",
+            "Results": {"series": [{"seriesID": "LNS14000000", "data": []}]},
+        }
+        mock_response.raise_for_status = Mock()
+        mock_post.return_value = mock_response
+
+        connector = BLSConnector(api_key="test_key", cache_dir=str(temp_cache_dir))
+        connector.connect()
+
+        result = connector.get_unemployment_rate()
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("requests.Session.post")
+    def test_get_cpi_return_type(self, mock_post, temp_cache_dir):
+        """Test that get_cpi returns DataFrame."""
+        mock_response = Mock()
+        mock_response.json.return_value = {
+            "status": "REQUEST_SUCCEEDED",
+            "Results": {"series": [{"seriesID": "CUUR0000SA0", "data": []}]},
+        }
+        mock_response.raise_for_status = Mock()
+        mock_post.return_value = mock_response
+
+        connector = BLSConnector(api_key="test_key", cache_dir=str(temp_cache_dir))
+        connector.connect()
+
+        result = connector.get_cpi()
+
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_common_series_id_return_type(self):
+        """Test that get_common_series_id returns Optional[str]."""
+        result = BLSConnector.get_common_series_id("unemployment_rate")
+
+        assert result is None or isinstance(result, str)
+
+    def test_get_api_key_return_type(self, temp_cache_dir):
+        """Test that _get_api_key returns Optional[str]."""
+        connector = BLSConnector(api_key="test_key", cache_dir=str(temp_cache_dir))
+
+        result = connector._get_api_key()
+
+        assert result is None or isinstance(result, str)
 
 
 if __name__ == "__main__":
