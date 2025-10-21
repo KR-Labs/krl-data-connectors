@@ -95,4 +95,9 @@ examples/*.csv
 PHASE*.md
 WEEK*.md
 SESSION_*.md
+CLEANUP_PLAN.md
+CONNECTOR_AUDIT_REPORT.md
+API_KEY_SETUP.md
+BRANCH_PROTECTION_SETUP.md
+branch-protection-ruleset*.json
 
