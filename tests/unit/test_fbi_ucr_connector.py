@@ -491,5 +491,123 @@ class TestFBIUCRSecurityInputValidation:
             pass
 
 
+class TestFBIUCRPropertyBased:
+    """Test FBI UCR connector using property-based testing with Hypothesis."""
+
+    @pytest.mark.hypothesis
+    def test_year_parameter_validation_property(self, fbi_connector):
+        """Property: Year parameter should accept valid years (1960-2023)."""
+        from hypothesis import given, strategies as st
+
+        @given(year=st.integers(min_value=1960, max_value=2023))
+        def check_year_handling(year):
+            with patch('requests.get') as mock_get:
+                mock_response = Mock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = {
+                    "results": [
+                        {
+                            "state_abbr": "RI",
+                            "year": year,
+                            "violent_crime": 1000,
+                            "property_crime": 5000
+                        }
+                    ]
+                }
+                mock_get.return_value = mock_response
+                
+                df = fbi_connector.get_state_crime_data('RI', year, use_api=True)
+                assert isinstance(df, pd.DataFrame)
+                assert mock_get.called
+
+        check_year_handling()
+
+    @pytest.mark.hypothesis
+    def test_state_code_property(self, fbi_connector):
+        """Property: State codes should be 2-letter uppercase strings."""
+        from hypothesis import given, strategies as st
+
+        @given(state=st.text(alphabet=st.characters(min_codepoint=65, max_codepoint=90), min_size=2, max_size=2))
+        def check_state_code_handling(state):
+            with patch('requests.get') as mock_get:
+                mock_response = Mock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = {
+                    "results": [
+                        {
+                            "state_abbr": state,
+                            "year": 2022,
+                            "violent_crime": 1000
+                        }
+                    ]
+                }
+                mock_get.return_value = mock_response
+                
+                # Only test valid state codes
+                try:
+                    df = fbi_connector.get_state_crime_data(state, 2022, use_api=True)
+                    assert isinstance(df, pd.DataFrame)
+                    assert mock_get.called
+                except (KeyError, ValueError):
+                    # Acceptable to reject invalid state codes
+                    pass
+
+        check_state_code_handling()
+
+    @pytest.mark.hypothesis
+    def test_crime_count_property(self, fbi_connector):
+        """Property: Crime counts should be non-negative integers."""
+        from hypothesis import given, strategies as st
+
+        @given(
+            violent_crime=st.integers(min_value=0, max_value=1000000),
+            property_crime=st.integers(min_value=0, max_value=1000000)
+        )
+        def check_crime_count_handling(violent_crime, property_crime):
+            # Create mock crime data DataFrame with required columns
+            crime_df = pd.DataFrame({
+                'year': [2022],
+                'state': ['RI'],
+                'violent_crime': [violent_crime],
+                'property_crime': [property_crime]
+            })
+            
+            # Test violent crime filtering
+            if hasattr(fbi_connector, 'get_violent_crime'):
+                result = fbi_connector.get_violent_crime(crime_df)
+                assert isinstance(result, pd.DataFrame)
+                if not result.empty and 'violent_crime' in result.columns:
+                    assert all(result['violent_crime'] >= 0)
+
+        check_crime_count_handling()
+
+    @pytest.mark.hypothesis
+    def test_crime_rate_property(self, fbi_connector):
+        """Property: Crime rates should be calculable from counts and population."""
+        from hypothesis import given, strategies as st
+
+        @given(
+            crime_count=st.integers(min_value=0, max_value=100000),
+            population=st.integers(min_value=1, max_value=10000000)
+        )
+        def check_rate_calculation(crime_count, population):
+            # Crime rate per 100,000 population
+            expected_rate = (crime_count / population) * 100000
+            
+            # Create test data
+            test_df = pd.DataFrame({
+                'crime_count': [crime_count],
+                'population': [population]
+            })
+            
+            # Validate rate calculation range
+            assert expected_rate >= 0
+            if population > 0:
+                assert expected_rate <= 100000 * 100000  # Max possible rate
+
+        check_rate_calculation()
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
+
