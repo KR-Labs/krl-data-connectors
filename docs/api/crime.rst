@@ -4,7 +4,7 @@
 Crime Data Connectors
 =====================
 
-Connectors for crime statistics and public safety data.
+Connectors for crime statistics, criminal justice data, and victim services.
 
 FBI UCR Connector
 -----------------
@@ -17,17 +17,41 @@ FBI Uniform Crime Reporting connector for crime statistics data.
    :show-inheritance:
    :inherited-members:
 
+Bureau of Justice Connector
+---------------------------
+
+Bureau of Justice Statistics connector for criminal justice data.
+
+.. autoclass:: krl_data_connectors.crime.BureauOfJusticeConnector
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :inherited-members:
+
+Victims of Crime Connector
+--------------------------
+
+Office for Victims of Crime connector for crime victimization data.
+
+.. autoclass:: krl_data_connectors.crime.VictimsOfCrimeConnector
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :inherited-members:
+
 Example Usage
 ~~~~~~~~~~~~~
 
 .. code-block:: python
 
-   from krl_data_connectors.crime import FBIUCRConnector
+   from krl_data_connectors.crime import (
+       FBIUCRConnector,
+       BureauOfJusticeConnector,
+       VictimsOfCrimeConnector
+   )
 
-   # Initialize
+   # FBI crime statistics
    fbi = FBIUCRConnector()
-
-   # Get agency crime data
    crime_data = fbi.get_agency_data(
        ori="CA0190000",  # San Francisco PD
        offense="violent-crime",
@@ -35,8 +59,17 @@ Example Usage
        until=2023
    )
 
-   # Get state-level estimates
-   state_estimates = fbi.get_state_estimates(
-       state="CA",
-       variable="violent-crime"
+   # Bureau of Justice statistics
+   bjs = BureauOfJusticeConnector()
+   justice_stats = bjs.get_corrections_data(
+       year=2024,
+       facility_type="prison"
+   )
+   
+   # Victims of crime data
+   ovc = VictimsOfCrimeConnector()
+   victim_data = ovc.get_victimization_data(
+       state="NY",
+       year=2024,
+       crime_type="violent"
    )
