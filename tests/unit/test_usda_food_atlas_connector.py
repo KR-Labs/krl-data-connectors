@@ -30,45 +30,43 @@ from krl_data_connectors.agricultural.usda_food_atlas_connector import (
 class TestUSDAFoodAtlasConnectorTypeContracts:
     """Test type contracts and return value structures (Layer 8)."""
 
-    def test_connect_return_type(self):
+    @patch("requests.Session.get")
+    def test_connect_return_type(self, mock_get):
         """Test that connect returns None."""
+        mock_response = Mock()
+        mock_response.json.return_value = {
+            "data": [{"FIPS": "06001", "County": "Alameda", "State": "California"}]
+        }
+        mock_response.raise_for_status = Mock()
+        mock_get.return_value = mock_response
+
         atlas = USDAFoodAtlasConnector()
 
         result = atlas.connect()
 
         assert result is None
 
-    @patch("requests.Session.get")
-    def test_get_county_data_return_type(self, mock_get):
+    @patch.object(USDAFoodAtlasConnector, "_make_request")
+    def test_get_county_data_return_type(self, mock_request):
         """Test that get_county_data returns DataFrame."""
-        mock_response = Mock()
-        mock_response.json.return_value = {
-            "features": [
-                {"attributes": {"FIPS": "01001", "County": "Autauga", "State": "Alabama"}}
-            ]
+        mock_request.return_value = {
+            "data": [{"FIPS": "01001", "County": "Autauga", "State": "Alabama"}]
         }
-        mock_response.raise_for_status = Mock()
-        mock_get.return_value = mock_response
 
         atlas = USDAFoodAtlasConnector()
-        atlas.connect()
 
         result = atlas.get_county_data(county_fips="01001")
 
         assert isinstance(result, pd.DataFrame)
 
-    @patch("requests.Session.get")
-    def test_get_indicators_return_type(self, mock_get):
+    @patch.object(USDAFoodAtlasConnector, "_make_request")
+    def test_get_indicators_return_type(self, mock_request):
         """Test that get_indicators returns DataFrame."""
-        mock_response = Mock()
-        mock_response.json.return_value = {
-            "features": [{"attributes": {"FIPS": "01001", "PCT_LACCESS_POP15": 5.2}}]
+        mock_request.return_value = {
+            "data": [{"FIPS": "01001", "PCT_LACCESS_POP15": 5.2}]
         }
-        mock_response.raise_for_status = Mock()
-        mock_get.return_value = mock_response
 
         atlas = USDAFoodAtlasConnector()
-        atlas.connect()
 
         result = atlas.get_indicators(indicators=["PCT_LACCESS_POP15"])
 
@@ -92,16 +90,14 @@ class TestUSDAFoodAtlasConnectorTypeContracts:
 
         assert isinstance(result, dict)
 
-    @patch("requests.Session.get")
-    def test_fetch_return_type(self, mock_get):
+    @patch.object(USDAFoodAtlasConnector, "_make_request")
+    def test_fetch_return_type(self, mock_request):
         """Test that fetch returns DataFrame."""
-        mock_response = Mock()
-        mock_response.json.return_value = {"features": [{"attributes": {}}]}
-        mock_response.raise_for_status = Mock()
-        mock_get.return_value = mock_response
+        mock_request.return_value = {
+            "data": [{"FIPS": "01001", "County": "Autauga", "State": "Alabama"}]
+        }
 
         atlas = USDAFoodAtlasConnector()
-        atlas.connect()
 
         result = atlas.fetch()
 

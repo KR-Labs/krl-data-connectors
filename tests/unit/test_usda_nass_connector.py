@@ -27,8 +27,14 @@ from krl_data_connectors.agricultural.usda_nass_connector import USDANASSConnect
 class TestUSDANASSConnectorTypeContracts:
     """Test type contracts and return value structures (Layer 8)."""
 
-    def test_connect_return_type(self):
+    @patch("requests.Session.get")
+    def test_connect_return_type(self, mock_get):
         """Test that connect returns None."""
+        mock_response = Mock()
+        mock_response.json.return_value = {"year": ["2020", "2021", "2022"]}
+        mock_response.raise_for_status = Mock()
+        mock_get.return_value = mock_response
+
         nass = USDANASSConnector(api_key="test_key")
 
         result = nass.connect()

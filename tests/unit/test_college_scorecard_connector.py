@@ -29,8 +29,17 @@ from krl_data_connectors.education.college_scorecard_connector import (
 class TestCollegeScorecardConnectorTypeContracts:
     """Test type contracts and return value structures (Layer 8)."""
 
-    def test_connect_return_type(self):
+    @patch("requests.Session.get")
+    def test_connect_return_type(self, mock_get):
         """Test that connect returns None."""
+        mock_response = Mock()
+        mock_response.json.return_value = {
+            "results": [{"id": 123456}],
+            "metadata": {"total": 1},
+        }
+        mock_response.raise_for_status = Mock()
+        mock_get.return_value = mock_response
+
         scorecard = CollegeScorecardConnector(api_key="test_key")
 
         result = scorecard.connect()
@@ -39,7 +48,7 @@ class TestCollegeScorecardConnectorTypeContracts:
 
     @patch("requests.Session.get")
     def test_get_schools_return_type(self, mock_get):
-        """Test that get_schools returns dict."""
+        """Test that get_schools returns list of dicts."""
         mock_response = Mock()
         mock_response.json.return_value = {
             "results": [{"id": 123456, "school.name": "Test University"}],
@@ -53,8 +62,9 @@ class TestCollegeScorecardConnectorTypeContracts:
 
         result = scorecard.get_schools()
 
-        assert isinstance(result, dict)
-        assert "results" in result
+        assert isinstance(result, list)
+        if result:
+            assert isinstance(result[0], dict)
 
     @patch("requests.Session.get")
     def test_get_school_by_id_return_type(self, mock_get):
