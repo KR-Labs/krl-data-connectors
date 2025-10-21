@@ -537,5 +537,95 @@ class TestCDCPropertyBased:
         check_icd_code_handling()
 
 
+class TestCDCConnectorTypeContracts:
+    """Test type contracts and return value structures (Layer 8)."""
+
+    @patch.object(CDCWonderConnector, "get_population_estimates")
+    def test_connect_return_type(self, mock_get_pop):
+        """Test that connect returns None."""
+        mock_get_pop.return_value = pd.DataFrame({"Year": [2020], "Population": [100]})
+        
+        cdc = CDCWonderConnector()
+
+        result = cdc.connect()
+
+        assert result is None
+
+    @patch.object(CDCWonderConnector, "get_mortality_data")
+    def test_fetch_return_type(self, mock_get_mortality):
+        """Test that fetch returns DataFrame."""
+        mock_get_mortality.return_value = pd.DataFrame({
+            "Year": [2020],
+            "Deaths": [100]
+        })
+
+        cdc = CDCWonderConnector()
+
+        result = cdc.fetch(dataset="mortality", years=[2020], geo_level="national")
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("requests.Session.post")
+    def test_get_mortality_data_return_type(self, mock_post):
+        """Test that get_mortality_data returns DataFrame."""
+        mock_response = Mock()
+        mock_response.text = '<?xml version="1.0"?><data-table><r><c l="Year" v="2020"/><c l="Deaths" v="100"/></r></data-table>'
+        mock_response.raise_for_status = Mock()
+        mock_post.return_value = mock_response
+
+        cdc = CDCWonderConnector()
+
+        result = cdc.get_mortality_data(years=[2020], geo_level="national")
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("requests.Session.post")
+    def test_get_natality_data_return_type(self, mock_post):
+        """Test that get_natality_data returns DataFrame."""
+        mock_response = Mock()
+        mock_response.text = '<?xml version="1.0"?><data-table><r><c l="Year" v="2020"/><c l="Births" v="3500"/></r></data-table>'
+        mock_response.raise_for_status = Mock()
+        mock_post.return_value = mock_response
+
+        cdc = CDCWonderConnector()
+
+        result = cdc.get_natality_data(years=[2020], geo_level="national")
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("requests.Session.post")
+    def test_get_population_estimates_return_type(self, mock_post):
+        """Test that get_population_estimates returns DataFrame."""
+        mock_response = Mock()
+        mock_response.text = '<?xml version="1.0"?><data-table><r><c l="Year" v="2020"/><c l="Population" v="330000000"/></r></data-table>'
+        mock_response.raise_for_status = Mock()
+        mock_post.return_value = mock_response
+
+        cdc = CDCWonderConnector()
+
+        result = cdc.get_population_estimates(years=[2020], states=["06"])
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch.object(CDCWonderConnector, "get_population_estimates")
+    def test_validate_connection_return_type(self, mock_get_pop):
+        """Test that validate_connection returns bool."""
+        mock_get_pop.return_value = pd.DataFrame({"test": [1]})
+
+        cdc = CDCWonderConnector()
+
+        result = cdc.validate_connection()
+
+        assert isinstance(result, bool)
+
+    def test_get_available_databases_return_type(self):
+        """Test that get_available_databases returns dict."""
+        cdc = CDCWonderConnector()
+
+        result = cdc.get_available_databases()
+
+        assert isinstance(result, dict)
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
