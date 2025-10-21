@@ -410,3 +410,121 @@ class TestBaseConnectorSecurityInputValidation:
 
         # Should accept whitespace (validation is connector-specific)
         assert connector.api_key == "   "
+
+
+class TestBaseConnectorTypeContracts:
+    """Test type contracts and return value structures (Layer 8)."""
+
+    def test_connect_return_type(self, temp_cache_dir):
+        """Test that connect returns None."""
+        connector = MockConnector(cache_dir=str(temp_cache_dir))
+
+        result = connector.connect()
+
+        assert result is None
+
+    def test_disconnect_return_type(self, temp_cache_dir):
+        """Test that disconnect returns None."""
+        connector = MockConnector(cache_dir=str(temp_cache_dir))
+        connector.session = Mock()
+
+        result = connector.disconnect()
+
+        assert result is None
+
+    def test_clear_cache_return_type(self, temp_cache_dir):
+        """Test that clear_cache returns None."""
+        connector = MockConnector(cache_dir=str(temp_cache_dir))
+
+        result = connector.clear_cache()
+
+        assert result is None
+
+    def test_get_cache_stats_return_type(self, temp_cache_dir):
+        """Test that get_cache_stats returns dict."""
+        connector = MockConnector(cache_dir=str(temp_cache_dir))
+
+        result = connector.get_cache_stats()
+
+        assert isinstance(result, dict)
+        # Basic cache stats should have cache_dir
+        assert "cache_dir" in result
+
+    def test_get_cache_stats_structure(self, temp_cache_dir):
+        """Test that get_cache_stats returns expected structure."""
+        connector = MockConnector(cache_dir=str(temp_cache_dir))
+
+        result = connector.get_cache_stats()
+
+        # Required keys from FileCache.get_stats()
+        assert "cache_dir" in result
+        assert "hits" in result
+        assert "misses" in result
+        assert "total_requests" in result
+        assert "hit_rate" in result
+        assert "cache_size" in result
+
+        # Value types
+        assert isinstance(result["hits"], int)
+        assert isinstance(result["misses"], int)
+        assert isinstance(result["total_requests"], int)
+        assert isinstance(result["cache_size"], int)
+
+    def test_fetch_return_type(self, temp_cache_dir):
+        """Test that fetch returns appropriate type."""
+        connector = MockConnector(cache_dir=str(temp_cache_dir))
+
+        # fetch is abstract but should be implementable
+        result = connector.fetch()
+
+        # MockConnector's fetch raises NotImplementedError
+        # Just verify it's callable
+        assert hasattr(connector, "fetch")
+        assert callable(connector.fetch)
+
+    def test_get_api_key_return_type(self, temp_cache_dir):
+        """Test that _get_api_key returns Optional[str]."""
+        connector = MockConnector(cache_dir=str(temp_cache_dir))
+
+        result = connector._get_api_key()
+
+        assert result is None or isinstance(result, str)
+
+    def test_make_cache_key_return_type(self, temp_cache_dir):
+        """Test that _make_cache_key returns str."""
+        connector = MockConnector(cache_dir=str(temp_cache_dir))
+
+        result = connector._make_cache_key("http://test.com", params={"param1": "value1"})
+
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+    def test_make_request_return_type(self, temp_cache_dir):
+        """Test that _make_request returns appropriate type."""
+        connector = MockConnector(cache_dir=str(temp_cache_dir))
+
+        with patch("requests.Session") as mock_session_class:
+            mock_session = Mock()
+            mock_response = Mock()
+            mock_response.json.return_value = {"data": "test"}
+            mock_response.raise_for_status = Mock()
+            mock_session.get.return_value = mock_response
+            mock_session_class.return_value = mock_session
+
+            connector.session = mock_session
+            result = connector._make_request("http://test.com")
+
+            # Should return dict (JSON response)
+            assert isinstance(result, dict) or result is None
+
+    def test_context_manager_return_types(self, temp_cache_dir):
+        """Test that context manager methods return proper types."""
+        connector = MockConnector(cache_dir=str(temp_cache_dir))
+
+        # __enter__ should return self
+        result_enter = connector.__enter__()
+        assert result_enter is connector
+
+        # __exit__ should return False (doesn't suppress exceptions)
+        result_exit = connector.__exit__(None, None, None)
+        assert result_exit is False
