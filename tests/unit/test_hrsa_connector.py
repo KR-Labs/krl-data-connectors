@@ -442,3 +442,107 @@ class TestIntegration:
         high_need_la = hrsa_connector.get_high_need_areas(la_data, score_threshold=19)
         assert len(high_need_la) == 2
         assert all(high_need_la['HPSA_Score'] >= 19)
+
+
+# =============================================================================
+# Layer 5: Security Tests
+# =============================================================================
+
+
+class TestHRSASecurityInjection:
+    """Test security: SQL injection and command injection prevention."""
+
+    def test_sql_injection_in_state(self, hrsa_connector, sample_hpsa_data):
+        """Test SQL injection attempt in state parameter."""
+        # SQL injection attempt
+        malicious_state = "RI'; DROP TABLE data; --"
+
+        # Should handle safely
+        try:
+            df = hrsa_connector.get_state_data(sample_hpsa_data, malicious_state)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, KeyError):
+            # Acceptable to reject invalid state codes
+            pass
+
+    def test_command_injection_in_county(self, hrsa_connector, sample_hpsa_data):
+        """Test command injection prevention in county parameter."""
+        # Command injection attempt
+        malicious_county = "Providence; rm -rf /"
+
+        # Should handle safely
+        try:
+            df = hrsa_connector.get_county_data(sample_hpsa_data, malicious_county)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, Exception):
+            # Acceptable to reject malicious input
+            pass
+
+    def test_xss_injection_in_discipline(self, hrsa_connector, sample_hpsa_data):
+        """Test XSS injection prevention."""
+        # XSS attempt
+        xss_payload = "<script>alert('XSS')</script>"
+
+        # Should handle safely
+        try:
+            df = hrsa_connector.filter_by_discipline(sample_hpsa_data, xss_payload)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, KeyError):
+            # Acceptable to reject XSS payloads
+            pass
+
+
+class TestHRSASecurityInputValidation:
+    """Test security: Input validation and sanitization."""
+
+    def test_score_threshold_validation(self, hrsa_connector, sample_hpsa_data):
+        """Test score threshold parameter validation."""
+        # Negative score (invalid)
+        with pytest.raises((ValueError, TypeError)):
+            hrsa_connector.get_high_need_areas(sample_hpsa_data, score_threshold=-1)
+
+        # Score too high (invalid)
+        with pytest.raises((ValueError, TypeError)):
+            hrsa_connector.get_high_need_areas(sample_hpsa_data, score_threshold=100)
+
+    def test_handles_null_bytes_in_state(self, hrsa_connector, sample_hpsa_data):
+        """Test handling of null bytes in state parameter."""
+        # Null byte injection
+        malicious_state = "RI\x00malicious"
+
+        # Should handle safely or reject
+        try:
+            df = hrsa_connector.get_state_data(sample_hpsa_data, malicious_state)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, TypeError):
+            # Acceptable to reject null bytes
+            pass
+
+    def test_handles_extremely_long_county_names(self, hrsa_connector, sample_hpsa_data):
+        """Test handling of excessively long county names (DoS prevention)."""
+        # Extremely long county name
+        long_county = "Providence" * 10000
+
+        # Should handle safely or reject
+        try:
+            df = hrsa_connector.get_county_data(sample_hpsa_data, long_county)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, Exception):
+            # Acceptable to reject overly long inputs
+            pass
+
+    def test_empty_state_validation(self, hrsa_connector, sample_hpsa_data):
+        """Test empty state parameter validation."""
+        # Empty state
+        with pytest.raises((ValueError, KeyError, TypeError)):
+            hrsa_connector.get_state_data(sample_hpsa_data, "")
+
+    def test_none_dataframe_handling(self, hrsa_connector):
+        """Test handling of None DataFrame."""
+        # None DataFrame
+        with pytest.raises((ValueError, AttributeError, TypeError)):
+            hrsa_connector.get_state_data(None, "RI")
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

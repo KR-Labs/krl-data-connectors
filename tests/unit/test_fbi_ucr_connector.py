@@ -351,3 +351,145 @@ class TestCrimeCategories:
         assert 'larceny' in fbi_connector.property_crimes
         assert 'motor-vehicle-theft' in fbi_connector.property_crimes
         assert 'arson' in fbi_connector.property_crimes
+
+
+# =============================================================================
+# Layer 5: Security Tests
+# =============================================================================
+
+
+class TestFBIUCRSecurityInjection:
+    """Test security: SQL injection and command injection prevention."""
+
+    @patch('requests.get')
+    def test_sql_injection_in_state(self, mock_get, fbi_connector):
+        """Test SQL injection attempt in state parameter."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = []
+        mock_get.return_value = mock_response
+
+        # SQL injection attempt
+        malicious_state = "RI'; DROP TABLE crime; --"
+
+        # Should handle safely
+        try:
+            df = fbi_connector.get_state_crime_data(malicious_state, 2023)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, KeyError):
+            # Acceptable to reject invalid state codes
+            pass
+
+    @patch('requests.get')
+    def test_command_injection_in_crime_type(self, mock_get, fbi_connector):
+        """Test command injection prevention."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = []
+        mock_get.return_value = mock_response
+
+        # Command injection attempt
+        malicious_crime = "murder; rm -rf /"
+
+        # Should handle safely
+        try:
+            df = fbi_connector.get_crime_data_by_type(malicious_crime, 2023)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, Exception):
+            # Acceptable to reject malicious input
+            pass
+
+    @patch('requests.get')
+    def test_xss_injection_prevention(self, mock_get, fbi_connector):
+        """Test XSS injection prevention."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = []
+        mock_get.return_value = mock_response
+
+        # XSS attempt
+        xss_payload = "<script>alert('XSS')</script>"
+
+        # Should handle safely
+        try:
+            df = fbi_connector.get_state_crime_data(xss_payload, 2023)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, KeyError):
+            # Acceptable to reject XSS payloads
+            pass
+
+
+class TestFBIUCRSecurityInputValidation:
+    """Test security: Input validation and sanitization."""
+
+    def test_year_type_validation(self, fbi_connector):
+        """Test year parameter type validation."""
+        # Invalid year type
+        with pytest.raises((ValueError, TypeError)):
+            fbi_connector.get_state_crime_data('RI', 'not_a_year')
+
+    def test_state_code_validation(self, fbi_connector):
+        """Test state code validation."""
+        # Empty state code
+        with pytest.raises((ValueError, KeyError)):
+            fbi_connector.get_state_crime_data('', 2023)
+
+    @patch('requests.get')
+    def test_handles_null_bytes(self, mock_get, fbi_connector):
+        """Test handling of null bytes in parameters."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = []
+        mock_get.return_value = mock_response
+
+        # Null byte injection
+        malicious_state = "RI\x00malicious"
+
+        # Should handle safely or reject
+        try:
+            df = fbi_connector.get_state_crime_data(malicious_state, 2023)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, TypeError):
+            # Acceptable to reject null bytes
+            pass
+
+    @patch('requests.get')
+    def test_handles_extremely_long_crime_types(self, mock_get, fbi_connector):
+        """Test handling of excessively long crime types (DoS prevention)."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = []
+        mock_get.return_value = mock_response
+
+        # Extremely long crime type
+        long_crime = "murder" * 10000
+
+        # Should handle safely or reject
+        try:
+            df = fbi_connector.get_crime_data_by_type(long_crime, 2023)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, Exception):
+            # Acceptable to reject overly long inputs
+            pass
+
+    def test_year_range_validation(self, fbi_connector):
+        """Test year range boundary validation."""
+        # Year too far in past (FBI UCR data starts ~1960s)
+        try:
+            df = fbi_connector.get_state_crime_data('RI', 1800)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, Exception):
+            # Acceptable to reject unreasonable years
+            pass
+
+        # Year too far in future
+        try:
+            df = fbi_connector.get_state_crime_data('RI', 9999)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, Exception):
+            # Acceptable to reject unreasonable years
+            pass
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

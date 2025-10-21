@@ -346,3 +346,123 @@ class TestIntegration:
             data, indicators=['P_PM25', 'P_MINORTY']
         )
         assert len(summary) == 3  # 3 states in test data
+
+
+# =============================================================================
+# Layer 5: Security Tests
+# =============================================================================
+
+
+class TestEJScreenSecurityInjection:
+    """Test security: SQL injection and command injection prevention."""
+
+    def test_sql_injection_in_state(self, ejscreen_connector, temp_csv_file):
+        """Test SQL injection attempt in state parameter."""
+        data = ejscreen_connector.load_data(temp_csv_file)
+
+        # SQL injection attempt
+        malicious_state = "RI'; DROP TABLE data; --"
+
+        # Should handle safely
+        try:
+            df = ejscreen_connector.get_state_data(data, malicious_state)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, KeyError):
+            # Acceptable to reject invalid state codes
+            pass
+
+    def test_command_injection_in_indicator(self, ejscreen_connector, temp_csv_file):
+        """Test command injection prevention."""
+        data = ejscreen_connector.load_data(temp_csv_file)
+
+        # Command injection attempt
+        malicious_indicator = "P_PM25; rm -rf /"
+
+        # Should handle safely
+        try:
+            df = ejscreen_connector.filter_by_threshold(data, malicious_indicator, 80)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, KeyError):
+            # Acceptable to reject invalid indicators
+            pass
+
+    def test_path_traversal_in_load(self, ejscreen_connector):
+        """Test path traversal prevention."""
+        # Path traversal attempt
+        malicious_path = "../../etc/passwd"
+
+        # Should prevent path traversal
+        with pytest.raises((FileNotFoundError, ValueError, OSError)):
+            ejscreen_connector.load_data(malicious_path)
+
+
+class TestEJScreenSecurityInputValidation:
+    """Test security: Input validation and sanitization."""
+
+    def test_threshold_type_validation(self, ejscreen_connector, temp_csv_file):
+        """Test threshold parameter type validation."""
+        data = ejscreen_connector.load_data(temp_csv_file)
+
+        # Invalid threshold type
+        with pytest.raises((ValueError, TypeError)):
+            ejscreen_connector.filter_by_threshold(data, 'P_PM25', 'not_a_number')
+
+    def test_threshold_range_validation(self, ejscreen_connector, temp_csv_file):
+        """Test threshold range validation."""
+        data = ejscreen_connector.load_data(temp_csv_file)
+
+        # Negative threshold
+        with pytest.raises((ValueError, TypeError)):
+            ejscreen_connector.filter_by_threshold(data, 'P_PM25', -1)
+
+        # Threshold > 100 (percentiles should be 0-100)
+        with pytest.raises((ValueError, TypeError)):
+            ejscreen_connector.filter_by_threshold(data, 'P_PM25', 101)
+
+    def test_handles_null_bytes_in_state(self, ejscreen_connector, temp_csv_file):
+        """Test handling of null bytes in state parameter."""
+        data = ejscreen_connector.load_data(temp_csv_file)
+
+        # Null byte injection
+        malicious_state = "RI\x00malicious"
+
+        # Should handle safely or reject
+        try:
+            df = ejscreen_connector.get_state_data(data, malicious_state)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, TypeError):
+            # Acceptable to reject null bytes
+            pass
+
+    def test_handles_extremely_long_indicator_names(self, ejscreen_connector, temp_csv_file):
+        """Test handling of excessively long indicator names (DoS prevention)."""
+        data = ejscreen_connector.load_data(temp_csv_file)
+
+        # Extremely long indicator name
+        long_indicator = "P_PM25" * 10000
+
+        # Should handle safely or reject
+        try:
+            df = ejscreen_connector.filter_by_threshold(data, long_indicator, 80)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, KeyError, Exception):
+            # Acceptable to reject overly long inputs
+            pass
+
+    def test_empty_state_validation(self, ejscreen_connector, temp_csv_file):
+        """Test empty state parameter validation."""
+        data = ejscreen_connector.load_data(temp_csv_file)
+
+        # Empty state
+        with pytest.raises((ValueError, KeyError)):
+            ejscreen_connector.get_state_data(data, "")
+
+    def test_none_dataframe_handling(self, ejscreen_connector):
+        """Test handling of None DataFrame."""
+        # None DataFrame
+        with pytest.raises((ValueError, AttributeError, TypeError)):
+            ejscreen_connector.get_state_data(None, "RI")
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

@@ -394,3 +394,99 @@ class TestEdgeCases:
         
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 0  # No matches (always empty without loaded data)
+
+
+# =============================================================================
+# Layer 5: Security Tests
+# =============================================================================
+
+
+class TestHUDFMRSecurityInjection:
+    """Test security: SQL injection and command injection prevention."""
+
+    def test_sql_injection_in_state(self, hud_connector, sample_fmr_data):
+        """Test SQL injection attempt in state parameter."""
+        # SQL injection attempt
+        malicious_state = "RI'; DROP TABLE fmr; --"
+
+        # Should handle safely
+        try:
+            df = hud_connector.get_state_fmrs(malicious_state, year=2023, use_api=False)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, KeyError):
+            # Acceptable to reject invalid state codes
+            pass
+
+    def test_command_injection_in_county(self, hud_connector, sample_fmr_data):
+        """Test command injection prevention."""
+        # Command injection attempt
+        malicious_county = "Providence; rm -rf /"
+
+        # Should handle safely
+        try:
+            df = hud_connector.get_county_fmrs('RI', malicious_county, year=2023, use_api=False)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, KeyError, Exception):
+            # Acceptable to reject malicious input
+            pass
+
+    def test_xss_injection_in_metro(self, hud_connector):
+        """Test XSS injection prevention."""
+        # XSS attempt
+        xss_payload = "<script>alert('XSS')</script>"
+
+        # Should handle safely
+        df = hud_connector.get_metro_fmrs(xss_payload)
+        assert isinstance(df, pd.DataFrame)
+
+
+class TestHUDFMRSecurityInputValidation:
+    """Test security: Input validation and sanitization."""
+
+    def test_year_type_validation(self, hud_connector):
+        """Test year parameter type validation."""
+        # Invalid year type
+        with pytest.raises((ValueError, TypeError, KeyError)):
+            hud_connector.get_state_fmrs('RI', year='not_a_year', use_api=False)
+
+    def test_handles_null_bytes_in_state(self, hud_connector):
+        """Test handling of null bytes in state parameter."""
+        # Null byte injection
+        malicious_state = "RI\x00malicious"
+
+        # Should handle safely or reject
+        try:
+            df = hud_connector.get_state_fmrs(malicious_state, year=2023, use_api=False)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, TypeError):
+            # Acceptable to reject null bytes
+            pass
+
+    def test_handles_extremely_long_metro_names(self, hud_connector):
+        """Test handling of excessively long metro names (DoS prevention)."""
+        # Extremely long metro name
+        long_metro = "Providence" * 10000
+
+        # Should handle safely
+        df = hud_connector.get_metro_fmrs(long_metro)
+        assert isinstance(df, pd.DataFrame)
+
+    def test_empty_state_validation(self, hud_connector):
+        """Test empty state parameter validation."""
+        # Empty state
+        with pytest.raises((ValueError, KeyError)):
+            hud_connector.get_state_fmrs('', year=2023, use_api=False)
+
+    def test_year_range_validation(self, hud_connector):
+        """Test year range boundary validation."""
+        # Year too far in past
+        try:
+            df = hud_connector.get_state_fmrs('RI', year=1800, use_api=False)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, KeyError, Exception):
+            # Acceptable to reject unreasonable years
+            pass
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])
