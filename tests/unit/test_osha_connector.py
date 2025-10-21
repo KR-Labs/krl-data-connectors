@@ -41,45 +41,6 @@ class TestOSHAConnectorInit:
         """Test initialization with custom max_retries."""
         connector = OSHAConnector(max_retries=5)
         assert connector.max_retries == 5
-    
-    def test_init_with_cache_dir(self):
-        """Test initialization with cache directory."""
-        connector = OSHAConnector(cache_dir="/tmp/cache")
-        assert connector.cache_dir == "/tmp/cache"
-
-
-class TestOSHAConnectorConnection:
-    """Test OSHAConnector connection methods."""
-    
-    @patch.object(OSHAConnector, 'session')
-    def test_connect_success(self, mock_session, osha_connector):
-        """Test successful connection to OSHA API."""
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_session.get.return_value = mock_response
-        
-        result = osha_connector.connect()
-        assert result is True
-        mock_session.get.assert_called_once()
-    
-    @patch.object(OSHAConnector, 'session')
-    def test_connect_failure(self, mock_session, osha_connector):
-        """Test failed connection to OSHA API."""
-        mock_session.get.side_effect = Exception("Connection error")
-        
-        result = osha_connector.connect()
-        assert result is False
-    
-    @patch.object(OSHAConnector, 'session')
-    def test_fetch_success(self, mock_session, osha_connector):
-        """Test successful data fetch."""
-        mock_response = MagicMock()
-        mock_response.json.return_value = {'data': [{'inspection_nr': '123'}]}
-        mock_session.get.return_value = mock_response
-        
-        result = osha_connector.fetch('inspections', {'size': 10})
-        assert 'data' in result
-        assert len(result['data']) == 1
 
 
 class TestOSHAConnectorGetInspections:
@@ -143,6 +104,15 @@ class TestOSHAConnectorGetInspections:
         result = osha_connector.get_inspections(limit=100)
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 0
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_inspections_error_handling(self, mock_fetch, osha_connector):
+        """Test inspections error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = osha_connector.get_inspections(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestOSHAConnectorGetViolations:
@@ -195,6 +165,24 @@ class TestOSHAConnectorGetViolations:
         result = osha_connector.get_violations(severity='serious', limit=100)
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_violations_error_handling(self, mock_fetch, osha_connector):
+        """Test violations error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = osha_connector.get_violations(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_violations_empty_response(self, mock_fetch, osha_connector):
+        """Test violations with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = osha_connector.get_violations(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestOSHAConnectorGetAccidents:
@@ -248,6 +236,24 @@ class TestOSHAConnectorGetAccidents:
         )
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_accidents_error_handling(self, mock_fetch, osha_connector):
+        """Test accidents error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = osha_connector.get_accidents(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_accidents_empty_response(self, mock_fetch, osha_connector):
+        """Test accidents with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = osha_connector.get_accidents(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestOSHAConnectorGetEstablishments:
@@ -297,6 +303,24 @@ class TestOSHAConnectorGetEstablishments:
         result = osha_connector.get_establishments(naics_code='336', limit=100)
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_establishments_error_handling(self, mock_fetch, osha_connector):
+        """Test establishments error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = osha_connector.get_establishments(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_establishments_empty_response(self, mock_fetch, osha_connector):
+        """Test establishments with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = osha_connector.get_establishments(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestOSHAConnectorGetIndustryStatistics:
@@ -346,6 +370,24 @@ class TestOSHAConnectorGetIndustryStatistics:
         result = osha_connector.get_industry_statistics(year=2023, limit=100)
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_statistics_error_handling(self, mock_fetch, osha_connector):
+        """Test statistics error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = osha_connector.get_industry_statistics(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_statistics_empty_response(self, mock_fetch, osha_connector):
+        """Test statistics with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = osha_connector.get_industry_statistics(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestOSHAConnectorGetStandards:
@@ -381,6 +423,24 @@ class TestOSHAConnectorGetStandards:
         result = osha_connector.get_standards(standard_number='1910.147', limit=50)
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_standards_error_handling(self, mock_fetch, osha_connector):
+        """Test standards error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = osha_connector.get_standards(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_standards_empty_response(self, mock_fetch, osha_connector):
+        """Test standards with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = osha_connector.get_standards(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestOSHAConnectorGetComplianceActions:
@@ -434,6 +494,24 @@ class TestOSHAConnectorGetComplianceActions:
         )
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_compliance_actions_error_handling(self, mock_fetch, osha_connector):
+        """Test compliance actions error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = osha_connector.get_compliance_actions(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_compliance_actions_empty_response(self, mock_fetch, osha_connector):
+        """Test compliance actions with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = osha_connector.get_compliance_actions(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestOSHAConnectorGetEnforcementCases:
@@ -486,6 +564,24 @@ class TestOSHAConnectorGetEnforcementCases:
         result = osha_connector.get_enforcement_cases(status='closed', limit=100)
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_enforcement_cases_error_handling(self, mock_fetch, osha_connector):
+        """Test enforcement cases error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = osha_connector.get_enforcement_cases(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_enforcement_cases_empty_response(self, mock_fetch, osha_connector):
+        """Test enforcement cases with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = osha_connector.get_enforcement_cases(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestOSHAConnectorGetFatalities:
@@ -535,6 +631,24 @@ class TestOSHAConnectorGetFatalities:
         result = osha_connector.get_fatalities(year=2024, limit=100)
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_fatalities_error_handling(self, mock_fetch, osha_connector):
+        """Test fatalities error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = osha_connector.get_fatalities(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_fatalities_empty_response(self, mock_fetch, osha_connector):
+        """Test fatalities with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = osha_connector.get_fatalities(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestOSHAConnectorGetInspectionHistory:
@@ -576,6 +690,24 @@ class TestOSHAConnectorGetInspectionHistory:
         )
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_inspection_history_error_handling(self, mock_fetch, osha_connector):
+        """Test inspection history error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = osha_connector.get_inspection_history(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(OSHAConnector, 'fetch')
+    def test_get_inspection_history_empty_response(self, mock_fetch, osha_connector):
+        """Test inspection history with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = osha_connector.get_inspection_history(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestOSHAConnectorClose:

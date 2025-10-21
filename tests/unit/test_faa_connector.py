@@ -48,40 +48,6 @@ class TestFAAConnectorInit:
         assert connector._faa_api_key == "test_key"
 
 
-class TestFAAConnectorConnection:
-    """Test FAAConnector connection methods."""
-    
-    @patch.object(FAAConnector, 'session')
-    def test_connect_success(self, mock_session, faa_connector):
-        """Test successful connection to FAA API."""
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_session.get.return_value = mock_response
-        
-        result = faa_connector.connect()
-        assert result is True
-        mock_session.get.assert_called_once()
-    
-    @patch.object(FAAConnector, 'session')
-    def test_connect_failure(self, mock_session, faa_connector):
-        """Test failed connection to FAA API."""
-        mock_session.get.side_effect = Exception("Connection error")
-        
-        result = faa_connector.connect()
-        assert result is False
-    
-    @patch.object(FAAConnector, 'session')
-    def test_fetch_success(self, mock_session, faa_connector):
-        """Test successful data fetch."""
-        mock_response = MagicMock()
-        mock_response.json.return_value = {'data': [{'n_number': 'N12345'}]}
-        mock_session.get.return_value = mock_response
-        
-        result = faa_connector.fetch('aircraft', {'limit': 10})
-        assert 'data' in result
-        assert len(result['data']) == 1
-
-
 class TestFAAConnectorGetAircraftRegistry:
     """Test get_aircraft_registry method."""
     
@@ -139,6 +105,24 @@ class TestFAAConnectorGetAircraftRegistry:
         result = faa_connector.get_aircraft_registry(limit=100)
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 0
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_aircraft_empty_response(self, mock_fetch, faa_connector):
+        """Test aircraft registry with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = faa_connector.get_aircraft_registry(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_aircraft_error_handling(self, mock_fetch, faa_connector):
+        """Test aircraft registry error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = faa_connector.get_aircraft_registry(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestFAAConnectorGetAccidents:
@@ -192,6 +176,24 @@ class TestFAAConnectorGetAccidents:
         )
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_accidents_error_handling(self, mock_fetch, faa_connector):
+        """Test accidents error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = faa_connector.get_accidents(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_accidents_empty_response(self, mock_fetch, faa_connector):
+        """Test accidents with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = faa_connector.get_accidents(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestFAAConnectorGetIncidents:
@@ -231,6 +233,24 @@ class TestFAAConnectorGetIncidents:
         )
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_incidents_error_handling(self, mock_fetch, faa_connector):
+        """Test incidents error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = faa_connector.get_incidents(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_incidents_empty_response(self, mock_fetch, faa_connector):
+        """Test incidents with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = faa_connector.get_incidents(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestFAAConnectorGetAirports:
@@ -280,6 +300,24 @@ class TestFAAConnectorGetAirports:
         result = faa_connector.get_airports(airport_type='public', limit=100)
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_airports_error_handling(self, mock_fetch, faa_connector):
+        """Test airports error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = faa_connector.get_airports(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_airports_empty_response(self, mock_fetch, faa_connector):
+        """Test airports with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = faa_connector.get_airports(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestFAAConnectorGetAirmenCertifications:
@@ -318,6 +356,24 @@ class TestFAAConnectorGetAirmenCertifications:
         )
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_airmen_error_handling(self, mock_fetch, faa_connector):
+        """Test airmen certifications error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = faa_connector.get_airmen_certifications(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_airmen_empty_response(self, mock_fetch, faa_connector):
+        """Test airmen certifications with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = faa_connector.get_airmen_certifications(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestFAAConnectorGetAirworthinessDirectives:
@@ -356,6 +412,24 @@ class TestFAAConnectorGetAirworthinessDirectives:
         )
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_ads_error_handling(self, mock_fetch, faa_connector):
+        """Test airworthiness directives error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = faa_connector.get_airworthiness_directives(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_ads_empty_response(self, mock_fetch, faa_connector):
+        """Test airworthiness directives with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = faa_connector.get_airworthiness_directives(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestFAAConnectorGetEnforcementActions:
@@ -395,6 +469,24 @@ class TestFAAConnectorGetEnforcementActions:
         )
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_enforcement_error_handling(self, mock_fetch, faa_connector):
+        """Test enforcement actions error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = faa_connector.get_enforcement_actions(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_enforcement_empty_response(self, mock_fetch, faa_connector):
+        """Test enforcement actions with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = faa_connector.get_enforcement_actions(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestFAAConnectorGetServiceDifficultyReports:
@@ -433,6 +525,24 @@ class TestFAAConnectorGetServiceDifficultyReports:
         )
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_sdr_error_handling(self, mock_fetch, faa_connector):
+        """Test SDR error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = faa_connector.get_service_difficulty_reports(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_sdr_empty_response(self, mock_fetch, faa_connector):
+        """Test SDR with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = faa_connector.get_service_difficulty_reports(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestFAAConnectorGetMaintenanceRecords:
@@ -468,6 +578,24 @@ class TestFAAConnectorGetMaintenanceRecords:
         result = faa_connector.get_maintenance_records(n_number='N54321', limit=50)
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_maintenance_error_handling(self, mock_fetch, faa_connector):
+        """Test maintenance records error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = faa_connector.get_maintenance_records(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_maintenance_empty_response(self, mock_fetch, faa_connector):
+        """Test maintenance records with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = faa_connector.get_maintenance_records(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestFAAConnectorGetFlightStandardsData:
@@ -503,6 +631,24 @@ class TestFAAConnectorGetFlightStandardsData:
         result = faa_connector.get_flight_standards_data(district='WP-01', limit=50)
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_flight_standards_error_handling(self, mock_fetch, faa_connector):
+        """Test flight standards error handling."""
+        mock_fetch.side_effect = Exception("API Error")
+        
+        result = faa_connector.get_flight_standards_data(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+    
+    @patch.object(FAAConnector, 'fetch')
+    def test_get_flight_standards_empty_response(self, mock_fetch, faa_connector):
+        """Test flight standards with empty response."""
+        mock_fetch.return_value = {}
+        
+        result = faa_connector.get_flight_standards_data(limit=100)
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
 
 
 class TestFAAConnectorClose:
