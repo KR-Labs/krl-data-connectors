@@ -786,6 +786,128 @@ class TestWorldBankConnectorTypeContracts:
 
         assert result is None
 
+    def test_connect_return_type(self):
+        """Test that connect returns None."""
+        wb = WorldBankConnector()
+
+        result = wb.connect()
+
+        assert result is None
+
+    @patch("requests.Session")
+    def test_get_multiple_indicators_return_type(self, mock_session_class):
+        """Test that get_multiple_indicators returns list of dicts."""
+        mock_session = Mock()
+        mock_response = Mock()
+        mock_response.json.return_value = [
+            {"page": 1, "pages": 1},
+            [
+                {
+                    "indicator": {"id": "SP.POP.TOTL", "value": "Population"},
+                    "country": {"id": "USA"},
+                    "value": 100000,
+                }
+            ],
+        ]
+        mock_response.raise_for_status = Mock()
+        mock_session.get.return_value = mock_response
+
+        wb = WorldBankConnector()
+
+        with patch.object(wb, "_init_session", return_value=mock_session):
+            result = wb.get_multiple_indicators(
+                indicators=["SP.POP.TOTL"], countries=["USA"]
+            )
+
+        assert isinstance(result, list)
+        if result:
+            assert isinstance(result[0], dict)
+
+    @patch("requests.Session")
+    def test_get_indicators_return_type(self, mock_session_class):
+        """Test that get_indicators returns list of dicts."""
+        mock_session = Mock()
+        mock_response = Mock()
+        mock_response.json.return_value = [
+            {"page": 1, "pages": 1},
+            [{"id": "SP.POP.TOTL", "name": "Population, total"}],
+        ]
+        mock_response.raise_for_status = Mock()
+        mock_session.get.return_value = mock_response
+
+        wb = WorldBankConnector()
+
+        with patch.object(wb, "_init_session", return_value=mock_session):
+            result = wb.get_indicators()
+
+        assert isinstance(result, list)
+        if result:
+            assert isinstance(result[0], dict)
+
+    @patch("requests.Session")
+    def test_search_indicators_return_type(self, mock_session_class):
+        """Test that search_indicators returns list of dicts."""
+        mock_session = Mock()
+        mock_response = Mock()
+        mock_response.json.return_value = [
+            {"page": 1, "pages": 1},
+            [{"id": "SP.POP.TOTL", "name": "Population, total"}],
+        ]
+        mock_response.raise_for_status = Mock()
+        mock_session.get.return_value = mock_response
+
+        wb = WorldBankConnector()
+
+        with patch.object(wb, "_init_session", return_value=mock_session):
+            result = wb.search_indicators("population")
+
+        assert isinstance(result, list)
+        if result:
+            assert isinstance(result[0], dict)
+            assert "id" in result[0]
+            assert "name" in result[0]
+
+    @patch("requests.Session")
+    def test_get_sources_return_type(self, mock_session_class):
+        """Test that get_sources returns list of dicts."""
+        mock_session = Mock()
+        mock_response = Mock()
+        mock_response.json.return_value = [
+            {"page": 1, "pages": 1},
+            [{"id": 2, "name": "World Development Indicators"}],
+        ]
+        mock_response.raise_for_status = Mock()
+        mock_session.get.return_value = mock_response
+
+        wb = WorldBankConnector()
+
+        with patch.object(wb, "_init_session", return_value=mock_session):
+            result = wb.get_sources()
+
+        assert isinstance(result, list)
+        if result:
+            assert isinstance(result[0], dict)
+
+    @patch("requests.Session")
+    def test_get_indicator_metadata_return_type(self, mock_session_class):
+        """Test that get_indicator_metadata returns dict."""
+        mock_session = Mock()
+        mock_response = Mock()
+        mock_response.json.return_value = [
+            {"page": 1, "pages": 1},
+            [{"id": "SP.POP.TOTL", "name": "Population, total", "sourceNote": "..."}],
+        ]
+        mock_response.raise_for_status = Mock()
+        mock_session.get.return_value = mock_response
+
+        wb = WorldBankConnector()
+
+        with patch.object(wb, "_init_session", return_value=mock_session):
+            result = wb.get_indicator_metadata("SP.POP.TOTL")
+
+        assert isinstance(result, dict)
+        assert "id" in result
+
 
 # ============================================================================
 # Test Configuration

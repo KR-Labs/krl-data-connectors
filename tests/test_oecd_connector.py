@@ -723,3 +723,63 @@ class TestOECDConnectorTypeContracts:
 
         result = oecd.disconnect()
         assert result is None
+
+    def test_connect_return_type(self):
+        """Test connect returns None."""
+        oecd = OECDConnector()
+
+        result = oecd.connect()
+        assert result is None
+
+    @patch("requests.Session.get")
+    def test_get_dataflow_structure_return_type(self, mock_get):
+        """Test get_dataflow_structure returns str."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.headers = {"content-type": "application/xml"}
+        mock_response.text = '<?xml version="1.0"?><Structure></Structure>'
+        mock_response.raise_for_status = MagicMock()
+        mock_get.return_value = mock_response
+
+        oecd = OECDConnector()
+        oecd._init_session()
+
+        result = oecd.get_dataflow_structure("OECD.SDD.NAD,DSD_NAAG@DF_NAAG_I")
+        assert isinstance(result, str)
+
+    @patch("requests.Session.get")
+    def test_get_codelists_return_type(self, mock_get):
+        """Test get_codelists returns str."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.headers = {"content-type": "application/xml"}
+        mock_response.text = '<?xml version="1.0"?><Codelists></Codelists>'
+        mock_response.raise_for_status = MagicMock()
+        mock_get.return_value = mock_response
+
+        oecd = OECDConnector()
+        oecd._init_session()
+
+        result = oecd.get_codelists()
+        assert isinstance(result, str)
+
+    @patch("requests.Session.get")
+    def test_get_data_structure_return_type(self, mock_get):
+        """Test get_data_structure returns str."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.headers = {"content-type": "application/xml"}
+        mock_response.text = '<?xml version="1.0"?><DataStructures></DataStructures>'
+        mock_response.raise_for_status = MagicMock()
+        mock_get.return_value = mock_response
+
+        oecd = OECDConnector()
+        oecd._init_session()
+
+        result = oecd.get_data_structure()
+        assert isinstance(result, str)
+
+
+# ============================================================================
+# Test Configuration
+# ============================================================================
