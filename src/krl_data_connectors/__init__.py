@@ -22,9 +22,12 @@ from .bea_connector import BEAConnector
 from .bls_connector import BLSConnector
 from .cbp_connector import CountyBusinessPatternsConnector
 from .census_connector import CensusConnector
+from .crime import FBIUCRConnector
+from .education import NCESConnector
 from .environment import EJScreenConnector, EPAAirQualityConnector
 from .fred_connector import FREDConnector
 from .health import CDCWonderConnector, CountyHealthRankingsConnector, HRSAConnector
+from .housing import HUDFMRConnector, ZillowConnector
 from .lehd_connector import LEHDConnector
 from .utils.config import find_config_file, load_api_key_from_config
 
@@ -45,6 +48,10 @@ __all__ = [
     "HRSAConnector",
     "EJScreenConnector",
     "EPAAirQualityConnector",
+    "FBIUCRConnector",
+    "NCESConnector",
+    "HUDFMRConnector",
+    "ZillowConnector",
     "find_config_file",
     "load_api_key_from_config",
 ]
