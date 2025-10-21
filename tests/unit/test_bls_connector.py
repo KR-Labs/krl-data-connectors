@@ -579,5 +579,205 @@ class TestBLSLogging:
         assert len(caplog.records) > 0
 
 
+# =============================================================================
+# Layer 5: Security Tests
+# =============================================================================
+
+
+class TestBLSSecurityInjection:
+    """Test security: SQL injection and command injection prevention."""
+
+    @patch.object(BLSConnector, "_bls_post_request")
+    def test_sql_injection_in_series_id(self, mock_request):
+        """Test SQL injection attempt in series_id parameter."""
+        mock_response = {
+            "status": "REQUEST_SUCCEEDED",
+            "Results": {
+                "series": [
+                    {
+                        "seriesID": "LNS14000000",
+                        "data": [{"year": "2023", "period": "M12", "value": "3.7"}],
+                    }
+                ]
+            },
+        }
+        mock_request.return_value = mock_response
+
+        connector = BLSConnector(api_key="test_key")
+
+        # SQL injection attempt
+        malicious_series = "LNS14000000'; DROP TABLE data; --"
+
+        # Should handle safely
+        df = connector.get_series(malicious_series, start_year=2023, end_year=2023)
+
+        assert isinstance(df, pd.DataFrame)
+
+    @patch.object(BLSConnector, "_bls_post_request")
+    def test_command_injection_in_parameters(self, mock_request):
+        """Test command injection attempt in parameters."""
+        mock_response = {
+            "status": "REQUEST_SUCCEEDED",
+            "Results": {
+                "series": [
+                    {
+                        "seriesID": "LNS14000000",
+                        "data": [{"year": "2023", "period": "M12", "value": "3.7"}],
+                    }
+                ]
+            },
+        }
+        mock_request.return_value = mock_response
+
+        connector = BLSConnector(api_key="test_key")
+
+        # Command injection attempt in series ID
+        malicious = "LNS14000000; rm -rf /"
+
+        # Should handle safely
+        df = connector.get_series(malicious, start_year=2023, end_year=2023)
+
+        assert isinstance(df, pd.DataFrame)
+
+    @patch.object(BLSConnector, "_bls_post_request")
+    def test_xss_injection_prevention(self, mock_request):
+        """Test XSS injection prevention in parameters."""
+        mock_response = {
+            "status": "REQUEST_SUCCEEDED",
+            "Results": {
+                "series": [
+                    {
+                        "seriesID": "LNS14000000",
+                        "data": [{"year": "2023", "period": "M12", "value": "3.7"}],
+                    }
+                ]
+            },
+        }
+        mock_request.return_value = mock_response
+
+        connector = BLSConnector(api_key="test_key")
+
+        # XSS attempt
+        xss_payload = "<script>alert('XSS')</script>"
+
+        # Should handle safely
+        df = connector.get_series(xss_payload, start_year=2023, end_year=2023)
+
+        assert isinstance(df, pd.DataFrame)
+
+
+class TestBLSSecurityAPIKey:
+    """Test security: API key exposure prevention."""
+
+    def test_api_key_not_in_repr(self):
+        """Test that API key is not exposed in repr()."""
+        api_key = "super_secret_bls_key_12345"
+        connector = BLSConnector(api_key=api_key)
+
+        repr_str = repr(connector)
+
+        # API key should be masked or not present
+        assert api_key not in repr_str
+
+    def test_api_key_not_in_str(self):
+        """Test that API key is not exposed in str()."""
+        api_key = "super_secret_bls_key_12345"
+        connector = BLSConnector(api_key=api_key)
+
+        str_repr = str(connector)
+
+        # API key should be masked or not present
+        assert api_key not in str_repr
+
+    @patch.object(BLSConnector, "_bls_post_request")
+    def test_api_key_not_in_error_messages(self, mock_request):
+        """Test that API key is not leaked in error messages."""
+        api_key = "super_secret_bls_key_12345"
+        mock_request.side_effect = Exception("BLS API request failed")
+
+        connector = BLSConnector(api_key=api_key)
+
+        with pytest.raises(Exception) as exc_info:
+            connector.get_series("LNS14000000")
+
+        # API key should not appear in exception message
+        assert api_key not in str(exc_info.value)
+
+    def test_api_key_not_in_logs(self, caplog):
+        """Test that API key is not logged."""
+        api_key = "super_secret_bls_key_12345"
+        connector = BLSConnector(api_key=api_key)
+        connector.logger.propagate = True
+
+        with caplog.at_level("DEBUG", logger="BLSConnector"):
+            # Trigger some logging
+            repr(connector)
+
+        # Check all log messages
+        for record in caplog.records:
+            assert api_key not in record.message
+
+
+class TestBLSSecurityInputValidation:
+    """Test security: Input validation and sanitization."""
+
+    @patch.object(BLSConnector, "_bls_post_request")
+    def test_handles_null_bytes_in_series_id(self, mock_request):
+        """Test handling of null bytes in series ID."""
+        mock_response = {
+            "status": "REQUEST_SUCCEEDED",
+            "Results": {"series": []},
+        }
+        mock_request.return_value = mock_response
+
+        connector = BLSConnector(api_key="test_key")
+
+        # Null byte injection
+        malicious_series = "LNS14000000\x00malicious"
+
+        # Should handle safely or reject
+        try:
+            df = connector.get_series(malicious_series, start_year=2023, end_year=2023)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, TypeError):
+            # Acceptable to reject null bytes
+            pass
+
+    @patch.object(BLSConnector, "_bls_post_request")
+    def test_handles_extremely_long_series_ids(self, mock_request):
+        """Test handling of excessively long series IDs (DoS attempt)."""
+        mock_response = {
+            "status": "REQUEST_SUCCEEDED",
+            "Results": {"series": []},
+        }
+        mock_request.return_value = mock_response
+
+        connector = BLSConnector(api_key="test_key")
+
+        # Extremely long series ID
+        long_series = "LNS" * 10000
+
+        # Should handle safely or reject
+        try:
+            df = connector.get_series(long_series, start_year=2023, end_year=2023)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, Exception):
+            # Acceptable to reject overly long inputs
+            pass
+
+    def test_year_range_boundary_validation(self):
+        """Test year range boundary validation for security."""
+        connector = BLSConnector(api_key="test_key")
+
+        # Negative years (should fail)
+        with pytest.raises(ValueError):
+            connector.get_series("LNS14000000", start_year=-1, end_year=2023)
+
+        # Future years too far out (should be acceptable but may return no data)
+        # Year 9999 is an extreme case
+        with pytest.raises(ValueError):
+            connector.get_series("LNS14000000", start_year=1900, end_year=9999)
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

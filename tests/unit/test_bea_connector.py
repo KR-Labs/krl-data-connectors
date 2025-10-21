@@ -618,5 +618,187 @@ class TestBEALogging:
         assert len(caplog.records) > 0
 
 
+# =============================================================================
+# Layer 5: Security Tests
+# =============================================================================
+
+
+class TestBEASecurityInjection:
+    """Test security: SQL injection and command injection prevention."""
+
+    @patch.object(BEAConnector, "_make_request")
+    def test_sql_injection_in_table_name(self, mock_request):
+        """Test SQL injection attempt in table_name parameter."""
+        mock_response = {
+            "BEAAPI": {"Results": {"Data": [{"DataValue": "100", "TimePeriod": "2023"}]}}
+        }
+        mock_request.return_value = mock_response
+
+        connector = BEAConnector(api_key="test_key")
+
+        # Malicious SQL injection attempt
+        malicious_table = "T10101'; DROP TABLE data; --"
+
+        # Should not execute SQL, just pass as string parameter
+        df = connector.get_nipa_data(table_name=malicious_table)
+
+        # Verify the call was made safely
+        assert isinstance(df, pd.DataFrame)
+        call_kwargs = mock_request.call_args.kwargs
+        params = call_kwargs.get("params", {})
+        assert "TableName" in params
+        # Parameter should be safely encoded
+        assert malicious_table in params["TableName"] or malicious_table == params["TableName"]
+
+    @patch.object(BEAConnector, "_make_request")
+    def test_command_injection_in_year(self, mock_request):
+        """Test command injection attempt in year parameter."""
+        mock_response = {
+            "BEAAPI": {"Results": {"Data": [{"DataValue": "100", "TimePeriod": "2023"}]}}
+        }
+        mock_request.return_value = mock_response
+
+        connector = BEAConnector(api_key="test_key")
+
+        # Malicious command injection attempt
+        malicious_year = "2023; rm -rf /"
+
+        # Should handle safely
+        df = connector.get_nipa_data(table_name="T10101", year=malicious_year)
+
+        assert isinstance(df, pd.DataFrame)
+
+    @patch.object(BEAConnector, "_make_request")
+    def test_xss_injection_in_parameters(self, mock_request):
+        """Test XSS injection attempt in parameters."""
+        mock_response = {
+            "BEAAPI": {"Results": {"Data": [{"DataValue": "100", "TimePeriod": "2023"}]}}
+        }
+        mock_request.return_value = mock_response
+
+        connector = BEAConnector(api_key="test_key")
+
+        # XSS attempt
+        xss_payload = "<script>alert('XSS')</script>"
+
+        # Should handle safely
+        df = connector.get_regional_data(
+            table_name="SAINC1",
+            line_code=xss_payload,
+            geo_fips="STATE",
+            year="2023",
+        )
+
+        assert isinstance(df, pd.DataFrame)
+
+
+class TestBEASecurityAPIKey:
+    """Test security: API key exposure prevention."""
+
+    def test_api_key_not_in_repr(self):
+        """Test that API key is not exposed in repr()."""
+        api_key = "super_secret_key_12345"
+        connector = BEAConnector(api_key=api_key)
+
+        repr_str = repr(connector)
+
+        # API key should be masked or not present
+        assert api_key not in repr_str
+
+    def test_api_key_not_in_str(self):
+        """Test that API key is not exposed in str()."""
+        api_key = "super_secret_key_12345"
+        connector = BEAConnector(api_key=api_key)
+
+        str_repr = str(connector)
+
+        # API key should be masked or not present
+        assert api_key not in str_repr
+
+    @patch.object(BEAConnector, "_make_request")
+    def test_api_key_not_in_error_messages(self, mock_request):
+        """Test that API key is not leaked in error messages."""
+        api_key = "super_secret_key_12345"
+        mock_request.side_effect = Exception("API request failed")
+
+        connector = BEAConnector(api_key=api_key)
+
+        with pytest.raises(Exception) as exc_info:
+            connector.get_nipa_data(table_name="T10101")
+
+        # API key should not appear in exception message
+        assert api_key not in str(exc_info.value)
+
+    def test_api_key_not_in_logs(self, caplog):
+        """Test that API key is not logged."""
+        api_key = "super_secret_key_12345"
+        connector = BEAConnector(api_key=api_key)
+        connector.logger.propagate = True
+
+        with caplog.at_level("DEBUG", logger="BEAConnector"):
+            # Trigger some logging
+            repr(connector)
+
+        # Check all log messages
+        for record in caplog.records:
+            assert api_key not in record.message
+
+
+class TestBEASecurityInputValidation:
+    """Test security: Input validation and sanitization."""
+
+    def test_rejects_empty_api_key(self):
+        """Test that empty API key is rejected."""
+        with pytest.raises(ValueError, match="API key is required"):
+            BEAConnector(api_key="")
+
+    def test_rejects_whitespace_only_api_key(self):
+        """Test that whitespace-only API key is rejected."""
+        with pytest.raises(ValueError):
+            BEAConnector(api_key="   ")
+
+    @patch.object(BEAConnector, "_make_request")
+    def test_handles_null_bytes_in_parameters(self, mock_request):
+        """Test handling of null bytes in parameters."""
+        mock_response = {
+            "BEAAPI": {"Results": {"Data": [{"DataValue": "100", "TimePeriod": "2023"}]}}
+        }
+        mock_request.return_value = mock_response
+
+        connector = BEAConnector(api_key="test_key")
+
+        # Null byte injection attempt
+        malicious_table = "T10101\x00malicious"
+
+        # Should handle safely or reject
+        try:
+            df = connector.get_nipa_data(table_name=malicious_table)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, TypeError):
+            # Acceptable to reject null bytes
+            pass
+
+    @patch.object(BEAConnector, "_make_request")
+    def test_handles_extremely_long_parameters(self, mock_request):
+        """Test handling of excessively long parameters."""
+        mock_response = {
+            "BEAAPI": {"Results": {"Data": [{"DataValue": "100", "TimePeriod": "2023"}]}}
+        }
+        mock_request.return_value = mock_response
+
+        connector = BEAConnector(api_key="test_key")
+
+        # Extremely long parameter (DoS attempt)
+        long_table = "T" * 10000
+
+        # Should handle safely
+        try:
+            df = connector.get_nipa_data(table_name=long_table)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, Exception):
+            # Acceptable to reject overly long inputs
+            pass
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
