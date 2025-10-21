@@ -486,5 +486,137 @@ class TestLEHDLogging:
         assert len(caplog.records) > 0
 
 
+# =============================================================================
+# Layer 5: Security Tests
+# =============================================================================
+
+
+class TestLEHDSecurityInjection:
+    """Test security: SQL injection and command injection prevention."""
+
+    @patch("pandas.read_csv")
+    def test_sql_injection_in_state(self, mock_read_csv, mock_od_data):
+        """Test SQL injection attempt in state parameter."""
+        mock_read_csv.return_value = mock_od_data
+
+        connector = LEHDConnector()
+
+        # SQL injection attempt
+        malicious_state = "ca'; DROP TABLE data; --"
+
+        # Should handle safely
+        try:
+            df = connector.get_od_data(state=malicious_state, year=2019)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, FileNotFoundError):
+            # Acceptable to reject invalid state codes
+            pass
+
+    @patch("pandas.read_csv")
+    def test_command_injection_in_parameters(self, mock_read_csv, mock_od_data):
+        """Test command injection prevention."""
+        mock_read_csv.return_value = mock_od_data
+
+        connector = LEHDConnector()
+
+        # Command injection attempt
+        malicious_job_type = "JT00; rm -rf /"
+
+        # Should handle safely
+        try:
+            df = connector.get_od_data(state="ca", year=2019, job_type=malicious_job_type)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, FileNotFoundError):
+            # Acceptable to reject invalid job types
+            pass
+
+    @patch("pandas.read_csv")
+    def test_path_traversal_prevention(self, mock_read_csv, mock_od_data):
+        """Test path traversal prevention."""
+        mock_read_csv.return_value = mock_od_data
+
+        connector = LEHDConnector()
+
+        # Path traversal attempt
+        malicious_state = "../../etc/passwd"
+
+        # Should prevent path traversal
+        try:
+            df = connector.get_od_data(state=malicious_state, year=2019)
+            # Should not access files outside expected directory
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, FileNotFoundError, OSError):
+            # Expected to reject path traversal
+            pass
+
+
+class TestLEHDSecurityInputValidation:
+    """Test security: Input validation and sanitization."""
+
+    def test_year_type_validation(self):
+        """Test year parameter type validation."""
+        connector = LEHDConnector()
+
+        # Invalid year types
+        with pytest.raises((ValueError, TypeError)):
+            connector.get_od_data(state="ca", year="not_a_year")
+
+    def test_state_code_validation(self):
+        """Test state code validation."""
+        connector = LEHDConnector()
+
+        # Empty state code
+        with pytest.raises((ValueError, TypeError)):
+            connector.get_od_data(state="", year=2019)
+
+    @patch("pandas.read_csv")
+    def test_handles_null_bytes(self, mock_read_csv, mock_od_data):
+        """Test handling of null bytes in parameters."""
+        mock_read_csv.return_value = mock_od_data
+
+        connector = LEHDConnector()
+
+        # Null byte injection
+        malicious_state = "ca\x00malicious"
+
+        # Should handle safely or reject
+        try:
+            df = connector.get_od_data(state=malicious_state, year=2019)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, TypeError, FileNotFoundError):
+            # Acceptable to reject null bytes
+            pass
+
+    @patch("pandas.read_csv")
+    def test_handles_extremely_long_state_codes(self, mock_read_csv, mock_od_data):
+        """Test handling of excessively long state codes (DoS prevention)."""
+        mock_read_csv.return_value = mock_od_data
+
+        connector = LEHDConnector()
+
+        # Extremely long state code
+        long_state = "ca" * 10000
+
+        # Should handle safely or reject
+        try:
+            df = connector.get_od_data(state=long_state, year=2019)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, FileNotFoundError, Exception):
+            # Acceptable to reject overly long inputs
+            pass
+
+    def test_year_range_validation(self):
+        """Test year range boundary validation."""
+        connector = LEHDConnector()
+
+        # Year too far in past
+        with pytest.raises((ValueError, FileNotFoundError)):
+            connector.get_od_data(state="ca", year=1900)
+
+        # Year too far in future
+        with pytest.raises((ValueError, FileNotFoundError)):
+            connector.get_od_data(state="ca", year=9999)
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

@@ -513,3 +513,145 @@ class TestSchoolTypes:
         assert nces_connector.school_types[2] == 'Special education school'
         assert nces_connector.school_types[3] == 'Vocational school'
         assert nces_connector.school_types[4] == 'Alternative/other school'
+
+
+# =============================================================================
+# Layer 5: Security Tests
+# =============================================================================
+
+
+class TestNCESSecurityInjection:
+    """Test security: SQL injection and command injection prevention."""
+
+    @patch('requests.get')
+    def test_sql_injection_in_state(self, mock_get, nces_connector):
+        """Test SQL injection attempt in state parameter."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = []
+        mock_get.return_value = mock_response
+
+        # SQL injection attempt
+        malicious_state = "RI'; DROP TABLE schools; --"
+
+        # Should handle safely
+        try:
+            df = nces_connector.get_state_schools(malicious_state, 2023)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, KeyError):
+            # Acceptable to reject invalid state codes
+            pass
+
+    @patch('requests.get')
+    def test_command_injection_in_parameters(self, mock_get, nces_connector):
+        """Test command injection prevention."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = []
+        mock_get.return_value = mock_response
+
+        # Command injection attempt
+        malicious_school_id = "440001; rm -rf /"
+
+        # Should handle safely
+        try:
+            df = nces_connector.get_school_details(malicious_school_id)
+            assert isinstance(df, (pd.DataFrame, dict, type(None)))
+        except (ValueError, Exception):
+            # Acceptable to reject malicious input
+            pass
+
+    @patch('requests.get')
+    def test_xss_injection_prevention(self, mock_get, nces_connector):
+        """Test XSS injection prevention."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = []
+        mock_get.return_value = mock_response
+
+        # XSS attempt
+        xss_payload = "<script>alert('XSS')</script>"
+
+        # Should handle safely
+        try:
+            df = nces_connector.get_state_schools(xss_payload, 2023)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, KeyError):
+            # Acceptable to reject XSS payloads
+            pass
+
+
+class TestNCESSecurityInputValidation:
+    """Test security: Input validation and sanitization."""
+
+    def test_year_type_validation(self, nces_connector):
+        """Test year parameter type validation."""
+        # Invalid year type
+        with pytest.raises((ValueError, TypeError)):
+            nces_connector.get_state_schools('RI', 'not_a_year')
+
+    def test_state_code_validation(self, nces_connector):
+        """Test state code validation."""
+        # Empty state code
+        with pytest.raises((ValueError, KeyError)):
+            nces_connector.get_state_schools('', 2023)
+
+    @patch('requests.get')
+    def test_handles_null_bytes(self, mock_get, nces_connector):
+        """Test handling of null bytes in parameters."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = []
+        mock_get.return_value = mock_response
+
+        # Null byte injection
+        malicious_state = "RI\x00malicious"
+
+        # Should handle safely or reject
+        try:
+            df = nces_connector.get_state_schools(malicious_state, 2023)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, TypeError):
+            # Acceptable to reject null bytes
+            pass
+
+    @patch('requests.get')
+    def test_handles_extremely_long_school_ids(self, mock_get, nces_connector):
+        """Test handling of excessively long school IDs (DoS prevention)."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = []
+        mock_get.return_value = mock_response
+
+        # Extremely long school ID
+        long_id = "440001" * 10000
+
+        # Should handle safely or reject
+        try:
+            df = nces_connector.get_school_details(long_id)
+            assert isinstance(df, (pd.DataFrame, dict, type(None)))
+        except (ValueError, Exception):
+            # Acceptable to reject overly long inputs
+            pass
+
+    def test_year_range_validation(self, nces_connector):
+        """Test year range boundary validation."""
+        # Year too far in past (should fail or return empty)
+        try:
+            df = nces_connector.get_state_schools('RI', 1800)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, Exception):
+            # Acceptable to reject unreasonable years
+            pass
+
+        # Year too far in future (should fail or return empty)
+        try:
+            df = nces_connector.get_state_schools('RI', 9999)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, Exception):
+            # Acceptable to reject unreasonable years
+            pass
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

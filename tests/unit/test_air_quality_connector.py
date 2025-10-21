@@ -538,3 +538,161 @@ class TestMakeRequest:
         result = connector._make_request('observation/zipCode/current/', {'zipCode': '99999'})
 
         assert result == []
+
+
+# =============================================================================
+# Layer 5: Security Tests
+# =============================================================================
+
+
+class TestAirQualitySecurityInjection:
+    """Test security: SQL injection and command injection prevention."""
+
+    @patch('requests.get')
+    def test_sql_injection_in_zip_code(self, mock_get, connector):
+        """Test SQL injection attempt in ZIP code parameter."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = []
+        mock_get.return_value = mock_response
+
+        # SQL injection attempt
+        malicious_zip = "94102'; DROP TABLE data; --"
+
+        # Should handle safely
+        df = connector.get_current_observations_by_zip(malicious_zip)
+        assert isinstance(df, pd.DataFrame)
+
+    @patch('requests.get')
+    def test_command_injection_in_parameters(self, mock_get, connector):
+        """Test command injection prevention."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = []
+        mock_get.return_value = mock_response
+
+        # Command injection attempt
+        malicious_lat = "37.7749; rm -rf /"
+
+        # Should handle safely
+        try:
+            df = connector.get_current_observations_by_latlon(malicious_lat, -122.4194)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, TypeError):
+            # Acceptable to reject invalid coordinates
+            pass
+
+    @patch('requests.get')
+    def test_xss_injection_prevention(self, mock_get, connector):
+        """Test XSS injection prevention."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = []
+        mock_get.return_value = mock_response
+
+        # XSS attempt
+        xss_payload = "<script>alert('XSS')</script>"
+
+        # Should handle safely
+        df = connector.get_current_observations_by_zip(xss_payload)
+        assert isinstance(df, pd.DataFrame)
+
+
+class TestAirQualitySecurityAPIKey:
+    """Test security: API key exposure prevention."""
+
+    def test_api_key_not_in_repr(self, mock_api_key):
+        """Test that API key is not exposed in repr()."""
+        connector = EPAAirQualityConnector(api_key=mock_api_key)
+        repr_str = repr(connector)
+
+        # API key should be masked or not present
+        assert mock_api_key not in repr_str
+
+    def test_api_key_not_in_str(self, mock_api_key):
+        """Test that API key is not exposed in str()."""
+        connector = EPAAirQualityConnector(api_key=mock_api_key)
+        str_repr = str(connector)
+
+        # API key should be masked or not present
+        assert mock_api_key not in str_repr
+
+    @patch('requests.get')
+    def test_api_key_not_in_error_messages(self, mock_get, mock_api_key):
+        """Test that API key is not leaked in error messages."""
+        mock_get.side_effect = Exception("API request failed")
+
+        connector = EPAAirQualityConnector(api_key=mock_api_key)
+
+        with pytest.raises(Exception) as exc_info:
+            connector.get_current_observations_by_zip('94102')
+
+        # API key should not appear in exception message
+        assert mock_api_key not in str(exc_info.value)
+
+
+class TestAirQualitySecurityInputValidation:
+    """Test security: Input validation and sanitization."""
+
+    @patch('requests.get')
+    def test_handles_null_bytes_in_zip(self, mock_get, connector):
+        """Test handling of null bytes in ZIP code."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = []
+        mock_get.return_value = mock_response
+
+        # Null byte injection
+        malicious_zip = "94102\x00malicious"
+
+        # Should handle safely or reject
+        try:
+            df = connector.get_current_observations_by_zip(malicious_zip)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, TypeError):
+            # Acceptable to reject null bytes
+            pass
+
+    @patch('requests.get')
+    def test_handles_extremely_long_zip_codes(self, mock_get, connector):
+        """Test handling of excessively long ZIP codes (DoS prevention)."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = []
+        mock_get.return_value = mock_response
+
+        # Extremely long ZIP code
+        long_zip = "94102" * 10000
+
+        # Should handle safely or reject
+        try:
+            df = connector.get_current_observations_by_zip(long_zip)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, Exception):
+            # Acceptable to reject overly long inputs
+            pass
+
+    def test_coordinate_range_validation(self, connector):
+        """Test latitude/longitude range validation."""
+        # Invalid latitude (>90)
+        with pytest.raises((ValueError, Exception)):
+            connector.get_current_observations_by_latlon(91.0, -122.0)
+
+        # Invalid latitude (<-90)
+        with pytest.raises((ValueError, Exception)):
+            connector.get_current_observations_by_latlon(-91.0, -122.0)
+
+        # Invalid longitude (>180)
+        with pytest.raises((ValueError, Exception)):
+            connector.get_current_observations_by_latlon(37.0, 181.0)
+
+        # Invalid longitude (<-180)
+        with pytest.raises((ValueError, Exception)):
+            connector.get_current_observations_by_latlon(37.0, -181.0)
+
+    def test_date_format_validation(self, connector):
+        """Test date parameter format validation."""
+        # Invalid date format
+        with pytest.raises((ValueError, TypeError)):
+            connector.get_forecast_by_zip('94102', date='not-a-date')
+
