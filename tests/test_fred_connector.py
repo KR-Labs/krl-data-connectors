@@ -475,3 +475,14 @@ class TestFREDConnectorTypeContracts:
         result = fred._get_api_key()
 
         assert result is None or isinstance(result, str)
+
+    @patch.object(FREDConnector, "_make_request")
+    def test_connect_return_type(self, mock_request):
+        """Test connect returns None."""
+        mock_request.return_value = {"seriess": [{"id": "GNPCA"}]}
+
+        fred = FREDConnector(api_key="test_key")
+
+        result = fred.connect()
+
+        assert result is None
