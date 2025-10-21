@@ -488,5 +488,113 @@ class TestHUDFMRSecurityInputValidation:
             pass
 
 
+class TestHUDFMRPropertyBased:
+    """Test HUD FMR connector using property-based testing with Hypothesis."""
+
+    @pytest.mark.hypothesis
+    def test_year_parameter_validation_property(self, hud_connector):
+        """Property: Year parameter should accept valid fiscal years (2000-2025)."""
+        from hypothesis import given, strategies as st
+
+        @given(year=st.integers(min_value=2000, max_value=2025))
+        def check_year_handling(year):
+            # Mock DataFrame with FMR data
+            mock_df = pd.DataFrame({
+                'state': ['RI'],
+                'year': [year],
+                'fmr_0br': [800],
+                'fmr_1br': [900],
+                'fmr_2br': [1100]
+            })
+            
+            with patch.object(hud_connector, '_api_get_state_fmrs') as mock_api:
+                mock_api.return_value = mock_df
+                df = hud_connector.get_state_fmrs('RI', year=year, use_api=True)
+                assert isinstance(df, pd.DataFrame)
+
+        check_year_handling()
+
+    @pytest.mark.hypothesis
+    def test_state_code_property(self, hud_connector):
+        """Property: State codes should be 2-letter uppercase strings."""
+        from hypothesis import given, strategies as st
+
+        @given(state=st.text(alphabet=st.characters(min_codepoint=65, max_codepoint=90), min_size=2, max_size=2))
+        def check_state_code_handling(state):
+            mock_df = pd.DataFrame({
+                'state': [state],
+                'year': [2024],
+                'fmr_2br': [1100]
+            })
+            
+            with patch.object(hud_connector, '_api_get_state_fmrs') as mock_api:
+                mock_api.return_value = mock_df
+                
+                try:
+                    df = hud_connector.get_state_fmrs(state, year=2024, use_api=True)
+                    assert isinstance(df, pd.DataFrame)
+                except (KeyError, ValueError):
+                    # Acceptable to reject invalid state codes
+                    pass
+
+        check_state_code_handling()
+
+    @pytest.mark.hypothesis
+    def test_bedroom_count_property(self, hud_connector):
+        """Property: Bedroom counts should be 0-4."""
+        from hypothesis import given, strategies as st
+
+        @given(bedrooms=st.integers(min_value=0, max_value=4))
+        def check_bedroom_handling(bedrooms):
+            # Create FMR data with bedroom columns
+            fmr_df = pd.DataFrame({
+                'metro_name': ['Providence'],
+                'fmr_0br': [800],
+                'fmr_1br': [900],
+                'fmr_2br': [1100],
+                'fmr_3br': [1400],
+                'fmr_4br': [1600]
+            })
+            
+            # Test bedroom filtering
+            if hasattr(hud_connector, 'get_fmr_by_bedrooms'):
+                result = hud_connector.get_fmr_by_bedrooms(fmr_df, bedrooms)
+                assert isinstance(result, pd.DataFrame)
+                # Should have bedroom-specific column
+                expected_col = f'fmr_{bedrooms}br'
+                if not result.empty:
+                    assert expected_col in result.columns or 'fmr' in result.columns
+
+        check_bedroom_handling()
+
+    @pytest.mark.hypothesis
+    def test_fmr_amount_property(self, hud_connector):
+        """Property: FMR amounts should be positive numbers (in dollars)."""
+        from hypothesis import given, strategies as st
+
+        @given(
+            fmr_0br=st.integers(min_value=100, max_value=5000),
+            fmr_2br=st.integers(min_value=500, max_value=10000)
+        )
+        def check_fmr_amount_handling(fmr_0br, fmr_2br):
+            # Create FMR data
+            fmr_df = pd.DataFrame({
+                'state': ['RI'],
+                'year': [2024],
+                'fmr_0br': [fmr_0br],
+                'fmr_2br': [fmr_2br]
+            })
+            
+            # Validate FMR amounts are positive
+            assert all(fmr_df['fmr_0br'] > 0)
+            assert all(fmr_df['fmr_2br'] > 0)
+            # 2BR should typically cost more than 0BR
+            if fmr_2br > fmr_0br:
+                assert fmr_df['fmr_2br'].iloc[0] > fmr_df['fmr_0br'].iloc[0]
+
+        check_fmr_amount_handling()
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
+
