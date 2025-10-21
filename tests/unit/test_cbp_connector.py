@@ -674,5 +674,100 @@ class TestCBPSecurityInputValidation:
             pass
 
 
+class TestCBPPropertyBased:
+    """Test CBP connector using property-based testing with Hypothesis."""
+
+    @pytest.mark.hypothesis
+    def test_year_parameter_validation_property(self):
+        """Property: Year parameter should accept valid years (2017-2021)."""
+        from hypothesis import given, strategies as st
+
+        cbp_connector = CountyBusinessPatternsConnector()
+
+        @given(year=st.integers(min_value=2017, max_value=2021))
+        def check_year_handling(year):
+            with patch.object(cbp_connector, "_make_request") as mock_request:
+                # Mock Census API response format (list of lists)
+                mock_request.return_value = [
+                    ["ESTAB", "EMP", "state"],
+                    ["1000", "5000", "06"],
+                ]
+                df = cbp_connector.get_state_data(year=year)
+                assert isinstance(df, pd.DataFrame)
+                assert mock_request.called
+
+        check_year_handling()
+
+    @pytest.mark.hypothesis
+    def test_state_fips_code_property(self):
+        """Property: State FIPS codes should be 2-digit numeric strings."""
+        from hypothesis import given, strategies as st
+
+        cbp_connector = CountyBusinessPatternsConnector()
+
+        @given(state=st.text(alphabet=st.characters(whitelist_categories=("Nd",)), min_size=2, max_size=2))
+        def check_state_code_handling(state):
+            with patch.object(cbp_connector, "_make_request") as mock_request:
+                mock_request.return_value = [
+                    ["ESTAB", "EMP", "state"],
+                    ["1000", "5000", state],
+                ]
+                df = cbp_connector.get_state_data(year=2021, state=state)
+                assert isinstance(df, pd.DataFrame)
+                assert mock_request.called
+
+        check_state_code_handling()
+
+    @pytest.mark.hypothesis
+    def test_county_fips_code_property(self):
+        """Property: County FIPS codes should be 3-digit numeric strings."""
+        from hypothesis import given, strategies as st
+
+        cbp_connector = CountyBusinessPatternsConnector()
+
+        @given(county=st.text(alphabet=st.characters(whitelist_categories=("Nd",)), min_size=3, max_size=3))
+        def check_county_code_handling(county):
+            with patch.object(cbp_connector, "_make_request") as mock_request:
+                mock_request.return_value = [
+                    ["ESTAB", "EMP", "state", "county"],
+                    ["1000", "5000", "06", county],
+                ]
+                df = cbp_connector.get_county_data(year=2021, state="06", county=county)
+                assert isinstance(df, pd.DataFrame)
+                assert mock_request.called
+
+        check_county_code_handling()
+
+    @pytest.mark.hypothesis
+    def test_naics_code_property(self):
+        """Property: NAICS codes should be alphanumeric strings with hyphens."""
+        from hypothesis import given, strategies as st
+
+        cbp_connector = CountyBusinessPatternsConnector()
+
+        @given(
+            naics=st.text(
+                alphabet=st.characters(whitelist_categories=("Nd",)) | st.just("-"),
+                min_size=2,
+                max_size=10,
+            )
+        )
+        def check_naics_code_handling(naics):
+            # Skip invalid patterns (leading/trailing hyphens)
+            if naics.startswith("-") or naics.endswith("-") or "--" in naics:
+                return
+
+            with patch.object(cbp_connector, "_make_request") as mock_request:
+                mock_request.return_value = [
+                    ["ESTAB", "EMP", "NAICS2017", "state"],
+                    ["1000", "5000", naics, "06"],
+                ]
+                df = cbp_connector.get_state_data(year=2021, naics=naics)
+                assert isinstance(df, pd.DataFrame)
+                assert mock_request.called
+
+        check_naics_code_handling()
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
