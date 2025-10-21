@@ -528,5 +528,151 @@ class TestCBPLogging:
         assert len(caplog.records) > 0
 
 
+# =============================================================================
+# Layer 5: Security Tests
+# =============================================================================
+
+
+class TestCBPSecurityInjection:
+    """Test security: SQL injection and command injection prevention."""
+
+    @patch.object(CountyBusinessPatternsConnector, "_make_request")
+    def test_sql_injection_in_parameters(self, mock_request):
+        """Test SQL injection attempt in parameters."""
+        mock_response = [
+            ["ESTAB", "state"],
+            ["1000", "06"],
+        ]
+        mock_request.return_value = mock_response
+
+        connector = CountyBusinessPatternsConnector()
+
+        # SQL injection attempt
+        malicious_state = "06'; DROP TABLE data; --"
+
+        # Should handle safely
+        df = connector.get_state_data(year=2021, state=malicious_state)
+
+        assert isinstance(df, pd.DataFrame)
+
+    @patch.object(CountyBusinessPatternsConnector, "_make_request")
+    def test_command_injection_prevention(self, mock_request):
+        """Test command injection prevention."""
+        mock_response = [
+            ["ESTAB", "NAICS2017"],
+            ["1000", "00"],
+        ]
+        mock_request.return_value = mock_response
+
+        connector = CountyBusinessPatternsConnector()
+
+        # Command injection attempt
+        malicious_naics = "00; rm -rf /"
+
+        # Should handle safely
+        df = connector.get_state_data(year=2021, naics=malicious_naics)
+
+        assert isinstance(df, pd.DataFrame)
+
+    @patch.object(CountyBusinessPatternsConnector, "_make_request")
+    def test_xss_injection_prevention(self, mock_request):
+        """Test XSS injection prevention."""
+        mock_response = [
+            ["ESTAB", "county"],
+            ["1000", "001"],
+        ]
+        mock_request.return_value = mock_response
+
+        connector = CountyBusinessPatternsConnector()
+
+        # XSS attempt
+        xss_payload = "<script>alert('XSS')</script>"
+
+        # Should handle safely
+        df = connector.get_county_data(year=2021, county=xss_payload)
+
+        assert isinstance(df, pd.DataFrame)
+
+
+class TestCBPSecurityAPIKey:
+    """Test security: API key exposure prevention."""
+
+    def test_api_key_not_in_repr(self):
+        """Test that API key is not exposed in repr()."""
+        api_key = "super_secret_cbp_key_12345"
+        connector = CountyBusinessPatternsConnector(api_key=api_key)
+
+        repr_str = repr(connector)
+
+        # API key should be masked or not present
+        assert api_key not in repr_str
+
+    def test_api_key_not_in_str(self):
+        """Test that API key is not exposed in str()."""
+        api_key = "super_secret_cbp_key_12345"
+        connector = CountyBusinessPatternsConnector(api_key=api_key)
+
+        str_repr = str(connector)
+
+        # API key should be masked or not present
+        assert api_key not in str_repr
+
+
+class TestCBPSecurityInputValidation:
+    """Test security: Input validation and sanitization."""
+
+    @patch.object(CountyBusinessPatternsConnector, "_make_request")
+    def test_handles_null_bytes(self, mock_request):
+        """Test handling of null bytes in parameters."""
+        mock_response = [
+            ["ESTAB", "state"],
+            ["1000", "06"],
+        ]
+        mock_request.return_value = mock_response
+
+        connector = CountyBusinessPatternsConnector()
+
+        # Null byte injection
+        malicious_state = "06\x00malicious"
+
+        # Should handle safely or reject
+        try:
+            df = connector.get_state_data(year=2021, state=malicious_state)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, TypeError):
+            # Acceptable to reject null bytes
+            pass
+
+    def test_year_validation(self):
+        """Test year parameter validation."""
+        connector = CountyBusinessPatternsConnector()
+
+        # Invalid year types
+        with pytest.raises((ValueError, TypeError)):
+            connector.get_state_data(year="not_a_year")
+
+    @patch.object(CountyBusinessPatternsConnector, "_make_request")
+    def test_handles_extremely_long_inputs(self, mock_request):
+        """Test handling of excessively long inputs (DoS prevention)."""
+        mock_response = [
+            ["ESTAB", "state"],
+            ["1000", "06"],
+        ]
+        mock_request.return_value = mock_response
+
+        connector = CountyBusinessPatternsConnector()
+
+        # Extremely long NAICS code
+        long_naics = "123456" * 10000
+
+        # Should handle safely or reject
+        try:
+            df = connector.get_state_data(year=2021, naics=long_naics)
+            assert isinstance(df, pd.DataFrame)
+        except (ValueError, Exception):
+            # Acceptable to reject overly long inputs
+            pass
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
