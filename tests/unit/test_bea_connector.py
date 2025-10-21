@@ -922,5 +922,177 @@ class TestBEAPropertyBased:
         check_geo_fips_format()
 
 
+class TestBEAConnectorTypeContracts:
+    """Test type contracts and return value structures (Layer 8)."""
+
+    def test_connect_return_type(self):
+        """Test that connect returns None."""
+        bea = BEAConnector(api_key="test_key")
+
+        result = bea.connect()
+
+        assert result is None
+
+    @patch.object(BEAConnector, "_make_request")
+    def test_fetch_return_type(self, mock_request):
+        """Test that fetch returns DataFrame."""
+        mock_request.return_value = {
+            "BEAAPI": {
+                "Results": {
+                    "Data": [
+                        {"TableName": "T10101", "SeriesCode": "A191RC", "DataValue": "20000", "TimePeriod": "2020"}
+                    ]
+                }
+            }
+        }
+
+        bea = BEAConnector(api_key="test_key")
+
+        result = bea.fetch(dataset="nipa", table_name="T10101", frequency="A", year="2020")
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch.object(BEAConnector, "_make_request")
+    def test_get_dataset_list_return_type(self, mock_request):
+        """Test that get_dataset_list returns DataFrame."""
+        mock_request.return_value = {
+            "BEAAPI": {
+                "Results": {
+                    "Dataset": [
+                        {"DatasetName": "NIPA", "DatasetDescription": "National Income and Product Accounts"}
+                    ]
+                }
+            }
+        }
+
+        bea = BEAConnector(api_key="test_key")
+
+        result = bea.get_dataset_list()
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch.object(BEAConnector, "_make_request")
+    def test_get_parameter_list_return_type(self, mock_request):
+        """Test that get_parameter_list returns DataFrame."""
+        mock_request.return_value = {
+            "BEAAPI": {
+                "Results": {
+                    "Parameter": [
+                        {"ParameterName": "Frequency", "ParameterDescription": "A=Annual, Q=Quarterly, M=Monthly"}
+                    ]
+                }
+            }
+        }
+
+        bea = BEAConnector(api_key="test_key")
+
+        result = bea.get_parameter_list("NIPA")
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch.object(BEAConnector, "_make_request")
+    def test_get_parameter_values_return_type(self, mock_request):
+        """Test that get_parameter_values returns DataFrame."""
+        mock_request.return_value = {
+            "BEAAPI": {
+                "Results": {
+                    "ParamValue": [
+                        {"Key": "A", "Desc": "Annual"}
+                    ]
+                }
+            }
+        }
+
+        bea = BEAConnector(api_key="test_key")
+
+        result = bea.get_parameter_values("NIPA", "Frequency")
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch.object(BEAConnector, "_make_request")
+    def test_get_nipa_data_return_type(self, mock_request):
+        """Test that get_nipa_data returns DataFrame."""
+        mock_request.return_value = {
+            "BEAAPI": {
+                "Results": {
+                    "Data": [
+                        {"TableName": "T10101", "SeriesCode": "A191RC", "DataValue": "20000", "TimePeriod": "2020"}
+                    ]
+                }
+            }
+        }
+
+        bea = BEAConnector(api_key="test_key")
+
+        result = bea.get_nipa_data(table_name="T10101", frequency="A", year="2020")
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch.object(BEAConnector, "_make_request")
+    def test_get_regional_data_return_type(self, mock_request):
+        """Test that get_regional_data returns DataFrame."""
+        mock_request.return_value = {
+            "BEAAPI": {
+                "Results": {
+                    "Data": [
+                        {"GeoFips": "06", "GeoName": "California", "Code": "PCPI", "DataValue": "60000", "TimePeriod": "2020"}
+                    ]
+                }
+            }
+        }
+
+        bea = BEAConnector(api_key="test_key")
+
+        result = bea.get_regional_data(table_name="CAINC1", geo_fips="STATE", year="2020")
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch.object(BEAConnector, "_make_request")
+    def test_get_gdp_by_industry_return_type(self, mock_request):
+        """Test that get_gdp_by_industry returns DataFrame."""
+        mock_request.return_value = {
+            "BEAAPI": {
+                "Results": {
+                    "Data": [
+                        {"TableID": "1", "Industry": "Agriculture", "DataValue": "1000", "TimePeriod": "2020"}
+                    ]
+                }
+            }
+        }
+
+        bea = BEAConnector(api_key="test_key")
+
+        result = bea.get_gdp_by_industry(frequency="A", year="2020", table_id="1")
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch.object(BEAConnector, "_make_request")
+    def test_get_fixed_assets_return_type(self, mock_request):
+        """Test that get_fixed_assets returns DataFrame."""
+        mock_request.return_value = {
+            "BEAAPI": {
+                "Results": {
+                    "Data": [
+                        {"TableName": "FAAt201", "SeriesCode": "K1", "DataValue": "5000", "TimePeriod": "2020"}
+                    ]
+                }
+            }
+        }
+
+        bea = BEAConnector(api_key="test_key")
+
+        result = bea.get_fixed_assets(table_name="FAAt201", year="2020")
+
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_api_key_return_type(self):
+        """Test that _get_api_key returns Optional[str]."""
+        bea = BEAConnector(api_key="test_key")
+
+        result = bea._get_api_key()
+
+        assert result is None or isinstance(result, str)
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
