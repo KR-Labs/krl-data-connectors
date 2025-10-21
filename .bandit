@@ -1,0 +1,100 @@
+# .bandit.yml - Security linting configuration
+# Part of 10-Layer Testing Architecture - Layer 5 (SAST)
+
+exclude_dirs:
+  - /tests/
+  - /htmlcov/
+  - /.venv/
+  - /venv/
+  - /__pycache__/
+  - /build/
+  - /dist/
+  - /.eggs/
+
+# Enable all security tests
+tests:
+  # Debugging and weak crypto
+  - B201  # flask_debug_true
+  - B301  # pickle usage (insecure deserialization)
+  - B302  # marshal usage
+  - B303  # md5/sha1 usage (weak hashing)
+  - B304  # insecure ciphers
+  - B305  # insecure cipher modes
+  - B306  # mktemp usage (insecure temp files)
+  - B307  # eval usage (code injection)
+  - B308  # mark_safe usage (XSS risk)
+  
+  # Network security
+  - B310  # urllib with file protocol
+  - B321  # ftplib usage (insecure protocol)
+  - B323  # unverified SSL/TLS context
+  - B501  # request without verify=True
+  - B502  # ssl with bad defaults
+  - B503  # ssl with bad version
+  - B504  # ssl with no version specified
+  - B505  # weak cryptographic key
+  - B507  # ssh no host key verification
+  
+  # Injection vulnerabilities
+  - B601  # paramiko shell injection
+  - B602  # shell injection subprocess
+  - B603  # subprocess without shell=True check
+  - B604  # shell=True usage
+  - B605  # shell injection via shell=True
+  - B606  # shell injection with shell=False
+  - B607  # partial path in start_process
+  - B608  # SQL injection
+  - B609  # wildcard injection
+  
+  # Deserialization and parsing
+  - B311  # random module for cryptographic purposes
+  - B312  # telnetlib usage (insecure protocol)
+  - B313  # xml vulnerable to XXE attacks
+  - B314  # xml entity expansion attack
+  - B315  # xml entity expansion attack
+  - B316  # xml entity expansion attack
+  - B317  # xml external entity attack
+  - B318  # xml external entity attack
+  - B319  # xml external entity attack
+  - B320  # xml external entity attack
+  - B324  # insecure hash functions
+  - B325  # tempnam usage (race condition)
+  - B506  # yaml.load usage (code execution)
+
+# Severity and confidence levels
+severity_level: low
+confidence_level: low
+
+# Blacklist imports
+blacklist_imports:
+  bad_import_sets:
+    - pickle
+    - marshal
+    - shelve
+    - dill
+    - yaml.load:
+        qualnames:
+          - yaml.load
+        message: "Use yaml.safe_load() instead of yaml.load()"
+
+# Blacklist calls
+blacklist_calls:
+  bad_name_sets:
+    - pickle:
+        qualnames:
+          - pickle.loads
+          - pickle.load
+          - pickle.Unpickler
+        message: "Avoid using pickle for untrusted data"
+    - subprocess:
+        qualnames:
+          - subprocess.Popen
+          - subprocess.call
+          - subprocess.run
+        message: "Check if shell=True is used (security risk)"
+    - eval:
+        qualnames:
+          - eval
+          - exec
+          - compile
+        message: "Avoid eval/exec with user input"

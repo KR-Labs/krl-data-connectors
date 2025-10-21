@@ -63,6 +63,49 @@ repos:
       - id: flake8
         args: [--max-line-length=88, --extend-ignore=E203,W503]
   
+  # Security scanning with Bandit (SAST - 10-Layer Architecture Layer 5)
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: ['-c', '.bandit', '--severity-level', 'low', '--recursive', 'src/']
+        files: ^src/
+  
+  # Static type checking with mypy (10-Layer Architecture Layer 8)
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.7.1
+    hooks:
+      - id: mypy
+        additional_dependencies: 
+          - types-requests
+          - types-setuptools
+          - pydantic
+        args: [--config-file=mypy.ini, --ignore-missing-imports]
+        files: ^src/
+  
+  # Fast Python linter (Rust-based)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.8
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+  
+  # Docstring coverage
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.5.0
+    hooks:
+      - id: interrogate
+        args: [--fail-under=70, --verbose, --ignore-init-method, --ignore-init-module]
+        files: ^src/
+  
+  # Safety check for known vulnerabilities (10-Layer Architecture Layer 5)
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
+    rev: v1.3.3
+    hooks:
+      - id: python-safety-dependencies-check
+        files: requirements.*\.txt$
+  
   # YAML validation
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
@@ -83,6 +126,34 @@ repos:
     hooks:
       - id: markdownlint
         args: [--rules, '~MD013,~MD024,~MD033,~MD041']
+  
+  # Quick unit tests (10-Layer Architecture Layer 1)
+  - repo: local
+    hooks:
+      - id: pytest-quick
+        name: pytest-quick (unit tests on commit)
+        entry: bash -c 'if [ -d tests/unit ]; then pytest tests/unit/ -x --tb=short -q --maxfail=1 --timeout=30; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [commit]
+      
+      # Check test coverage doesn't decrease
+      - id: coverage-check
+        name: coverage-check (ensure 70%+ coverage)
+        entry: bash -c 'if [ -d tests ]; then pytest tests/unit/ --cov=src --cov-fail-under=70 --no-cov-on-fail -q --timeout=60; fi'
+        language: system
+        pass_filenames: false
+        always_run: false
+        stages: [push]
+      
+      # Ensure no internal documents are committed
+      - id: check-internal-docs
+        name: check-internal-docs (prevent leaking internal strategy)
+        entry: bash -c 'if git diff --cached --name-only | grep -E "(INTERNAL|_SUMMARY|_REPORT|_ROADMAP|_PLAN|_TODO|_NOTES|PHASE|WEEK|SESSION_|API_KEY_SETUP|BRANCH_PROTECTION)"; then echo "ERROR: Attempting to commit internal documentation. Please review .gitignore patterns."; exit 1; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
 
 # Additional requirements for local hooks
 additional_dependencies:

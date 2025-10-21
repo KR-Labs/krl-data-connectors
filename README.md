@@ -403,21 +403,52 @@ For implementation schedules and API specifications, see [ROADMAP.md](ROADMAP.md
 
 ## Testing
 
-KRL Data Connectors include a comprehensive test suite to ensure operational reliability and reproducibility. Execute tests and measure coverage as follows:
+KRL Data Connectors implement a **10-layer testing architecture** following industry best practices from FAANG, fintech, and defense sectors. All tooling is open-source (OSS).
+
+### Testing Stack
+
+| Layer | Purpose | Tools | Status |
+|-------|---------|-------|--------|
+| **1. Unit Tests** | Individual function correctness | pytest, hypothesis | ✅ 408 tests, 73% coverage |
+| **2. Integration** | Component interactions | pytest, requests-mock | ✅ Implemented |
+| **3. E2E Tests** | Full workflow validation | playwright | 🔄 Planned |
+| **4. Performance** | Load & stress testing | locust, pytest-benchmark | 🔄 Planned |
+| **5. SAST** | Static security analysis | bandit, safety, mypy | ✅ Configured |
+| **6. DAST** | Runtime security testing | OWASP ZAP | 🔄 Planned |
+| **7. Mutation** | Test quality measurement | mutmut, hypothesis | 🔄 Planned |
+| **8. Contract** | Type & interface validation | pydantic, mypy | ✅ Configured |
+| **9. Penetration** | Ethical hacking assessment | metasploit, burp | 📅 Annual |
+| **10. Monitoring** | Continuous validation | GitHub Actions, Snyk | ✅ Active |
+
+### Quick Test Commands
 
 ```bash
 # Run all tests
-pytest
+make test
 
-# Run specific connector tests
-pytest tests/unit/test_ejscreen_connector.py tests/unit/test_hrsa_connector.py tests/unit/test_air_quality_connector.py -v
+# Run with coverage
+make coverage
 
-# Run with coverage reporting
-pytest --cov=src --cov-report=html
+# Run security scans
+make security
 
-# Run integration tests (requires API keys)
-pytest tests/integration/ -v
+# Run type checking
+make type-check
+
+# Full CI simulation
+make ci
+
+# See all available commands
+make help
 ```
+
+### Coverage Goals
+
+- **Current**: 73.30% overall, 408 tests passing
+- **Target**: 90%+ line coverage, 85%+ branch coverage
+- **Mutation Goal**: 90%+ kill rate
+
+For detailed testing guide, see [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md).
 
 ---
 
