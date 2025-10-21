@@ -10,5 +10,6 @@ SPDX-License-Identifier: Apache-2.0
 from .air_quality_connector import EPAAirQualityConnector
 from .ejscreen_connector import EJScreenConnector
 from .superfund_connector import SuperfundConnector
+from .water_quality_connector import WaterQualityConnector
 
-__all__ = ["EJScreenConnector", "EPAAirQualityConnector", "SuperfundConnector"]
+__all__ = ["EJScreenConnector", "EPAAirQualityConnector", "SuperfundConnector", "WaterQualityConnector"]
