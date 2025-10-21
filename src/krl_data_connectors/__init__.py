@@ -23,6 +23,7 @@ from .bls_connector import BLSConnector
 from .cbp_connector import CountyBusinessPatternsConnector
 from .census_connector import CensusConnector
 from .crime import FBIUCRConnector
+from .economic import WorldBankConnector
 from .education import NCESConnector
 from .environment import EJScreenConnector, EPAAirQualityConnector
 from .fred_connector import FREDConnector
@@ -43,6 +44,7 @@ __all__ = [
     "BLSConnector",
     "BEAConnector",
     "USDAFoodAtlasConnector",
+    "WorldBankConnector",
     "CDCWonderConnector",
     "CountyHealthRankingsConnector",
     "HRSAConnector",

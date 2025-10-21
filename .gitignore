@@ -39,6 +39,7 @@ env/
 # Testing
 .tox/
 .nox/
+.hypothesis/
 .coverage
 .coverage.*
 .cache
