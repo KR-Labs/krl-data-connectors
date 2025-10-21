@@ -8,6 +8,7 @@ Licensed under the Apache License, Version 2.0.
 
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 import pandas as pd
 import pytest
@@ -600,6 +601,102 @@ class TestHRSASecurityInputValidation:
         # None DataFrame
         with pytest.raises((ValueError, AttributeError, TypeError)):
             hrsa_connector.get_state_data(None, "RI")
+
+
+class TestHRSAConnectorTypeContracts:
+    """Test type contracts and return value structures (Layer 8)."""
+
+    def test_connect_return_type(self):
+        """Test that connect returns None."""
+        hrsa = HRSAConnector()
+
+        result = hrsa.connect()
+
+        assert result is None
+
+    def test_fetch_return_type(self):
+        """Test that fetch raises NotImplementedError."""
+        hrsa = HRSAConnector()
+
+        with pytest.raises(NotImplementedError):
+            hrsa.fetch()
+
+    @patch("pathlib.Path.exists")
+    @patch("pandas.read_csv")
+    def test_load_hpsa_data_return_type(self, mock_read_csv, mock_exists):
+        """Test that load_hpsa_data returns DataFrame."""
+        mock_exists.return_value = True
+        mock_read_csv.return_value = pd.DataFrame({
+            "State": ["RI"],
+            "County": ["Providence"],
+            "Discipline": ["Primary Care"]
+        })
+
+        hrsa = HRSAConnector()
+
+        result = hrsa.load_hpsa_data("test.csv")
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pathlib.Path.exists")
+    @patch("pandas.read_csv")
+    def test_load_mua_data_return_type(self, mock_read_csv, mock_exists):
+        """Test that load_mua_data returns DataFrame."""
+        mock_exists.return_value = True
+        mock_read_csv.return_value = pd.DataFrame({
+            "State": ["RI"],
+            "County": ["Providence"],
+            "MUA_Type": ["Rural"]
+        })
+
+        hrsa = HRSAConnector()
+
+        result = hrsa.load_mua_data("test.csv")
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pathlib.Path.exists")
+    @patch("pandas.read_csv")
+    def test_load_health_center_data_return_type(self, mock_read_csv, mock_exists):
+        """Test that load_health_center_data returns DataFrame."""
+        mock_exists.return_value = True
+        mock_read_csv.return_value = pd.DataFrame({
+            "State": ["RI"],
+            "Center_Name": ["Providence Health"],
+            "Patients": [5000]
+        })
+
+        hrsa = HRSAConnector()
+
+        result = hrsa.load_health_center_data("test.csv")
+
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_state_data_return_type(self):
+        """Test that get_state_data returns DataFrame."""
+        hrsa = HRSAConnector()
+
+        df = pd.DataFrame({
+            "State_Abbr": ["RI", "MA"],
+            "County_Name": ["Providence", "Suffolk"]
+        })
+
+        result = hrsa.get_state_data(df, "RI")
+
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_county_data_return_type(self):
+        """Test that get_county_data returns DataFrame."""
+        hrsa = HRSAConnector()
+
+        df = pd.DataFrame({
+            "State_Abbr": ["RI", "RI"],
+            "County_Name": ["Providence", "Kent"]
+        })
+
+        result = hrsa.get_county_data(df, "Providence", state="RI")
+
+        assert isinstance(result, pd.DataFrame)
 
 
 if __name__ == "__main__":

@@ -173,3 +173,115 @@ class TestCHRConnectorSecurityInputValidation:
             chr_connector.load_rankings_data(str(invalid_file))
         except (pd.errors.ParserError, ValueError, KeyError):
             pass  # Expected to fail for invalid format
+
+
+class TestCHRConnectorTypeContracts:
+    """Test type contracts and return value structures (Layer 8)."""
+
+    def test_connect_return_type(self):
+        """Test that connect returns None."""
+        chr = CountyHealthRankingsConnector()
+
+        result = chr.connect()
+
+        assert result is None
+
+    def test_fetch_return_type(self):
+        """Test that fetch raises NotImplementedError."""
+        chr = CountyHealthRankingsConnector()
+
+        with pytest.raises(NotImplementedError):
+            chr.fetch(file_path="test.csv")
+
+    @patch("pathlib.Path.exists")
+    @patch("pandas.read_csv")
+    def test_load_rankings_data_return_type(self, mock_read_csv, mock_exists):
+        """Test that load_rankings_data returns DataFrame."""
+        mock_exists.return_value = True
+        mock_read_csv.return_value = pd.DataFrame({
+            "state": ["RI"],
+            "county": ["Providence"],
+            "premature_death": [5000]
+        })
+
+        chr = CountyHealthRankingsConnector()
+
+        result = chr.load_rankings_data("test.csv")
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pathlib.Path.exists")
+    @patch("pandas.read_csv")
+    def test_load_trends_data_return_type(self, mock_read_csv, mock_exists):
+        """Test that load_trends_data returns DataFrame."""
+        mock_exists.return_value = True
+        mock_read_csv.return_value = pd.DataFrame({
+            "state": ["RI"],
+            "year": [2020],
+            "measure": ["premature_death"],
+            "value": [5000]
+        })
+
+        chr = CountyHealthRankingsConnector()
+
+        result = chr.load_trends_data("test.csv")
+
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_state_data_return_type(self):
+        """Test that get_state_data returns DataFrame."""
+        chr = CountyHealthRankingsConnector()
+
+        df = pd.DataFrame({
+            "state": ["RI", "MA"],
+            "county": ["Providence", "Suffolk"],
+            "premature_death": [5000, 6000]
+        })
+
+        result = chr.get_state_data(df, "RI")
+
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_county_data_return_type(self):
+        """Test that get_county_data returns DataFrame."""
+        chr = CountyHealthRankingsConnector()
+
+        df = pd.DataFrame({
+            "state": ["RI", "RI"],
+            "county": ["Providence", "Kent"],
+            "premature_death": [5000, 4500]
+        })
+
+        result = chr.get_county_data(df, "Providence", state="RI")
+
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_health_outcomes_return_type(self):
+        """Test that get_health_outcomes returns DataFrame."""
+        chr = CountyHealthRankingsConnector()
+
+        df = pd.DataFrame({
+            "state": ["RI"],
+            "county": ["Providence"],
+            "premature_death": [5000],
+            "poor_health_days": [3.5]
+        })
+
+        result = chr.get_health_outcomes(df)
+
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_health_factors_return_type(self):
+        """Test that get_health_factors returns DataFrame."""
+        chr = CountyHealthRankingsConnector()
+
+        df = pd.DataFrame({
+            "state": ["RI"],
+            "county": ["Providence"],
+            "adult_smoking": [18.0],
+            "adult_obesity": [28.0]
+        })
+
+        result = chr.get_health_factors(df)
+
+        assert isinstance(result, pd.DataFrame)
