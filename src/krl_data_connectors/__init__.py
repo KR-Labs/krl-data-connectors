@@ -23,7 +23,7 @@ from .bls_connector import BLSConnector
 from .cbp_connector import CountyBusinessPatternsConnector
 from .census_connector import CensusConnector
 from .crime import FBIUCRConnector
-from .economic import WorldBankConnector
+from .economic import OECDConnector, WorldBankConnector
 from .education import NCESConnector
 from .environment import EJScreenConnector, EPAAirQualityConnector
 from .fred_connector import FREDConnector
@@ -33,27 +33,24 @@ from .lehd_connector import LEHDConnector
 from .utils.config import find_config_file, load_api_key_from_config
 
 __all__ = [
-    "__version__",
-    "__author__",
-    "__license__",
     "BaseConnector",
-    "FREDConnector",
-    "CensusConnector",
-    "LEHDConnector",
-    "CountyBusinessPatternsConnector",
     "BLSConnector",
-    "BEAConnector",
-    "USDAFoodAtlasConnector",
+    "CDCConnector",
+    "CensusConnector",
+    "DataUSAConnector",
+    "EIAConnector",
+    "EPAConnector",
+    "FDAConnector",
+    "FREDConnector",
+    "NASAConnector",
+    "NCEIConnector",
+    "NIHConnector",
+    "NOAAConnector",
+    "NSFConnector",
+    "OECDConnector",
+    "OpenFDAConnector",
+    "SECConnector",
+    "TreasuryConnector",
+    "USDAConnector",
     "WorldBankConnector",
-    "CDCWonderConnector",
-    "CountyHealthRankingsConnector",
-    "HRSAConnector",
-    "EJScreenConnector",
-    "EPAAirQualityConnector",
-    "FBIUCRConnector",
-    "NCESConnector",
-    "HUDFMRConnector",
-    "ZillowConnector",
-    "find_config_file",
-    "load_api_key_from_config",
 ]
