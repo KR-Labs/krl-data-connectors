@@ -362,7 +362,7 @@ class FBIUCRConnector(BaseConnector):
         """
         if crime_col not in data.columns or population_col not in data.columns:
             self.logger.warning(
-                f"Required columns not found",
+                "Required columns not found",
                 extra={"crime_col": crime_col, "population_col": population_col},
             )
             return data

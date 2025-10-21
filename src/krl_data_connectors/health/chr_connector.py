@@ -13,7 +13,8 @@ County Health Rankings does NOT provide a REST API. Data is provided as annual
 CSV and SAS file releases.
 
 **Data Downloads:**
-- **National Data**: https://www.countyhealthrankings.org/health-data/methodology-and-sources/rankings-data-documentation
+- **National Data**:
+  https://www.countyhealthrankings.org/health-data/methodology-and-sources/rankings-data-documentation
   - Available formats: CSV, SAS
   - Annual releases (2010-present)
   - Analytic Data: Rankings + raw measures
@@ -336,7 +337,7 @@ class CountyHealthRankingsConnector(BaseConnector):
                     county_column = col
                     break
             else:
-                raise ValueError(f"County column not found in data")
+                raise ValueError("County column not found in data")
 
         # Case-insensitive county match
         filtered = data[data[county_column].str.lower() == county.lower()].copy()
@@ -380,7 +381,7 @@ class CountyHealthRankingsConnector(BaseConnector):
             self.logger.info(f"Sorted {len(sorted_data)} records by health outcomes rank")
             return sorted_data
         else:
-            self.logger.warning(f"Health outcomes rank column not found")
+            self.logger.warning("Health outcomes rank column not found")
             return data
 
     def get_health_factors(
@@ -411,7 +412,7 @@ class CountyHealthRankingsConnector(BaseConnector):
             self.logger.info(f"Sorted {len(sorted_data)} records by health factors rank")
             return sorted_data
         else:
-            self.logger.warning(f"Health factors rank column not found")
+            self.logger.warning("Health factors rank column not found")
             return data
 
     def get_top_performers(

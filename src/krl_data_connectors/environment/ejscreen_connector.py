@@ -27,7 +27,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
-import requests
 
 from ..base_connector import BaseConnector
 

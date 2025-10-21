@@ -64,7 +64,7 @@ Licensed under the Apache License, Version 2.0.
 """
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, List, Optional, Union
 
 import pandas as pd
 import requests

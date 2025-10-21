@@ -64,7 +64,6 @@ Licensed under the Apache License, Version 2.0.
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-import numpy as np
 import pandas as pd
 
 from krl_data_connectors.base_connector import BaseConnector
