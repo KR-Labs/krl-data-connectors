@@ -5,8 +5,9 @@
 # ----------------------------------------------------------------------
 # SPDX-License-Identifier: Apache-2.0
 
-"""Financial and securities data connectors for KRL Data Connectors."""
+"""Financial data connectors for KRL Data Connectors."""
 
-from krl_data_connectors.financial.sec_connector import SECConnector
+from .sec_connector import SECConnector
+from .treasury_connector import TreasuryConnector
 
-__all__ = ["SECConnector"]
+__all__ = ["SECConnector", "TreasuryConnector"]
