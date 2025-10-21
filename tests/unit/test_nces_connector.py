@@ -796,5 +796,119 @@ class TestNCESPropertyBased:
         check_enrollment_handling()
 
 
+class TestNCESConnectorTypeContracts:
+    """Test type contracts and return value structures (Layer 8)."""
+
+    def test_connect_return_type(self):
+        """Test that connect returns None."""
+        nces = NCESConnector()
+
+        result = nces.connect()
+
+        assert result is None
+
+    @patch("pandas.read_csv")
+    def test_fetch_return_type(self, mock_read_csv):
+        """Test that fetch returns DataFrame."""
+        mock_read_csv.return_value = pd.DataFrame({
+            "NCESSCH": ["440001"],
+            "SCH_NAME": ["Test School"],
+            "ENROLLMENT": [500]
+        })
+
+        nces = NCESConnector()
+
+        result = nces.fetch(dataset="schools", state="OH", year=2020)
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pandas.read_csv")
+    def test_load_school_data_return_type(self, mock_read_csv):
+        """Test that load_school_data returns DataFrame."""
+        mock_read_csv.return_value = pd.DataFrame({
+            "NCESSCH": ["440001"],
+            "SCH_NAME": ["Test School"]
+        })
+
+        nces = NCESConnector()
+
+        result = nces.load_school_data("test.csv")
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pandas.read_csv")
+    def test_get_state_schools_return_type(self, mock_read_csv):
+        """Test that get_state_schools returns DataFrame."""
+        mock_read_csv.return_value = pd.DataFrame({
+            "NCESSCH": ["440001"],
+            "SCH_NAME": ["Test School"],
+            "STATE": ["OH"]
+        })
+
+        nces = NCESConnector()
+
+        result = nces.get_state_schools(state="OH", year=2020, use_api=False)
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pandas.read_csv")
+    def test_get_enrollment_data_return_type(self, mock_read_csv):
+        """Test that get_enrollment_data returns DataFrame."""
+        mock_read_csv.return_value = pd.DataFrame({
+            "NCESSCH": ["440001"],
+            "ENROLLMENT": [500]
+        })
+
+        nces = NCESConnector()
+
+        result = nces.get_enrollment_data(state="OH", year=2020, use_api=False)
+
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_demographics_return_type(self):
+        """Test that get_demographics returns DataFrame."""
+        nces = NCESConnector()
+
+        schools_df = pd.DataFrame({
+            "NCESSCH": ["440001"],
+            "WHITE": [50],
+            "BLACK": [30],
+            "HISPANIC": [15]
+        })
+
+        result = nces.get_demographics(schools_df)
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pandas.read_csv")
+    def test_get_graduation_rates_return_type(self, mock_read_csv):
+        """Test that get_graduation_rates returns DataFrame."""
+        mock_read_csv.return_value = pd.DataFrame({
+            "NCESSCH": ["440001"],
+            "GRAD_RATE": [85.5]
+        })
+
+        nces = NCESConnector()
+
+        result = nces.get_graduation_rates(state="OH", year=2020, use_api=False)
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pandas.read_csv")
+    def test_get_district_finance_return_type(self, mock_read_csv):
+        """Test that get_district_finance returns DataFrame."""
+        mock_read_csv.return_value = pd.DataFrame({
+            "LEAID": ["4400001"],
+            "TOTALREV": [1000000],
+            "TOTALEXP": [950000]
+        })
+
+        nces = NCESConnector()
+
+        result = nces.get_district_finance(state="OH", year=2020, use_api=False)
+
+        assert isinstance(result, pd.DataFrame)
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
