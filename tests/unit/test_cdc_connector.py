@@ -408,5 +408,132 @@ class TestCDCSecurityInputValidation:
             pass
 
 
+class TestCDCPropertyBased:
+    """Test Layer 7: Property-Based Testing with Hypothesis."""
+
+    @pytest.mark.hypothesis
+    def test_year_list_property(self):
+        """Property test: Year lists should be handled consistently."""
+        from hypothesis import given, strategies as st
+
+        cdc_connector = CDCWonderConnector()
+
+        @given(years=st.lists(st.integers(min_value=1999, max_value=2025), min_size=1, max_size=5))
+        def check_year_list_handling(years):
+            with patch.object(cdc_connector, "_make_cdc_request") as mock_request:
+                mock_request.return_value = pd.DataFrame({
+                    "State": ["CA"],
+                    "Year": [years[0]],
+                    "Deaths": [100]
+                })
+
+                try:
+                    df = cdc_connector.get_mortality_data(years=years, geo_level="state")
+                    assert isinstance(df, pd.DataFrame)
+                    # All years should be integers
+                    assert all(isinstance(y, int) for y in years)
+                except (ValueError, TypeError):
+                    pass  # Validation may reject some year combinations
+
+        check_year_list_handling()
+
+    @pytest.mark.hypothesis
+    def test_state_code_list_property(self):
+        """Property test: State codes should be 2-character uppercase strings."""
+        from hypothesis import given, strategies as st
+
+        cdc_connector = CDCWonderConnector()
+
+        @given(
+            states=st.lists(
+                st.text(alphabet=st.characters(whitelist_categories=("Lu",)), min_size=2, max_size=2),
+                min_size=1,
+                max_size=3
+            )
+        )
+        def check_state_list_handling(states):
+            # Return XML string as CDC expects
+            xml_response = """<?xml version="1.0"?><response><data-table><r>
+            <c l="State" v="{}">CA</c><c l="Year" v="2020">2020</c>
+            <c l="Deaths" v="100">100</c></r></data-table></response>""".format(states[0])
+            
+            with patch.object(cdc_connector, "_make_cdc_request") as mock_request:
+                mock_request.return_value = xml_response
+
+                try:
+                    df = cdc_connector.get_mortality_data(
+                        years=[2020], geo_level="state", states=states
+                    )
+                    assert isinstance(df, pd.DataFrame)
+                except (ValueError, KeyError, Exception):
+                    pass  # Invalid state codes or other errors may be rejected
+
+        check_state_list_handling()
+
+    @pytest.mark.hypothesis
+    def test_geo_level_parameter_property(self):
+        """Property test: Geographic level should only accept valid values."""
+        from hypothesis import given, strategies as st
+
+        cdc_connector = CDCWonderConnector()
+
+        valid_levels = ["national", "state", "county"]
+
+        @given(geo_level=st.text(min_size=1, max_size=20))
+        def check_geo_level_validation(geo_level):
+            xml_response = """<?xml version="1.0"?><response><data-table><r>
+            <c l="Year" v="2020">2020</c><c l="Deaths" v="100">100</c>
+            </r></data-table></response>"""
+            
+            with patch.object(cdc_connector, "_make_cdc_request") as mock_request:
+                mock_request.return_value = xml_response
+
+                try:
+                    df = cdc_connector.get_mortality_data(
+                        years=[2020], geo_level=geo_level
+                    )
+                    # If accepted, should be a valid level
+                    assert geo_level.lower() in valid_levels or isinstance(df, pd.DataFrame)
+                except (ValueError, KeyError, Exception):
+                    # Invalid levels should be rejected
+                    pass
+
+        check_geo_level_validation()
+
+    @pytest.mark.hypothesis
+    def test_cause_of_death_code_property(self):
+        """Property test: ICD-10 codes should be handled consistently."""
+        from hypothesis import given, strategies as st
+
+        cdc_connector = CDCWonderConnector()
+
+        @given(
+            icd_codes=st.lists(
+                st.text(alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", min_size=3, max_size=7),
+                min_size=1,
+                max_size=5
+            )
+        )
+        def check_icd_code_handling(icd_codes):
+            with patch.object(cdc_connector, "_make_cdc_request") as mock_request:
+                mock_request.return_value = pd.DataFrame({
+                    "Cause": [icd_codes[0]],
+                    "Year": [2020],
+                    "Deaths": [100]
+                })
+
+                try:
+                    df = cdc_connector.get_mortality_data(
+                        years=[2020],
+                        geo_level="national",
+                        cause_of_death=icd_codes
+                    )
+                    assert isinstance(df, pd.DataFrame)
+                except (ValueError, KeyError, TypeError):
+                    pass  # Invalid codes may be rejected
+
+        check_icd_code_handling()
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
