@@ -16,7 +16,7 @@ and demographic data providers including FRED, Census Bureau, BLS, World Bank, a
 """
 
 from .__version__ import __author__, __license__, __version__
-from .agricultural import USDAFoodAtlasConnector
+from .agricultural import USDAFoodAtlasConnector, USDANASSConnector
 from .base_connector import BaseConnector
 from .bea_connector import BEAConnector
 from .bls_connector import BLSConnector
@@ -51,6 +51,7 @@ __all__ = [
     "OpenFDAConnector",
     "SECConnector",
     "TreasuryConnector",
-    "USDAConnector",
+    "USDAFoodAtlasConnector",
+    "USDANASSConnector",
     "WorldBankConnector",
 ]

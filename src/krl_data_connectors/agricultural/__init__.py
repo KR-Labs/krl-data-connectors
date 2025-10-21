@@ -10,7 +10,11 @@ SPDX-License-Identifier: Apache-2.0
 from krl_data_connectors.agricultural.usda_food_atlas_connector import (
     USDAFoodAtlasConnector,
 )
+from krl_data_connectors.agricultural.usda_nass_connector import (
+    USDANASSConnector,
+)
 
 __all__ = [
     "USDAFoodAtlasConnector",
+    "USDANASSConnector",
 ]
