@@ -92,6 +92,7 @@ examples/*.csv
 *_PLAN.md
 *_TODO.md
 *_INTERNAL*.md
+INTERNAL_*.md
 *_NOTES.md
 PHASE*.md
 WEEK*.md
