@@ -5,9 +5,11 @@ Copyright (c) 2025 Sudiata Giddasira, Inc. d/b/a Quipu Research Labs, LLC d/b/a 
 SPDX-License-Identifier: Apache-2.0
 """
 
-import pytest
-import pandas as pd
 from unittest.mock import Mock, patch
+
+import pandas as pd
+import pytest
+
 from krl_data_connectors.agricultural import USDAFoodAtlasConnector
 
 

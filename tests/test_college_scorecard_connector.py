@@ -14,10 +14,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import requests
-from hypothesis import given, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 
 from krl_data_connectors.education.college_scorecard_connector import CollegeScorecardConnector
-
 
 # ============================================================================
 # Layer 1: Unit Tests - Initialization & Core Functionality

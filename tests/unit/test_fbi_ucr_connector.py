@@ -494,7 +494,8 @@ class TestFBIUCRPropertyBased:
     @pytest.mark.hypothesis
     def test_year_parameter_validation_property(self, fbi_connector):
         """Property: Year parameter should accept valid years (1960-2023)."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         @given(year=st.integers(min_value=1960, max_value=2023))
         def check_year_handling(year):
@@ -522,7 +523,8 @@ class TestFBIUCRPropertyBased:
     @pytest.mark.hypothesis
     def test_state_code_property(self, fbi_connector):
         """Property: State codes should be 2-letter uppercase strings."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         @given(
             state=st.text(
@@ -552,7 +554,8 @@ class TestFBIUCRPropertyBased:
     @pytest.mark.hypothesis
     def test_crime_count_property(self, fbi_connector):
         """Property: Crime counts should be non-negative integers."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         @given(
             violent_crime=st.integers(min_value=0, max_value=1000000),
@@ -581,7 +584,8 @@ class TestFBIUCRPropertyBased:
     @pytest.mark.hypothesis
     def test_crime_rate_property(self, fbi_connector):
         """Property: Crime rates should be calculable from counts and population."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         @given(
             crime_count=st.integers(min_value=0, max_value=100000),

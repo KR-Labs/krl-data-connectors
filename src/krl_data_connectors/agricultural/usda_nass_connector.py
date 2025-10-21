@@ -4,6 +4,7 @@ Provides access to agricultural statistics from the National Agricultural Statis
 """
 
 from typing import Any, Dict, List, Optional
+
 import requests
 
 from krl_data_connectors.base_connector import BaseConnector

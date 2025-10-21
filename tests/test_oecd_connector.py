@@ -15,10 +15,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import requests
-from hypothesis import given, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 
 from krl_data_connectors.economic.oecd_connector import OECDConnector
-
 
 # ============================================================================
 # Layer 1: Unit Tests - Initialization & Core Functionality

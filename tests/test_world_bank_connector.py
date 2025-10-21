@@ -19,15 +19,15 @@ Author: KR Labs
 Date: October 2025
 """
 
+from unittest.mock import Mock, patch
+
 import pytest
 import requests
 from hypothesis import given
 from hypothesis import strategies as st
 from requests.exceptions import HTTPError, RequestException
-from unittest.mock import Mock, patch
 
 from krl_data_connectors.economic import WorldBankConnector
-
 
 # ============================================================================
 # LAYER 1: UNIT TESTS - Core Functionality

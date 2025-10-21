@@ -7,7 +7,7 @@ KR-Labs™ is a trademark of Quipu Research Labs, LLC, a subsidiary of Sudiata G
 SPDX-License-Identifier: Apache-2.0
 """
 
-from .ejscreen_connector import EJScreenConnector
 from .air_quality_connector import EPAAirQualityConnector
+from .ejscreen_connector import EJScreenConnector
 
 __all__ = ["EJScreenConnector", "EPAAirQualityConnector"]

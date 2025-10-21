@@ -680,7 +680,8 @@ class TestCBPPropertyBased:
     @pytest.mark.hypothesis
     def test_year_parameter_validation_property(self):
         """Property: Year parameter should accept valid years (2017-2021)."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         cbp_connector = CountyBusinessPatternsConnector()
 
@@ -701,7 +702,8 @@ class TestCBPPropertyBased:
     @pytest.mark.hypothesis
     def test_state_fips_code_property(self):
         """Property: State FIPS codes should be 2-digit numeric strings."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         cbp_connector = CountyBusinessPatternsConnector()
 
@@ -725,7 +727,8 @@ class TestCBPPropertyBased:
     @pytest.mark.hypothesis
     def test_county_fips_code_property(self):
         """Property: County FIPS codes should be 3-digit numeric strings."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         cbp_connector = CountyBusinessPatternsConnector()
 
@@ -749,7 +752,8 @@ class TestCBPPropertyBased:
     @pytest.mark.hypothesis
     def test_naics_code_property(self):
         """Property: NAICS codes should be alphanumeric strings with hyphens."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         cbp_connector = CountyBusinessPatternsConnector()
 

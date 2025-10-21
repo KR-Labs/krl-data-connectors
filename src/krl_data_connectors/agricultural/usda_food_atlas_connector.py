@@ -9,8 +9,10 @@ Copyright (c) 2025 Sudiata Giddasira, Inc. d/b/a Quipu Research Labs, LLC d/b/a 
 SPDX-License-Identifier: Apache-2.0
 """
 
-from typing import Dict, Any, Optional, List
+from typing import Any, Dict, List, Optional
+
 import pandas as pd
+
 from krl_data_connectors.base_connector import BaseConnector
 
 

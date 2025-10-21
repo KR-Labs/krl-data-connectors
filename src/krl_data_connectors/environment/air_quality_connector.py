@@ -40,13 +40,13 @@ Author: KR-Labs Development Team
 License: MIT
 """
 
-from typing import Optional, Dict, List, Union, Any
-from datetime import datetime
-import os
 import logging
+import os
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Union
 
-import requests
 import pandas as pd
+import requests
 
 from ..base_connector import BaseConnector
 

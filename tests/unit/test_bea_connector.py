@@ -806,7 +806,8 @@ class TestBEAPropertyBased:
     @pytest.mark.hypothesis
     def test_year_parameter_validation_property(self):
         """Property test: Year validation should be consistent across methods."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         connector = BEAConnector(api_key="test_key")
 
@@ -831,7 +832,8 @@ class TestBEAPropertyBased:
     @pytest.mark.hypothesis
     def test_table_name_type_property(self):
         """Property test: Table names should always be strings."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         connector = BEAConnector(api_key="test_key")
 
@@ -852,7 +854,8 @@ class TestBEAPropertyBased:
     @pytest.mark.hypothesis
     def test_frequency_parameter_property(self):
         """Property test: Frequency should only accept valid values."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         connector = BEAConnector(api_key="test_key")
 
@@ -876,7 +879,8 @@ class TestBEAPropertyBased:
     @pytest.mark.hypothesis
     def test_geo_fips_property(self):
         """Property test: GeoFips codes should be handled consistently."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         connector = BEAConnector(api_key="test_key")
 

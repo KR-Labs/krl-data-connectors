@@ -6,6 +6,7 @@ for postsecondary education institutional data.
 """
 
 from typing import Any, Dict, List, Optional
+
 import requests
 
 from krl_data_connectors.base_connector import BaseConnector

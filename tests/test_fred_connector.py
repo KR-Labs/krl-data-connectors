@@ -15,10 +15,10 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 import pytest
 import requests
-from hypothesis import given, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 
 from krl_data_connectors.fred_connector import FREDConnector
-
 
 # ============================================================================
 # Layer 1: Unit Tests - Initialization & Core Functionality

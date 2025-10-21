@@ -416,7 +416,8 @@ class TestCDCPropertyBased:
     @pytest.mark.hypothesis
     def test_year_list_property(self):
         """Property test: Year lists should be handled consistently."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         cdc_connector = CDCWonderConnector()
 
@@ -440,7 +441,8 @@ class TestCDCPropertyBased:
     @pytest.mark.hypothesis
     def test_state_code_list_property(self):
         """Property test: State codes should be 2-character uppercase strings."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         cdc_connector = CDCWonderConnector()
 
@@ -477,7 +479,8 @@ class TestCDCPropertyBased:
     @pytest.mark.hypothesis
     def test_geo_level_parameter_property(self):
         """Property test: Geographic level should only accept valid values."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         cdc_connector = CDCWonderConnector()
 
@@ -505,7 +508,8 @@ class TestCDCPropertyBased:
     @pytest.mark.hypothesis
     def test_cause_of_death_code_property(self):
         """Property test: ICD-10 codes should be handled consistently."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         cdc_connector = CDCWonderConnector()
 

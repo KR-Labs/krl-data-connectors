@@ -1,8 +1,10 @@
 """Tests for County Health Rankings Connector"""
 
-import pytest
-import pandas as pd
 from unittest.mock import patch
+
+import pandas as pd
+import pytest
+
 from krl_data_connectors.health import CountyHealthRankingsConnector
 
 

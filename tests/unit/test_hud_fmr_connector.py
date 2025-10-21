@@ -14,7 +14,7 @@ Updated to match current implementation.
 
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
 
 import pandas as pd
 import pytest
@@ -459,7 +459,8 @@ class TestHUDFMRPropertyBased:
     @pytest.mark.hypothesis
     def test_year_parameter_validation_property(self, hud_connector):
         """Property: Year parameter should accept valid fiscal years (2000-2025)."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         @given(year=st.integers(min_value=2000, max_value=2025))
         def check_year_handling(year):
@@ -484,7 +485,8 @@ class TestHUDFMRPropertyBased:
     @pytest.mark.hypothesis
     def test_state_code_property(self, hud_connector):
         """Property: State codes should be 2-letter uppercase strings."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         @given(
             state=st.text(
@@ -509,7 +511,8 @@ class TestHUDFMRPropertyBased:
     @pytest.mark.hypothesis
     def test_bedroom_count_property(self, hud_connector):
         """Property: Bedroom counts should be 0-4."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         @given(bedrooms=st.integers(min_value=0, max_value=4))
         def check_bedroom_handling(bedrooms):
@@ -539,7 +542,8 @@ class TestHUDFMRPropertyBased:
     @pytest.mark.hypothesis
     def test_fmr_amount_property(self, hud_connector):
         """Property: FMR amounts should be positive numbers (in dollars)."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         @given(
             fmr_0br=st.integers(min_value=100, max_value=5000),

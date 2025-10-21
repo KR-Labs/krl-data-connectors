@@ -677,7 +677,8 @@ class TestNCESPropertyBased:
     @pytest.mark.hypothesis
     def test_year_parameter_validation_property(self, nces_connector):
         """Property: Year parameter should accept valid school years (2000-2024)."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         @given(year=st.integers(min_value=2000, max_value=2024))
         def check_year_handling(year):
@@ -703,7 +704,8 @@ class TestNCESPropertyBased:
     @pytest.mark.hypothesis
     def test_state_code_property(self, nces_connector):
         """Property: State codes should be 2-letter uppercase strings."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         @given(
             state=st.text(
@@ -737,7 +739,8 @@ class TestNCESPropertyBased:
     @pytest.mark.hypothesis
     def test_school_id_format_property(self, nces_connector):
         """Property: School IDs should be numeric strings (6-12 digits)."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         @given(
             school_id=st.text(
@@ -769,7 +772,8 @@ class TestNCESPropertyBased:
     @pytest.mark.hypothesis
     def test_enrollment_data_property(self, nces_connector):
         """Property: Enrollment values should be non-negative integers."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         @given(enrollment=st.integers(min_value=0, max_value=50000))
         def check_enrollment_handling(enrollment):

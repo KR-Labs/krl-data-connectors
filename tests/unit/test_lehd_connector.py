@@ -624,7 +624,8 @@ class TestLEHDPropertyBased:
     @pytest.mark.hypothesis
     def test_year_parameter_validation_property(self):
         """Property: Year parameter should accept valid years (2002-2020)."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         lehd_connector = LEHDConnector()
 
@@ -650,7 +651,8 @@ class TestLEHDPropertyBased:
     @pytest.mark.hypothesis
     def test_state_code_property(self):
         """Property: State codes should be 2-letter strings."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         lehd_connector = LEHDConnector()
 
@@ -678,7 +680,8 @@ class TestLEHDPropertyBased:
     @pytest.mark.hypothesis
     def test_job_type_code_property(self):
         """Property: Job type codes should be alphanumeric strings (e.g., JT00, JT01)."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         lehd_connector = LEHDConnector()
 
@@ -702,7 +705,8 @@ class TestLEHDPropertyBased:
     @pytest.mark.hypothesis
     def test_segment_code_property(self):
         """Property: Segment codes should be alphanumeric strings (e.g., S000, SA01)."""
-        from hypothesis import given, strategies as st
+        from hypothesis import given
+        from hypothesis import strategies as st
 
         lehd_connector = LEHDConnector()
 

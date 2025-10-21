@@ -5,6 +5,7 @@ Supports multiple datasets, flexible dimension filtering, and various response f
 """
 
 from typing import Any, Dict, List, Optional, Union
+
 import requests
 
 from krl_data_connectors.base_connector import BaseConnector
