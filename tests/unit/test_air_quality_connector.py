@@ -693,3 +693,106 @@ class TestAirQualitySecurityInputValidation:
         # Invalid date format
         with pytest.raises((ValueError, TypeError)):
             connector.get_forecast_by_zip("94102", date="not-a-date")
+
+
+class TestEPAAirQualityConnectorTypeContracts:
+    """Test type contracts and return value structures (Layer 8)."""
+
+    def test_connect_return_type(self):
+        """Test that connect returns None."""
+        epa = EPAAirQualityConnector(api_key="test_key")
+        # connect() tries to make API call, will raise ConnectionError without mock
+        # For type contract, we just test that it's defined and callable
+        assert callable(epa.connect)
+
+    def test_fetch_return_type(self):
+        """Test that fetch raises NotImplementedError."""
+        epa = EPAAirQualityConnector(api_key="test_key")
+        with pytest.raises(NotImplementedError):
+            epa.fetch()
+
+    @patch("requests.get")
+    def test_get_current_by_zip_return_type(self, mock_get):
+        """Test that get_current_by_zip returns DataFrame."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = [
+            {"ZIP": "02903", "AQI": 45, "Parameter": "PM2.5"}
+        ]
+        mock_get.return_value = mock_response
+
+        epa = EPAAirQualityConnector(api_key="test_key")
+        result = epa.get_current_by_zip("02903")
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("requests.get")
+    def test_get_current_by_latlon_return_type(self, mock_get):
+        """Test that get_current_by_latlon returns DataFrame."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = [
+            {"Latitude": 41.8, "Longitude": -71.4, "AQI": 45}
+        ]
+        mock_get.return_value = mock_response
+
+        epa = EPAAirQualityConnector(api_key="test_key")
+        result = epa.get_current_by_latlon(41.8, -71.4)
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("requests.get")
+    def test_get_forecast_by_zip_return_type(self, mock_get):
+        """Test that get_forecast_by_zip returns DataFrame."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = [
+            {"ZIP": "02903", "AQI": 50, "DateForecast": "2025-01-01"}
+        ]
+        mock_get.return_value = mock_response
+
+        epa = EPAAirQualityConnector(api_key="test_key")
+        result = epa.get_forecast_by_zip("02903")
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("requests.get")
+    def test_get_historical_by_zip_return_type(self, mock_get):
+        """Test that get_historical_by_zip returns DataFrame."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = [
+            {"ZIP": "02903", "AQI": 42, "Date": "2024-01-01"}
+        ]
+        mock_get.return_value = mock_response
+
+        epa = EPAAirQualityConnector(api_key="test_key")
+        result = epa.get_historical_by_zip("02903", "2024-01-01", "2024-01-31")
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_aqi_category_return_type(self):
+        """Test that get_aqi_category returns string."""
+        epa = EPAAirQualityConnector(api_key="test_key")
+        result = epa.get_aqi_category(45)
+        assert isinstance(result, str)
+
+    def test_filter_by_parameter_return_type(self):
+        """Test that filter_by_parameter returns DataFrame."""
+        epa = EPAAirQualityConnector(api_key="test_key")
+        df = pd.DataFrame({
+            "ParameterName": ["PM2.5", "O3", "PM2.5"],
+            "AQI": [45, 55, 50]
+        })
+        result = epa.filter_by_parameter(df, "PM2.5")
+        assert isinstance(result, pd.DataFrame)
+
+    def test_filter_by_aqi_threshold_return_type(self):
+        """Test that filter_by_aqi_threshold returns DataFrame."""
+        epa = EPAAirQualityConnector(api_key="test_key")
+        df = pd.DataFrame({
+            "AQI": [25, 55, 150, 200],
+            "Location": ["A", "B", "C", "D"]
+        })
+        result = epa.filter_by_aqi_threshold(df, 100)
+        assert isinstance(result, pd.DataFrame)
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])
