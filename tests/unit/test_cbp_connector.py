@@ -781,5 +781,96 @@ class TestCBPPropertyBased:
         check_naics_code_handling()
 
 
+class TestCBPConnectorTypeContracts:
+    """Test type contracts and return value structures (Layer 8)."""
+
+    def test_connect_return_type(self):
+        """Test that connect returns None."""
+        cbp = CountyBusinessPatternsConnector(api_key="test_key")
+
+        result = cbp.connect()
+
+        assert result is None
+
+    @patch.object(CountyBusinessPatternsConnector, "_make_request")
+    def test_fetch_return_type(self, mock_request):
+        """Test that fetch returns DataFrame."""
+        mock_request.return_value = [
+            ["ESTAB", "EMP", "NAICS2017", "state"],
+            ["1000", "5000", "44-45", "06"],
+        ]
+
+        cbp = CountyBusinessPatternsConnector(api_key="test_key")
+
+        result = cbp.fetch(geography="state", year=2021)
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch.object(CountyBusinessPatternsConnector, "_make_request")
+    def test_get_county_data_return_type(self, mock_request):
+        """Test that get_county_data returns DataFrame."""
+        mock_request.return_value = [
+            ["ESTAB", "EMP", "NAICS2017", "county", "state"],
+            ["500", "2500", "44-45", "001", "06"],
+        ]
+
+        cbp = CountyBusinessPatternsConnector(api_key="test_key")
+
+        result = cbp.get_county_data(year=2021)
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch.object(CountyBusinessPatternsConnector, "_make_request")
+    def test_get_state_data_return_type(self, mock_request):
+        """Test that get_state_data returns DataFrame."""
+        mock_request.return_value = [
+            ["ESTAB", "EMP", "NAICS2017", "state"],
+            ["1000", "5000", "44-45", "06"],
+        ]
+
+        cbp = CountyBusinessPatternsConnector(api_key="test_key")
+
+        result = cbp.get_state_data(year=2021)
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch.object(CountyBusinessPatternsConnector, "_make_request")
+    def test_get_metro_data_return_type(self, mock_request):
+        """Test that get_metro_data returns DataFrame."""
+        mock_request.return_value = [
+            ["ESTAB", "EMP", "NAICS2017", "metro area"],
+            ["800", "4000", "44-45", "31080"],
+        ]
+
+        cbp = CountyBusinessPatternsConnector(api_key="test_key")
+
+        result = cbp.get_metro_data(year=2021)
+
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_naics_totals_return_type(self):
+        """Test that get_naics_totals returns DataFrame."""
+        cbp = CountyBusinessPatternsConnector(api_key="test_key")
+
+        # Create sample DataFrame
+        df = pd.DataFrame({
+            "NAICS2017": ["441", "442", "443"],
+            "ESTAB": [100, 200, 150],
+            "EMP": [1000, 2000, 1500]
+        })
+
+        result = cbp.get_naics_totals(df, level=2)
+
+        assert isinstance(result, pd.DataFrame)
+
+    def test_get_api_key_return_type(self):
+        """Test that _get_api_key returns Optional[str]."""
+        cbp = CountyBusinessPatternsConnector(api_key="test_key")
+
+        result = cbp._get_api_key()
+
+        assert result is None or isinstance(result, str)
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

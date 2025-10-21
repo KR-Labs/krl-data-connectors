@@ -728,5 +728,120 @@ class TestLEHDPropertyBased:
         check_segment_handling()
 
 
+class TestLEHDConnectorTypeContracts:
+    """Test type contracts and return value structures (Layer 8)."""
+
+    def test_connect_return_type(self):
+        """Test that connect returns None."""
+        lehd = LEHDConnector()
+
+        result = lehd.connect()
+
+        assert result is None
+
+    @patch("pandas.read_csv")
+    def test_fetch_return_type(self, mock_read_csv):
+        """Test that fetch returns DataFrame."""
+        mock_read_csv.return_value = pd.DataFrame({
+            "w_geocode": ["060371001001"],
+            "h_geocode": ["060371002001"],
+            "S000": [100]
+        })
+
+        lehd = LEHDConnector()
+
+        result = lehd.fetch(state="ca", year=2019)
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pandas.read_csv")
+    def test_get_od_data_return_type(self, mock_read_csv):
+        """Test that get_od_data returns DataFrame."""
+        mock_read_csv.return_value = pd.DataFrame({
+            "w_geocode": ["060371001001"],
+            "h_geocode": ["060371002001"],
+            "S000": [100]
+        })
+
+        lehd = LEHDConnector()
+
+        result = lehd.get_od_data(state="ca", year=2019)
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pandas.read_csv")
+    def test_get_rac_data_return_type(self, mock_read_csv):
+        """Test that get_rac_data returns DataFrame."""
+        mock_read_csv.return_value = pd.DataFrame({
+            "h_geocode": ["060371001001"],
+            "C000": [500],
+            "CE01": [100]
+        })
+
+        lehd = LEHDConnector()
+
+        result = lehd.get_rac_data(state="ca", year=2019)
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("pandas.read_csv")
+    def test_get_wac_data_return_type(self, mock_read_csv):
+        """Test that get_wac_data returns DataFrame."""
+        mock_read_csv.return_value = pd.DataFrame({
+            "w_geocode": ["060371001001"],
+            "C000": [500],
+            "CE01": [100]
+        })
+
+        lehd = LEHDConnector()
+
+        result = lehd.get_wac_data(state="ca", year=2019)
+
+        assert isinstance(result, pd.DataFrame)
+
+    @patch("requests.Session.get")
+    def test_get_available_years_return_type(self, mock_get):
+        """Test that get_available_years returns list of ints."""
+        mock_response = type('MockResponse', (), {
+            'text': '<html><a href="od_main_JT00_2015.csv.gz">2015</a><a href="od_main_JT00_2019.csv.gz">2019</a></html>',
+            'raise_for_status': lambda: None
+        })()
+        mock_get.return_value = mock_response
+
+        lehd = LEHDConnector()
+
+        result = lehd.get_available_years(state="ca")
+
+        assert isinstance(result, list)
+        if result:
+            assert isinstance(result[0], int)
+
+    def test_aggregate_to_tract_return_type(self):
+        """Test that aggregate_to_tract returns DataFrame."""
+        lehd = LEHDConnector()
+
+        df = pd.DataFrame({
+            "h_geocode": ["060371001001001", "060371001001002"],
+            "C000": [100, 200]
+        })
+
+        result = lehd.aggregate_to_tract(df, geocode_col="h_geocode")
+
+        assert isinstance(result, pd.DataFrame)
+
+    def test_aggregate_to_county_return_type(self):
+        """Test that aggregate_to_county returns DataFrame."""
+        lehd = LEHDConnector()
+
+        df = pd.DataFrame({
+            "h_geocode": ["060371001001", "060372001001"],
+            "C000": [100, 200]
+        })
+
+        result = lehd.aggregate_to_county(df, geocode_col="h_geocode")
+
+        assert isinstance(result, pd.DataFrame)
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
