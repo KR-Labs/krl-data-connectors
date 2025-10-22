@@ -716,9 +716,7 @@ class TestEPAAirQualityConnectorTypeContracts:
         """Test that get_current_by_zip returns DataFrame."""
         mock_response = Mock()
         mock_response.status_code = 200
-        mock_response.json.return_value = [
-            {"ZIP": "02903", "AQI": 45, "Parameter": "PM2.5"}
-        ]
+        mock_response.json.return_value = [{"ZIP": "02903", "AQI": 45, "Parameter": "PM2.5"}]
         mock_get.return_value = mock_response
 
         epa = EPAAirQualityConnector(api_key="test_key")
@@ -730,9 +728,7 @@ class TestEPAAirQualityConnectorTypeContracts:
         """Test that get_current_by_latlon returns DataFrame."""
         mock_response = Mock()
         mock_response.status_code = 200
-        mock_response.json.return_value = [
-            {"Latitude": 41.8, "Longitude": -71.4, "AQI": 45}
-        ]
+        mock_response.json.return_value = [{"Latitude": 41.8, "Longitude": -71.4, "AQI": 45}]
         mock_get.return_value = mock_response
 
         epa = EPAAirQualityConnector(api_key="test_key")
@@ -758,9 +754,7 @@ class TestEPAAirQualityConnectorTypeContracts:
         """Test that get_historical_by_zip returns DataFrame."""
         mock_response = Mock()
         mock_response.status_code = 200
-        mock_response.json.return_value = [
-            {"ZIP": "02903", "AQI": 42, "Date": "2024-01-01"}
-        ]
+        mock_response.json.return_value = [{"ZIP": "02903", "AQI": 42, "Date": "2024-01-01"}]
         mock_get.return_value = mock_response
 
         epa = EPAAirQualityConnector(api_key="test_key")
@@ -776,20 +770,14 @@ class TestEPAAirQualityConnectorTypeContracts:
     def test_filter_by_parameter_return_type(self):
         """Test that filter_by_parameter returns DataFrame."""
         epa = EPAAirQualityConnector(api_key="test_key")
-        df = pd.DataFrame({
-            "ParameterName": ["PM2.5", "O3", "PM2.5"],
-            "AQI": [45, 55, 50]
-        })
+        df = pd.DataFrame({"ParameterName": ["PM2.5", "O3", "PM2.5"], "AQI": [45, 55, 50]})
         result = epa.filter_by_parameter(df, "PM2.5")
         assert isinstance(result, pd.DataFrame)
 
     def test_filter_by_aqi_threshold_return_type(self):
         """Test that filter_by_aqi_threshold returns DataFrame."""
         epa = EPAAirQualityConnector(api_key="test_key")
-        df = pd.DataFrame({
-            "AQI": [25, 55, 150, 200],
-            "Location": ["A", "B", "C", "D"]
-        })
+        df = pd.DataFrame({"AQI": [25, 55, 150, 200], "Location": ["A", "B", "C", "D"]})
         result = epa.filter_by_aqi_threshold(df, 100)
         assert isinstance(result, pd.DataFrame)
 

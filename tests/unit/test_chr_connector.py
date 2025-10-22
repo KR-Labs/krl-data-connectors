@@ -205,11 +205,9 @@ class TestCHRConnectorTypeContracts:
     def test_load_rankings_data_return_type(self, mock_read_csv, mock_exists):
         """Test that load_rankings_data returns DataFrame."""
         mock_exists.return_value = True
-        mock_read_csv.return_value = pd.DataFrame({
-            "state": ["RI"],
-            "county": ["Providence"],
-            "premature_death": [5000]
-        })
+        mock_read_csv.return_value = pd.DataFrame(
+            {"state": ["RI"], "county": ["Providence"], "premature_death": [5000]}
+        )
 
         chr = CountyHealthRankingsConnector()
 
@@ -222,12 +220,9 @@ class TestCHRConnectorTypeContracts:
     def test_load_trends_data_return_type(self, mock_read_csv, mock_exists):
         """Test that load_trends_data returns DataFrame."""
         mock_exists.return_value = True
-        mock_read_csv.return_value = pd.DataFrame({
-            "state": ["RI"],
-            "year": [2020],
-            "measure": ["premature_death"],
-            "value": [5000]
-        })
+        mock_read_csv.return_value = pd.DataFrame(
+            {"state": ["RI"], "year": [2020], "measure": ["premature_death"], "value": [5000]}
+        )
 
         chr = CountyHealthRankingsConnector()
 
@@ -239,11 +234,13 @@ class TestCHRConnectorTypeContracts:
         """Test that get_state_data returns DataFrame."""
         chr = CountyHealthRankingsConnector()
 
-        df = pd.DataFrame({
-            "state": ["RI", "MA"],
-            "county": ["Providence", "Suffolk"],
-            "premature_death": [5000, 6000]
-        })
+        df = pd.DataFrame(
+            {
+                "state": ["RI", "MA"],
+                "county": ["Providence", "Suffolk"],
+                "premature_death": [5000, 6000],
+            }
+        )
 
         result = chr.get_state_data(df, "RI")
 
@@ -253,11 +250,13 @@ class TestCHRConnectorTypeContracts:
         """Test that get_county_data returns DataFrame."""
         chr = CountyHealthRankingsConnector()
 
-        df = pd.DataFrame({
-            "state": ["RI", "RI"],
-            "county": ["Providence", "Kent"],
-            "premature_death": [5000, 4500]
-        })
+        df = pd.DataFrame(
+            {
+                "state": ["RI", "RI"],
+                "county": ["Providence", "Kent"],
+                "premature_death": [5000, 4500],
+            }
+        )
 
         result = chr.get_county_data(df, "Providence", state="RI")
 
@@ -267,12 +266,14 @@ class TestCHRConnectorTypeContracts:
         """Test that get_health_outcomes returns DataFrame."""
         chr = CountyHealthRankingsConnector()
 
-        df = pd.DataFrame({
-            "state": ["RI"],
-            "county": ["Providence"],
-            "premature_death": [5000],
-            "poor_health_days": [3.5]
-        })
+        df = pd.DataFrame(
+            {
+                "state": ["RI"],
+                "county": ["Providence"],
+                "premature_death": [5000],
+                "poor_health_days": [3.5],
+            }
+        )
 
         result = chr.get_health_outcomes(df)
 
@@ -282,12 +283,14 @@ class TestCHRConnectorTypeContracts:
         """Test that get_health_factors returns DataFrame."""
         chr = CountyHealthRankingsConnector()
 
-        df = pd.DataFrame({
-            "state": ["RI"],
-            "county": ["Providence"],
-            "adult_smoking": [18.0],
-            "adult_obesity": [28.0]
-        })
+        df = pd.DataFrame(
+            {
+                "state": ["RI"],
+                "county": ["Providence"],
+                "adult_smoking": [18.0],
+                "adult_obesity": [28.0],
+            }
+        )
 
         result = chr.get_health_factors(df)
 

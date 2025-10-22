@@ -551,7 +551,7 @@ class TestCDCConnectorTypeContracts:
     def test_connect_return_type(self, mock_get_pop):
         """Test that connect returns None."""
         mock_get_pop.return_value = pd.DataFrame({"Year": [2020], "Population": [100]})
-        
+
         cdc = CDCWonderConnector()
 
         result = cdc.connect()
@@ -561,10 +561,7 @@ class TestCDCConnectorTypeContracts:
     @patch.object(CDCWonderConnector, "get_mortality_data")
     def test_fetch_return_type(self, mock_get_mortality):
         """Test that fetch returns DataFrame."""
-        mock_get_mortality.return_value = pd.DataFrame({
-            "Year": [2020],
-            "Deaths": [100]
-        })
+        mock_get_mortality.return_value = pd.DataFrame({"Year": [2020], "Deaths": [100]})
 
         cdc = CDCWonderConnector()
 

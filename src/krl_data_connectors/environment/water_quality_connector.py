@@ -162,29 +162,29 @@ class WaterQualityConnector(BaseConnector):
         Raises:
             requests.HTTPError: If API request fails
         """
-        endpoint = kwargs.get('endpoint')
-        params = kwargs.get('params')
-        
+        endpoint = kwargs.get("endpoint")
+        params = kwargs.get("params")
+
         if not endpoint:
             raise ValueError("endpoint parameter is required")
-        
+
         if not self.session:
             self.connect()
 
         url = f"{self.base_url}/{endpoint}"
         session = self._init_session()
-        
+
         try:
             response = session.get(url, params=params, timeout=self.timeout)
             response.raise_for_status()
-            
+
             # Try JSON first
             try:
                 return response.json()
             except ValueError:
                 # Fall back to text for non-JSON responses
                 return {"data": response.text}
-                
+
         except requests.HTTPError as e:
             self.logger.error(f"HTTP error fetching data: {e}")
             raise
@@ -213,7 +213,7 @@ class WaterQualityConnector(BaseConnector):
         """
         state = state.upper()
         cache_key = f"systems_state_{state}_{system_type}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -257,7 +257,7 @@ class WaterQualityConnector(BaseConnector):
             >>> print(system['PWS_NAME'].iloc[0])
         """
         cache_key = f"system_detail_{pwsid}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -294,7 +294,7 @@ class WaterQualityConnector(BaseConnector):
             >>> print(violations[['VIOLATION_CODE', 'VIOLATION_DESC', 'COMPL_STATUS']])
         """
         cache_key = f"violations_{pwsid}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -337,7 +337,7 @@ class WaterQualityConnector(BaseConnector):
         city = city.upper().replace(" ", "%20")
         state = state.upper()
         cache_key = f"systems_city_{city}_{state}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -377,7 +377,7 @@ class WaterQualityConnector(BaseConnector):
             >>> print(systems[['PWS_NAME', 'CITY_NAME']])
         """
         cache_key = f"systems_zip_{zip_code}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -400,7 +400,9 @@ class WaterQualityConnector(BaseConnector):
         self.logger.info(f"Retrieved {len(df)} systems for ZIP {zip_code}")
         return df
 
-    def get_community_water_systems(self, state: Optional[str] = None, limit: int = 1000) -> pd.DataFrame:
+    def get_community_water_systems(
+        self, state: Optional[str] = None, limit: int = 1000
+    ) -> pd.DataFrame:
         """
         Get Community Water Systems (CWS).
 
@@ -417,7 +419,7 @@ class WaterQualityConnector(BaseConnector):
             >>> print(f"Community water systems in CA: {len(cws_systems)}")
         """
         cache_key = f"cws_systems_{state}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -462,7 +464,7 @@ class WaterQualityConnector(BaseConnector):
             >>> print(violations['VIOLATION_CODE'].value_counts())
         """
         cache_key = f"health_violations_{state}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -471,8 +473,10 @@ class WaterQualityConnector(BaseConnector):
 
         # Fetch data - query for health-based violation categories
         state = state.upper()
-        endpoint = f"SDWA_VIOLATIONS/PRIMACY_AGENCY_CODE/{state}/IS_HEALTH_BASED_IND/Y/ROWS/0:{limit}/JSON"
-        
+        endpoint = (
+            f"SDWA_VIOLATIONS/PRIMACY_AGENCY_CODE/{state}/IS_HEALTH_BASED_IND/Y/ROWS/0:{limit}/JSON"
+        )
+
         self.logger.info(f"Fetching health-based violations for: {state}")
         data = self.fetch(endpoint=endpoint)
 
@@ -487,7 +491,9 @@ class WaterQualityConnector(BaseConnector):
         self.logger.info(f"Retrieved {len(df)} health-based violations for {state}")
         return df
 
-    def search_systems_by_name(self, system_name: str, state: Optional[str] = None, limit: int = 100) -> pd.DataFrame:
+    def search_systems_by_name(
+        self, system_name: str, state: Optional[str] = None, limit: int = 100
+    ) -> pd.DataFrame:
         """
         Search for water systems by name (partial match).
 
@@ -505,7 +511,7 @@ class WaterQualityConnector(BaseConnector):
             >>> print(systems[['PWS_NAME', 'CITY_NAME', 'POPULATION_SERVED_COUNT']])
         """
         cache_key = f"search_name_{system_name}_{state}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -514,12 +520,12 @@ class WaterQualityConnector(BaseConnector):
 
         # Fetch data (using BEGINNING operator in Envirofacts)
         system_name_encoded = system_name.upper().replace(" ", "%20")
-        
+
         if state:
             endpoint = f"SDWA_PUB_WATER_SYSTEMS/PWS_NAME/BEGINNING/{system_name_encoded}/PRIMACY_AGENCY_CODE/{state.upper()}/ROWS/0:{limit}/JSON"
         else:
             endpoint = f"SDWA_PUB_WATER_SYSTEMS/PWS_NAME/BEGINNING/{system_name_encoded}/ROWS/0:{limit}/JSON"
-        
+
         self.logger.info(f"Searching for systems matching: {system_name}")
         data = self.fetch(endpoint=endpoint)
 
@@ -551,7 +557,7 @@ class WaterQualityConnector(BaseConnector):
             >>> print(actions[['ENFORCEMENT_ID', 'ENFORCEMENT_DATE', 'ENFORCEMENT_TYPE']])
         """
         cache_key = f"enforcement_{pwsid}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -591,12 +597,12 @@ class WaterQualityConnector(BaseConnector):
             ...     print(f"Population served: {population:,}")
         """
         system_data = self.get_system_by_id(pwsid)
-        
+
         if system_data.empty:
             return None
-            
-        pop = system_data.get('POPULATION_SERVED_COUNT', pd.Series([None])).iloc[0]
-        
+
+        pop = system_data.get("POPULATION_SERVED_COUNT", pd.Series([None])).iloc[0]
+
         return int(pop) if pop is not None else None
 
     def close(self):

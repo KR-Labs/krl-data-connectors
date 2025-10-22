@@ -34,6 +34,7 @@ from krl_data_connectors.crime.bjs_connector import BureauOfJusticeConnector
 
 # Fixtures
 
+
 @pytest.fixture
 def bjs_connector():
     """Create BureauOfJusticeConnector instance."""
@@ -41,6 +42,7 @@ def bjs_connector():
 
 
 # Test Classes
+
 
 class TestBJSConnectorInit:
     """Test connector initialization."""
@@ -66,7 +68,7 @@ class TestBJSConnectorInit:
 class TestBJSConnectorConnection:
     """Test connection handling."""
 
-    @patch('krl_data_connectors.crime.bjs_connector.BureauOfJusticeConnector._init_session')
+    @patch("krl_data_connectors.crime.bjs_connector.BureauOfJusticeConnector._init_session")
     def test_connect_success(self, mock_init_session):
         """Test successful connection."""
         mock_session = MagicMock()
@@ -78,7 +80,7 @@ class TestBJSConnectorConnection:
         assert connector.session is not None
         mock_init_session.assert_called_once()
 
-    @patch('krl_data_connectors.crime.bjs_connector.BureauOfJusticeConnector._init_session')
+    @patch("krl_data_connectors.crime.bjs_connector.BureauOfJusticeConnector._init_session")
     def test_connect_already_connected(self, mock_init_session):
         """Test connect when already connected."""
         connector = BureauOfJusticeConnector()
@@ -117,7 +119,7 @@ class TestBJSConnectorGetCrimeStatistics:
         """Test that cached data is returned on second call."""
         # First call
         result1 = bjs_connector.get_crime_statistics(year=2023)
-        
+
         # Second call - should use cache
         result2 = bjs_connector.get_crime_statistics(year=2023)
 
@@ -273,6 +275,7 @@ class TestBJSConnectorClose:
 
 
 # Phase 4 Layer 8: Contract Tests
+
 
 class TestBJSConnectorTypeContracts:
     """Contract tests for return types (Phase 4 Layer 8)."""

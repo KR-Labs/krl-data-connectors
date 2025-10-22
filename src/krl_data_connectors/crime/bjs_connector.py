@@ -180,28 +180,28 @@ class BureauOfJusticeConnector(BaseConnector):
         Raises:
             requests.HTTPError: If API request fails
         """
-        endpoint = kwargs.get('endpoint')
-        params = kwargs.get('params', {})
-        
+        endpoint = kwargs.get("endpoint")
+        params = kwargs.get("params", {})
+
         if not endpoint:
             raise ValueError("endpoint parameter is required")
-        
+
         if not self.session:
             self.connect()
 
         url = f"{self.base_url}/{endpoint}"
-        
+
         try:
             response = self.session.get(url, params=params, timeout=self.timeout)
             response.raise_for_status()
-            
+
             # Try JSON first
             try:
                 return response.json()
             except ValueError:
                 # Some endpoints return CSV or other formats
                 return {"data": response.text}
-                
+
         except requests.HTTPError as e:
             self.logger.error(f"HTTP error fetching data: {e}")
             raise
@@ -214,7 +214,7 @@ class BureauOfJusticeConnector(BaseConnector):
         year: Optional[int] = None,
         state: Optional[str] = None,
         crime_type: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get crime statistics.
@@ -234,7 +234,7 @@ class BureauOfJusticeConnector(BaseConnector):
             >>> print(violent_crime[['state', 'crime_rate', 'total_incidents']])
         """
         cache_key = f"crime_stats_{year}_{state}_{crime_type}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -243,20 +243,28 @@ class BureauOfJusticeConnector(BaseConnector):
 
         filters = {}
         if year:
-            filters['year'] = year
+            filters["year"] = year
         if state:
-            filters['state'] = state.upper()
+            filters["state"] = state.upper()
         if crime_type:
-            filters['crime_type'] = crime_type
+            filters["crime_type"] = crime_type
 
         self.logger.info(f"Fetching crime statistics: {filters}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'year', 'state', 'crime_type', 'total_incidents',
-            'crime_rate', 'population', 'violent_crime',
-            'property_crime', 'arrests'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "year",
+                "state",
+                "crime_type",
+                "total_incidents",
+                "crime_rate",
+                "population",
+                "violent_crime",
+                "property_crime",
+                "arrests",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -268,7 +276,7 @@ class BureauOfJusticeConnector(BaseConnector):
         year: Optional[int] = None,
         state: Optional[str] = None,
         facility_type: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get prison and jail population data.
@@ -288,7 +296,7 @@ class BureauOfJusticeConnector(BaseConnector):
             >>> print(prisons[['state', 'total_inmates', 'capacity', 'occupancy_rate']])
         """
         cache_key = f"prison_pop_{year}_{state}_{facility_type}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -297,20 +305,31 @@ class BureauOfJusticeConnector(BaseConnector):
 
         filters = {}
         if year:
-            filters['year'] = year
+            filters["year"] = year
         if state:
-            filters['state'] = state.upper()
+            filters["state"] = state.upper()
         if facility_type:
-            filters['facility_type'] = facility_type
+            filters["facility_type"] = facility_type
 
         self.logger.info(f"Fetching prison population: {filters}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'year', 'state', 'facility_type', 'total_inmates',
-            'male', 'female', 'capacity', 'occupancy_rate',
-            'sentenced', 'unsentenced', 'federal', 'state_inmates'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "year",
+                "state",
+                "facility_type",
+                "total_inmates",
+                "male",
+                "female",
+                "capacity",
+                "occupancy_rate",
+                "sentenced",
+                "unsentenced",
+                "federal",
+                "state_inmates",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -322,7 +341,7 @@ class BureauOfJusticeConnector(BaseConnector):
         year: Optional[int] = None,
         state: Optional[str] = None,
         release_year: Optional[int] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get recidivism rates data.
@@ -342,7 +361,7 @@ class BureauOfJusticeConnector(BaseConnector):
             >>> print(recidivism[['state', 'one_year_rate', 'three_year_rate', 'five_year_rate']])
         """
         cache_key = f"recidivism_{year}_{state}_{release_year}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -351,20 +370,29 @@ class BureauOfJusticeConnector(BaseConnector):
 
         filters = {}
         if year:
-            filters['year'] = year
+            filters["year"] = year
         if state:
-            filters['state'] = state.upper()
+            filters["state"] = state.upper()
         if release_year:
-            filters['release_year'] = release_year
+            filters["release_year"] = release_year
 
         self.logger.info(f"Fetching recidivism rates: {filters}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'year', 'state', 'release_year', 'cohort_size',
-            'one_year_rate', 'three_year_rate', 'five_year_rate',
-            'rearrest_rate', 'reconviction_rate', 'reincarceration_rate'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "year",
+                "state",
+                "release_year",
+                "cohort_size",
+                "one_year_rate",
+                "three_year_rate",
+                "five_year_rate",
+                "rearrest_rate",
+                "reconviction_rate",
+                "reincarceration_rate",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -376,7 +404,7 @@ class BureauOfJusticeConnector(BaseConnector):
         year: Optional[int] = None,
         state: Optional[str] = None,
         offense_type: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get court sentencing data.
@@ -396,7 +424,7 @@ class BureauOfJusticeConnector(BaseConnector):
             >>> print(sentences[['offense_type', 'avg_sentence_months', 'total_sentences']])
         """
         cache_key = f"sentencing_{year}_{state}_{offense_type}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -405,20 +433,28 @@ class BureauOfJusticeConnector(BaseConnector):
 
         filters = {}
         if year:
-            filters['year'] = year
+            filters["year"] = year
         if state:
-            filters['state'] = state.upper()
+            filters["state"] = state.upper()
         if offense_type:
-            filters['offense_type'] = offense_type
+            filters["offense_type"] = offense_type
 
         self.logger.info(f"Fetching court sentencing data: {filters}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'year', 'state', 'offense_type', 'total_sentences',
-            'avg_sentence_months', 'prison_sentences', 'probation_sentences',
-            'jail_sentences', 'suspended_sentences'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "year",
+                "state",
+                "offense_type",
+                "total_sentences",
+                "avg_sentence_months",
+                "prison_sentences",
+                "probation_sentences",
+                "jail_sentences",
+                "suspended_sentences",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -430,7 +466,7 @@ class BureauOfJusticeConnector(BaseConnector):
         year: Optional[int] = None,
         state: Optional[str] = None,
         agency_type: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get law enforcement agency data.
@@ -450,7 +486,7 @@ class BureauOfJusticeConnector(BaseConnector):
             >>> print(agencies[['agency_name', 'officers', 'civilians', 'budget']])
         """
         cache_key = f"law_enforcement_{year}_{state}_{agency_type}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -459,20 +495,28 @@ class BureauOfJusticeConnector(BaseConnector):
 
         filters = {}
         if year:
-            filters['year'] = year
+            filters["year"] = year
         if state:
-            filters['state'] = state.upper()
+            filters["state"] = state.upper()
         if agency_type:
-            filters['agency_type'] = agency_type
+            filters["agency_type"] = agency_type
 
         self.logger.info(f"Fetching law enforcement data: {filters}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'year', 'state', 'agency_name', 'agency_type',
-            'total_officers', 'sworn_officers', 'civilians',
-            'budget', 'population_served'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "year",
+                "state",
+                "agency_name",
+                "agency_type",
+                "total_officers",
+                "sworn_officers",
+                "civilians",
+                "budget",
+                "population_served",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -484,7 +528,7 @@ class BureauOfJusticeConnector(BaseConnector):
         year: Optional[int] = None,
         crime_type: Optional[str] = None,
         demographic: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get crime victimization survey data (NCVS).
@@ -504,7 +548,7 @@ class BureauOfJusticeConnector(BaseConnector):
             >>> print(victims[['crime_type', 'victimization_rate', 'reported_to_police']])
         """
         cache_key = f"victimization_{year}_{crime_type}_{demographic}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -513,20 +557,29 @@ class BureauOfJusticeConnector(BaseConnector):
 
         filters = {}
         if year:
-            filters['year'] = year
+            filters["year"] = year
         if crime_type:
-            filters['crime_type'] = crime_type
+            filters["crime_type"] = crime_type
         if demographic:
-            filters['demographic'] = demographic
+            filters["demographic"] = demographic
 
         self.logger.info(f"Fetching victimization data: {filters}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'year', 'crime_type', 'victimization_rate', 'total_victimizations',
-            'reported_to_police', 'percent_reported', 'demographic_group',
-            'age_group', 'gender', 'race_ethnicity'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "year",
+                "crime_type",
+                "victimization_rate",
+                "total_victimizations",
+                "reported_to_police",
+                "percent_reported",
+                "demographic_group",
+                "age_group",
+                "gender",
+                "race_ethnicity",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -538,7 +591,7 @@ class BureauOfJusticeConnector(BaseConnector):
         year: Optional[int] = None,
         state: Optional[str] = None,
         supervision_type: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get probation and parole data.
@@ -558,7 +611,7 @@ class BureauOfJusticeConnector(BaseConnector):
             >>> print(supervision[['state', 'total_supervised', 'successful_completions']])
         """
         cache_key = f"supervision_{year}_{state}_{supervision_type}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -567,20 +620,28 @@ class BureauOfJusticeConnector(BaseConnector):
 
         filters = {}
         if year:
-            filters['year'] = year
+            filters["year"] = year
         if state:
-            filters['state'] = state.upper()
+            filters["state"] = state.upper()
         if supervision_type:
-            filters['supervision_type'] = supervision_type
+            filters["supervision_type"] = supervision_type
 
         self.logger.info(f"Fetching probation/parole data: {filters}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'year', 'state', 'supervision_type', 'total_supervised',
-            'entries', 'exits', 'successful_completions',
-            'revocations', 'avg_time_supervised'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "year",
+                "state",
+                "supervision_type",
+                "total_supervised",
+                "entries",
+                "exits",
+                "successful_completions",
+                "revocations",
+                "avg_time_supervised",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -588,10 +649,7 @@ class BureauOfJusticeConnector(BaseConnector):
         return df
 
     def get_federal_justice_statistics(
-        self,
-        year: Optional[int] = None,
-        category: Optional[str] = None,
-        limit: int = 1000
+        self, year: Optional[int] = None, category: Optional[str] = None, limit: int = 1000
     ) -> pd.DataFrame:
         """
         Get federal justice system statistics.
@@ -610,7 +668,7 @@ class BureauOfJusticeConnector(BaseConnector):
             >>> print(federal[['offense_type', 'total_sentences', 'avg_sentence']])
         """
         cache_key = f"federal_justice_{year}_{category}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -619,18 +677,26 @@ class BureauOfJusticeConnector(BaseConnector):
 
         filters = {}
         if year:
-            filters['year'] = year
+            filters["year"] = year
         if category:
-            filters['category'] = category
+            filters["category"] = category
 
         self.logger.info(f"Fetching federal justice statistics: {filters}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'year', 'category', 'offense_type', 'total_cases',
-            'convictions', 'acquittals', 'dismissals',
-            'avg_sentence_months', 'federal_prisoners'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "year",
+                "category",
+                "offense_type",
+                "total_cases",
+                "convictions",
+                "acquittals",
+                "dismissals",
+                "avg_sentence_months",
+                "federal_prisoners",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -642,7 +708,7 @@ class BureauOfJusticeConnector(BaseConnector):
         start_year: int,
         end_year: int,
         crime_type: Optional[str] = None,
-        state: Optional[str] = None
+        state: Optional[str] = None,
     ) -> pd.DataFrame:
         """
         Get crime trend data over time.
@@ -662,7 +728,7 @@ class BureauOfJusticeConnector(BaseConnector):
             >>> print(trends[['year', 'crime_rate', 'percent_change']])
         """
         cache_key = f"crime_trends_{start_year}_{end_year}_{crime_type}_{state}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -670,12 +736,19 @@ class BureauOfJusticeConnector(BaseConnector):
             return cached_data
 
         self.logger.info(f"Fetching crime trends: {start_year}-{end_year}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'year', 'crime_type', 'state', 'total_incidents',
-            'crime_rate', 'percent_change', 'five_year_avg'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "year",
+                "crime_type",
+                "state",
+                "total_incidents",
+                "crime_rate",
+                "percent_change",
+                "five_year_avg",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)

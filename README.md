@@ -9,14 +9,12 @@ SPDX-License-Identifier: Apache-2.0
 
 <div align="center">
 
-[![PyPI version](https://img.shields.io/pypi/v/krl-data-connectors.svg)](https://pypi.org/project/krl-data-connectors/)
-[![Python Version](https://img.shields.io/pypi/pyversions/krl-data-connectors.svg)](https://pypi.org/project/krl-data-connectors/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Documentation Status](https://readthedocs.org/projects/krl-data-connectors/badge/?version=latest)](https://krl-data-connectors.readthedocs.io/en/latest/?badge=latest)
-[![Tests](https://github.com/KR-Labs/krl-data-connectors/workflows/tests/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions)
-[![Coverage](https://img.shields.io/badge/coverage-90%25%2B-green)](https://github.com/KR-Labs/krl-data-connectors)
-[![Security](https://github.com/KR-Labs/krl-data-connectors/workflows/Security%20%26%20IP%20Protection/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/security-checks.yml)
-[![Downloads](https://img.shields.io/pypi/dm/krl-data-connectors.svg)](https://pypi.org/project/krl-data-connectors/)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Tests](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/tests.yml/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/tests.yml)
+[![Lint](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/lint.yml/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/lint.yml)
+[![Security](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/security-checks.yml/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/security-checks.yml)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 **Institutional-grade, production-ready connectors for socioeconomic and policy data infrastructure**
 

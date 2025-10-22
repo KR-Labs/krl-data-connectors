@@ -31,6 +31,7 @@ from krl_data_connectors.financial.sec_connector import SECConnector
 
 # Fixtures
 
+
 @pytest.fixture
 def sec_connector():
     """Create SECConnector instance."""
@@ -38,6 +39,7 @@ def sec_connector():
 
 
 # Test Classes
+
 
 class TestSECConnectorInit:
     """Test connector initialization."""
@@ -68,7 +70,7 @@ class TestSECConnectorInit:
 class TestSECConnectorConnection:
     """Test connection handling."""
 
-    @patch('krl_data_connectors.financial.sec_connector.SECConnector._init_session')
+    @patch("krl_data_connectors.financial.sec_connector.SECConnector._init_session")
     def test_connect_success(self, mock_init_session):
         """Test successful connection."""
         mock_session = MagicMock()
@@ -81,7 +83,7 @@ class TestSECConnectorConnection:
         assert "User-Agent" in connector.session.headers
         mock_init_session.assert_called_once()
 
-    @patch('krl_data_connectors.financial.sec_connector.SECConnector._init_session')
+    @patch("krl_data_connectors.financial.sec_connector.SECConnector._init_session")
     def test_connect_already_connected(self, mock_init_session):
         """Test connect when already connected."""
         connector = SECConnector()
@@ -97,9 +99,9 @@ class TestSECConnectorConnection:
         connector = SECConnector(user_agent="Test contact@test.com")
         connector.session = MagicMock()
         connector.session.headers = {}
-        
+
         connector.connect()
-        
+
         # Session should have User-Agent header set
 
 
@@ -152,9 +154,7 @@ class TestSECConnectorGetFilingsByForm:
     def test_get_filings_by_form_with_dates(self, sec_connector):
         """Test filings query with date range."""
         result = sec_connector.get_filings_by_form(
-            form_type="10-K",
-            start_date="2023-01-01",
-            end_date="2023-12-31"
+            form_type="10-K", start_date="2023-01-01", end_date="2023-12-31"
         )
         assert isinstance(result, pd.DataFrame)
 
@@ -275,6 +275,7 @@ class TestSECConnectorClose:
 
 
 # Phase 4 Layer 8: Contract Tests
+
 
 class TestSECConnectorTypeContracts:
     """Contract tests for return types (Phase 4 Layer 8)."""

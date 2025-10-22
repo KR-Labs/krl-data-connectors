@@ -181,20 +181,20 @@ class VictimsOfCrimeConnector(BaseConnector):
         Raises:
             requests.HTTPError: If API request fails
         """
-        endpoint = kwargs.pop('endpoint', None)
-        
+        endpoint = kwargs.pop("endpoint", None)
+
         if not endpoint:
             raise ValueError("endpoint parameter is required")
-        
+
         if not self.session:
             self.connect()
 
         url = f"{self.api_url}/{endpoint}"
-        
+
         try:
             response = self.session.get(url, params=kwargs, timeout=self.timeout)
             response.raise_for_status()
-            
+
             # Try JSON first
             try:
                 data = response.json()
@@ -207,10 +207,10 @@ class VictimsOfCrimeConnector(BaseConnector):
                 return pd.DataFrame(data)
             elif isinstance(data, dict):
                 # Handle different response structures
-                if 'data' in data:
-                    return pd.DataFrame(data['data'])
-                elif 'results' in data:
-                    return pd.DataFrame(data['results'])
+                if "data" in data:
+                    return pd.DataFrame(data["data"])
+                elif "results" in data:
+                    return pd.DataFrame(data["results"])
                 else:
                     return pd.DataFrame([data])
             else:

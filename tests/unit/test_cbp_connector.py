@@ -860,11 +860,13 @@ class TestCBPConnectorTypeContracts:
         cbp = CountyBusinessPatternsConnector(api_key="test_key")
 
         # Create sample DataFrame
-        df = pd.DataFrame({
-            "NAICS2017": ["441", "442", "443"],
-            "ESTAB": [100, 200, 150],
-            "EMP": [1000, 2000, 1500]
-        })
+        df = pd.DataFrame(
+            {
+                "NAICS2017": ["441", "442", "443"],
+                "ESTAB": [100, 200, 150],
+                "EMP": [1000, 2000, 1500],
+            }
+        )
 
         result = cbp.get_naics_totals(df, level=2)
 

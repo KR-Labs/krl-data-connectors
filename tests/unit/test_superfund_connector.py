@@ -86,7 +86,7 @@ class TestSuperfundConnectorConnection:
 
         connector = SuperfundConnector()
         connector.connect()
-        
+
         assert connector.session is not None
 
     @patch("requests.Session")
@@ -97,7 +97,7 @@ class TestSuperfundConnectorConnection:
         mock_session_class.return_value = mock_session
 
         connector = SuperfundConnector()
-        
+
         with pytest.raises(ConnectionError, match="Could not connect"):
             connector.connect()
 
@@ -109,14 +109,14 @@ class TestSuperfundConnectorGetSitesByState:
     def test_get_sites_by_state_success(self, mock_fetch, sample_site_response):
         """Test retrieving sites by state."""
         mock_fetch.return_value = sample_site_response
-        
+
         connector = SuperfundConnector()
         result = connector.get_sites_by_state("CA")
-        
+
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
         assert result.iloc[0]["STATE"] == "CA"
-        
+
         # Verify fetch was called with correct endpoint
         mock_fetch.assert_called_once()
         call_kwargs = mock_fetch.call_args[1]
@@ -126,12 +126,12 @@ class TestSuperfundConnectorGetSitesByState:
     def test_get_sites_by_state_with_status(self, mock_fetch, sample_site_response):
         """Test retrieving sites by state with status filter."""
         mock_fetch.return_value = sample_site_response
-        
+
         connector = SuperfundConnector()
         result = connector.get_sites_by_state("CA", status="F")
-        
+
         assert isinstance(result, pd.DataFrame)
-        
+
         # Verify status filter was applied
         call_kwargs = mock_fetch.call_args[1]
         assert "NPL_STATUS/F" in call_kwargs["endpoint"]
@@ -140,10 +140,10 @@ class TestSuperfundConnectorGetSitesByState:
     def test_get_sites_by_state_empty_result(self, mock_fetch):
         """Test handling of empty results."""
         mock_fetch.return_value = []
-        
+
         connector = SuperfundConnector()
         result = connector.get_sites_by_state("ZZ")  # Invalid state
-        
+
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 0
 
@@ -151,15 +151,15 @@ class TestSuperfundConnectorGetSitesByState:
     def test_get_sites_by_state_caching(self, mock_fetch, sample_site_response):
         """Test that results are cached."""
         mock_fetch.return_value = sample_site_response
-        
+
         connector = SuperfundConnector()
-        
+
         # First call
         result1 = connector.get_sites_by_state("CA")
-        
+
         # Second call should use cache
         result2 = connector.get_sites_by_state("CA")
-        
+
         # fetch should only be called once
         assert mock_fetch.call_count == 1
         assert result1.equals(result2)
@@ -172,10 +172,10 @@ class TestSuperfundConnectorGetSiteById:
     def test_get_site_by_id_success(self, mock_fetch, sample_site_response):
         """Test retrieving site by EPA ID."""
         mock_fetch.return_value = sample_site_response[0]
-        
+
         connector = SuperfundConnector()
         result = connector.get_site_by_id("CAD009195731")
-        
+
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
         assert result.iloc[0]["SITE_EPA_ID"] == "CAD009195731"
@@ -184,12 +184,12 @@ class TestSuperfundConnectorGetSiteById:
     def test_get_site_by_id_caching(self, mock_fetch, sample_site_response):
         """Test site details are cached."""
         mock_fetch.return_value = sample_site_response[0]
-        
+
         connector = SuperfundConnector()
-        
+
         result1 = connector.get_site_by_id("CAD009195731")
         result2 = connector.get_site_by_id("CAD009195731")
-        
+
         assert mock_fetch.call_count == 1
         assert result1.equals(result2)
 
@@ -201,13 +201,13 @@ class TestSuperfundConnectorGetSitesByCity:
     def test_get_sites_by_city_success(self, mock_fetch, sample_site_response):
         """Test retrieving sites by city and state."""
         mock_fetch.return_value = sample_site_response
-        
+
         connector = SuperfundConnector()
         result = connector.get_sites_by_city("Los Angeles", "CA")
-        
+
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
-        
+
         # Verify endpoint contains uppercase city name
         call_kwargs = mock_fetch.call_args[1]
         assert "LOS" in call_kwargs["endpoint"]
@@ -217,10 +217,10 @@ class TestSuperfundConnectorGetSitesByCity:
     def test_get_sites_by_city_handles_spaces(self, mock_fetch):
         """Test that city names with spaces are handled."""
         mock_fetch.return_value = []
-        
+
         connector = SuperfundConnector()
         connector.get_sites_by_city("San Francisco", "CA")
-        
+
         call_kwargs = mock_fetch.call_args[1]
         # Should encode spaces as %20
         assert "%20" in call_kwargs["endpoint"]
@@ -233,13 +233,13 @@ class TestSuperfundConnectorGetSitesByZip:
     def test_get_sites_by_zip_success(self, mock_fetch, sample_site_response):
         """Test retrieving sites by ZIP code."""
         mock_fetch.return_value = sample_site_response
-        
+
         connector = SuperfundConnector()
         result = connector.get_sites_by_zip("90001")
-        
+
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
-        
+
         call_kwargs = mock_fetch.call_args[1]
         assert "ZIP/90001" in call_kwargs["endpoint"]
 
@@ -251,13 +251,13 @@ class TestSuperfundConnectorGetNPLSites:
     def test_get_npl_sites_success(self, mock_fetch, sample_site_response):
         """Test retrieving all NPL sites."""
         mock_fetch.return_value = sample_site_response * 100  # Simulate multiple sites
-        
+
         connector = SuperfundConnector()
         result = connector.get_npl_sites()
-        
+
         assert isinstance(result, pd.DataFrame)
         assert len(result) > 0
-        
+
         # Verify it queries Final NPL status
         call_kwargs = mock_fetch.call_args[1]
         assert "NPL_STATUS/F" in call_kwargs["endpoint"]
@@ -266,12 +266,12 @@ class TestSuperfundConnectorGetNPLSites:
     def test_get_npl_sites_caching(self, mock_fetch, sample_site_response):
         """Test NPL sites are cached."""
         mock_fetch.return_value = sample_site_response
-        
+
         connector = SuperfundConnector()
-        
+
         result1 = connector.get_npl_sites()
         result2 = connector.get_npl_sites()
-        
+
         assert mock_fetch.call_count == 1
 
 
@@ -282,12 +282,12 @@ class TestSuperfundConnectorGetConstructionCompleteSites:
     def test_get_construction_complete_all_states(self, mock_fetch, sample_site_response):
         """Test retrieving construction complete sites nationwide."""
         mock_fetch.return_value = sample_site_response
-        
+
         connector = SuperfundConnector()
         result = connector.get_construction_complete_sites()
-        
+
         assert isinstance(result, pd.DataFrame)
-        
+
         call_kwargs = mock_fetch.call_args[1]
         assert "CONST_COMP_IND/Y" in call_kwargs["endpoint"]
 
@@ -295,12 +295,12 @@ class TestSuperfundConnectorGetConstructionCompleteSites:
     def test_get_construction_complete_by_state(self, mock_fetch, sample_site_response):
         """Test retrieving construction complete sites by state."""
         mock_fetch.return_value = sample_site_response
-        
+
         connector = SuperfundConnector()
         result = connector.get_construction_complete_sites(state="CA")
-        
+
         assert isinstance(result, pd.DataFrame)
-        
+
         call_kwargs = mock_fetch.call_args[1]
         assert "STATE/CA" in call_kwargs["endpoint"]
         assert "CONST_COMP_IND/Y" in call_kwargs["endpoint"]
@@ -313,12 +313,12 @@ class TestSuperfundConnectorSearchSitesByName:
     def test_search_sites_by_name_success(self, mock_fetch, sample_site_response):
         """Test searching sites by name."""
         mock_fetch.return_value = sample_site_response
-        
+
         connector = SuperfundConnector()
         result = connector.search_sites_by_name("Chemical")
-        
+
         assert isinstance(result, pd.DataFrame)
-        
+
         call_kwargs = mock_fetch.call_args[1]
         assert "SITE_NAME/BEGINNING" in call_kwargs["endpoint"]
         assert "CHEMICAL" in call_kwargs["endpoint"]
@@ -327,10 +327,10 @@ class TestSuperfundConnectorSearchSitesByName:
     def test_search_sites_by_name_with_spaces(self, mock_fetch):
         """Test name search handles spaces."""
         mock_fetch.return_value = []
-        
+
         connector = SuperfundConnector()
         connector.search_sites_by_name("Test Site")
-        
+
         call_kwargs = mock_fetch.call_args[1]
         assert "%20" in call_kwargs["endpoint"]
 
@@ -341,16 +341,14 @@ class TestSuperfundConnectorGetSiteCoordinates:
     @patch.object(SuperfundConnector, "get_site_by_id")
     def test_get_site_coordinates_success(self, mock_get_site):
         """Test retrieving site coordinates."""
-        mock_df = pd.DataFrame([{
-            "SITE_EPA_ID": "CAD009195731",
-            "LATITUDE": "34.0522",
-            "LONGITUDE": "-118.2437"
-        }])
+        mock_df = pd.DataFrame(
+            [{"SITE_EPA_ID": "CAD009195731", "LATITUDE": "34.0522", "LONGITUDE": "-118.2437"}]
+        )
         mock_get_site.return_value = mock_df
-        
+
         connector = SuperfundConnector()
         coords = connector.get_site_coordinates("CAD009195731")
-        
+
         assert coords is not None
         assert isinstance(coords, tuple)
         assert len(coords) == 2
@@ -360,24 +358,22 @@ class TestSuperfundConnectorGetSiteCoordinates:
     @patch.object(SuperfundConnector, "get_site_by_id")
     def test_get_site_coordinates_missing(self, mock_get_site):
         """Test handling of missing coordinates."""
-        mock_df = pd.DataFrame([{
-            "SITE_EPA_ID": "CAD009195731"
-        }])
+        mock_df = pd.DataFrame([{"SITE_EPA_ID": "CAD009195731"}])
         mock_get_site.return_value = mock_df
-        
+
         connector = SuperfundConnector()
         coords = connector.get_site_coordinates("CAD009195731")
-        
+
         assert coords is None
 
     @patch.object(SuperfundConnector, "get_site_by_id")
     def test_get_site_coordinates_empty_df(self, mock_get_site):
         """Test handling of empty DataFrame."""
         mock_get_site.return_value = pd.DataFrame()
-        
+
         connector = SuperfundConnector()
         coords = connector.get_site_coordinates("INVALID_ID")
-        
+
         assert coords is None
 
 
@@ -388,9 +384,9 @@ class TestSuperfundConnectorClose:
         """Test that close properly closes the session."""
         connector = SuperfundConnector()
         connector.session = Mock()
-        
+
         connector.close()
-        
+
         connector.session.close.assert_called_once()
         assert connector.session is None
 
@@ -479,7 +475,7 @@ class TestSuperfundConnectorTypeContracts:
         connector = SuperfundConnector()
         result = connector.get_site_coordinates("TEST")
         assert result is None or isinstance(result, tuple)
-        
+
         if result:
             assert len(result) == 2
             assert isinstance(result[0], float)

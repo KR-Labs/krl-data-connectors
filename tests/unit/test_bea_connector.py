@@ -947,7 +947,12 @@ class TestBEAConnectorTypeContracts:
             "BEAAPI": {
                 "Results": {
                     "Data": [
-                        {"TableName": "T10101", "SeriesCode": "A191RC", "DataValue": "20000", "TimePeriod": "2020"}
+                        {
+                            "TableName": "T10101",
+                            "SeriesCode": "A191RC",
+                            "DataValue": "20000",
+                            "TimePeriod": "2020",
+                        }
                     ]
                 }
             }
@@ -966,7 +971,10 @@ class TestBEAConnectorTypeContracts:
             "BEAAPI": {
                 "Results": {
                     "Dataset": [
-                        {"DatasetName": "NIPA", "DatasetDescription": "National Income and Product Accounts"}
+                        {
+                            "DatasetName": "NIPA",
+                            "DatasetDescription": "National Income and Product Accounts",
+                        }
                     ]
                 }
             }
@@ -985,7 +993,10 @@ class TestBEAConnectorTypeContracts:
             "BEAAPI": {
                 "Results": {
                     "Parameter": [
-                        {"ParameterName": "Frequency", "ParameterDescription": "A=Annual, Q=Quarterly, M=Monthly"}
+                        {
+                            "ParameterName": "Frequency",
+                            "ParameterDescription": "A=Annual, Q=Quarterly, M=Monthly",
+                        }
                     ]
                 }
             }
@@ -1001,13 +1012,7 @@ class TestBEAConnectorTypeContracts:
     def test_get_parameter_values_return_type(self, mock_request):
         """Test that get_parameter_values returns DataFrame."""
         mock_request.return_value = {
-            "BEAAPI": {
-                "Results": {
-                    "ParamValue": [
-                        {"Key": "A", "Desc": "Annual"}
-                    ]
-                }
-            }
+            "BEAAPI": {"Results": {"ParamValue": [{"Key": "A", "Desc": "Annual"}]}}
         }
 
         bea = BEAConnector(api_key="test_key")
@@ -1023,7 +1028,12 @@ class TestBEAConnectorTypeContracts:
             "BEAAPI": {
                 "Results": {
                     "Data": [
-                        {"TableName": "T10101", "SeriesCode": "A191RC", "DataValue": "20000", "TimePeriod": "2020"}
+                        {
+                            "TableName": "T10101",
+                            "SeriesCode": "A191RC",
+                            "DataValue": "20000",
+                            "TimePeriod": "2020",
+                        }
                     ]
                 }
             }
@@ -1042,7 +1052,13 @@ class TestBEAConnectorTypeContracts:
             "BEAAPI": {
                 "Results": {
                     "Data": [
-                        {"GeoFips": "06", "GeoName": "California", "Code": "PCPI", "DataValue": "60000", "TimePeriod": "2020"}
+                        {
+                            "GeoFips": "06",
+                            "GeoName": "California",
+                            "Code": "PCPI",
+                            "DataValue": "60000",
+                            "TimePeriod": "2020",
+                        }
                     ]
                 }
             }
@@ -1061,7 +1077,12 @@ class TestBEAConnectorTypeContracts:
             "BEAAPI": {
                 "Results": {
                     "Data": [
-                        {"TableID": "1", "Industry": "Agriculture", "DataValue": "1000", "TimePeriod": "2020"}
+                        {
+                            "TableID": "1",
+                            "Industry": "Agriculture",
+                            "DataValue": "1000",
+                            "TimePeriod": "2020",
+                        }
                     ]
                 }
             }
@@ -1080,7 +1101,12 @@ class TestBEAConnectorTypeContracts:
             "BEAAPI": {
                 "Results": {
                     "Data": [
-                        {"TableName": "FAAt201", "SeriesCode": "K1", "DataValue": "5000", "TimePeriod": "2020"}
+                        {
+                            "TableName": "FAAt201",
+                            "SeriesCode": "K1",
+                            "DataValue": "5000",
+                            "TimePeriod": "2020",
+                        }
                     ]
                 }
             }

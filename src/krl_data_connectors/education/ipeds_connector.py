@@ -183,28 +183,28 @@ class IPEDSConnector(BaseConnector):
         Raises:
             requests.HTTPError: If API request fails
         """
-        endpoint = kwargs.get('endpoint')
-        params = kwargs.get('params', {})
-        
+        endpoint = kwargs.get("endpoint")
+        params = kwargs.get("params", {})
+
         if not endpoint:
             raise ValueError("endpoint parameter is required")
-        
+
         if not self.session:
             self.connect()
 
         url = f"{self.base_url}/{endpoint}"
-        
+
         try:
             response = self.session.get(url, params=params, timeout=self.timeout)
             response.raise_for_status()
-            
+
             # Try JSON first
             try:
                 return response.json()
             except ValueError:
                 # Some endpoints return CSV or other formats
                 return {"data": response.text}
-                
+
         except requests.HTTPError as e:
             self.logger.error(f"HTTP error fetching data: {e}")
             raise
@@ -218,7 +218,7 @@ class IPEDSConnector(BaseConnector):
         control: Optional[int] = None,
         degree_granting: Optional[int] = None,
         level: Optional[int] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get institution directory information.
@@ -239,7 +239,7 @@ class IPEDSConnector(BaseConnector):
             >>> print(public_unis[['institution_name', 'city', 'enrollment']])
         """
         cache_key = f"institutions_{state}_{control}_{degree_granting}_{level}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -250,23 +250,34 @@ class IPEDSConnector(BaseConnector):
         # In production, this would query the actual IPEDS API/data files
         filters = {}
         if state:
-            filters['state'] = state.upper()
+            filters["state"] = state.upper()
         if control is not None:
-            filters['control'] = control
+            filters["control"] = control
         if degree_granting is not None:
-            filters['degree_granting'] = degree_granting
+            filters["degree_granting"] = degree_granting
         if level is not None:
-            filters['level'] = level
+            filters["level"] = level
 
         self.logger.info(f"Fetching institutions with filters: {filters}")
-        
+
         # Simulate API call (in production, this would be actual data)
         # For now, return empty DataFrame with expected structure
-        df = pd.DataFrame(columns=[
-            'unitid', 'institution_name', 'city', 'state', 'zip',
-            'control', 'level', 'degree_granting', 'carnegie_basic',
-            'website', 'enrollment_total', 'Founded'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "unitid",
+                "institution_name",
+                "city",
+                "state",
+                "zip",
+                "control",
+                "level",
+                "degree_granting",
+                "carnegie_basic",
+                "website",
+                "enrollment_total",
+                "Founded",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -278,7 +289,7 @@ class IPEDSConnector(BaseConnector):
         unitid: Optional[int] = None,
         year: Optional[int] = None,
         state: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get enrollment data.
@@ -298,7 +309,7 @@ class IPEDSConnector(BaseConnector):
             >>> print(enrollment[['institution_name', 'total_enrollment', 'full_time', 'part_time']])
         """
         cache_key = f"enrollment_{unitid}_{year}_{state}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -307,21 +318,36 @@ class IPEDSConnector(BaseConnector):
 
         filters = {}
         if unitid:
-            filters['unitid'] = unitid
+            filters["unitid"] = unitid
         if year:
-            filters['year'] = year
+            filters["year"] = year
         if state:
-            filters['state'] = state.upper()
+            filters["state"] = state.upper()
 
         self.logger.info(f"Fetching enrollment data: {filters}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'unitid', 'institution_name', 'year', 'total_enrollment',
-            'full_time', 'part_time', 'undergraduate', 'graduate',
-            'male', 'female', 'american_indian', 'asian', 'black',
-            'hispanic', 'white', 'two_or_more', 'nonresident_alien'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "unitid",
+                "institution_name",
+                "year",
+                "total_enrollment",
+                "full_time",
+                "part_time",
+                "undergraduate",
+                "graduate",
+                "male",
+                "female",
+                "american_indian",
+                "asian",
+                "black",
+                "hispanic",
+                "white",
+                "two_or_more",
+                "nonresident_alien",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -333,7 +359,7 @@ class IPEDSConnector(BaseConnector):
         unitid: Optional[int] = None,
         year: Optional[int] = None,
         state: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get graduation rates data.
@@ -353,7 +379,7 @@ class IPEDSConnector(BaseConnector):
             >>> print(grad_rates[['institution_name', 'grad_rate_4yr', 'grad_rate_6yr']])
         """
         cache_key = f"graduation_{unitid}_{year}_{state}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -362,20 +388,29 @@ class IPEDSConnector(BaseConnector):
 
         filters = {}
         if unitid:
-            filters['unitid'] = unitid
+            filters["unitid"] = unitid
         if year:
-            filters['cohort_year'] = year
+            filters["cohort_year"] = year
         if state:
-            filters['state'] = state.upper()
+            filters["state"] = state.upper()
 
         self.logger.info(f"Fetching graduation rates: {filters}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'unitid', 'institution_name', 'cohort_year', 'cohort_size',
-            'grad_rate_4yr', 'grad_rate_5yr', 'grad_rate_6yr',
-            'transfer_rate', 'still_enrolled', 'no_longer_enrolled'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "unitid",
+                "institution_name",
+                "cohort_year",
+                "cohort_size",
+                "grad_rate_4yr",
+                "grad_rate_5yr",
+                "grad_rate_6yr",
+                "transfer_rate",
+                "still_enrolled",
+                "no_longer_enrolled",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -387,7 +422,7 @@ class IPEDSConnector(BaseConnector):
         unitid: Optional[int] = None,
         year: Optional[int] = None,
         state: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get financial aid data.
@@ -407,7 +442,7 @@ class IPEDSConnector(BaseConnector):
             >>> print(aid[['institution_name', 'percent_receiving_aid', 'avg_grant_amount']])
         """
         cache_key = f"financial_aid_{unitid}_{year}_{state}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -416,20 +451,28 @@ class IPEDSConnector(BaseConnector):
 
         filters = {}
         if unitid:
-            filters['unitid'] = unitid
+            filters["unitid"] = unitid
         if year:
-            filters['year'] = year
+            filters["year"] = year
         if state:
-            filters['state'] = state.upper()
+            filters["state"] = state.upper()
 
         self.logger.info(f"Fetching financial aid data: {filters}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'unitid', 'institution_name', 'year', 'percent_receiving_aid',
-            'avg_net_price', 'avg_grant_amount', 'avg_loan_amount',
-            'pell_grant_recipients', 'federal_loan_recipients'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "unitid",
+                "institution_name",
+                "year",
+                "percent_receiving_aid",
+                "avg_net_price",
+                "avg_grant_amount",
+                "avg_loan_amount",
+                "pell_grant_recipients",
+                "federal_loan_recipients",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -441,7 +484,7 @@ class IPEDSConnector(BaseConnector):
         unitid: Optional[int] = None,
         year: Optional[int] = None,
         state: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get tuition and fees data.
@@ -461,7 +504,7 @@ class IPEDSConnector(BaseConnector):
             >>> print(tuition[['institution_name', 'in_state_tuition', 'out_state_tuition']])
         """
         cache_key = f"tuition_{unitid}_{year}_{state}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -470,20 +513,29 @@ class IPEDSConnector(BaseConnector):
 
         filters = {}
         if unitid:
-            filters['unitid'] = unitid
+            filters["unitid"] = unitid
         if year:
-            filters['year'] = year
+            filters["year"] = year
         if state:
-            filters['state'] = state.upper()
+            filters["state"] = state.upper()
 
         self.logger.info(f"Fetching tuition and fees: {filters}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'unitid', 'institution_name', 'year', 'in_state_tuition',
-            'out_state_tuition', 'in_state_fees', 'out_state_fees',
-            'room_board', 'books_supplies', 'other_expenses'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "unitid",
+                "institution_name",
+                "year",
+                "in_state_tuition",
+                "out_state_tuition",
+                "in_state_fees",
+                "out_state_fees",
+                "room_board",
+                "books_supplies",
+                "other_expenses",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -495,7 +547,7 @@ class IPEDSConnector(BaseConnector):
         unitid: Optional[int] = None,
         year: Optional[int] = None,
         state: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get institutional finance data.
@@ -515,7 +567,7 @@ class IPEDSConnector(BaseConnector):
             >>> print(finances[['institution_name', 'total_revenue', 'total_expenses']])
         """
         cache_key = f"finances_{unitid}_{year}_{state}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -524,21 +576,31 @@ class IPEDSConnector(BaseConnector):
 
         filters = {}
         if unitid:
-            filters['unitid'] = unitid
+            filters["unitid"] = unitid
         if year:
-            filters['year'] = year
+            filters["year"] = year
         if state:
-            filters['state'] = state.upper()
+            filters["state"] = state.upper()
 
         self.logger.info(f"Fetching institutional finances: {filters}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'unitid', 'institution_name', 'year', 'total_revenue',
-            'total_expenses', 'tuition_revenue', 'state_appropriations',
-            'federal_grants', 'endowment_income', 'instruction_expenses',
-            'research_expenses', 'student_services_expenses'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "unitid",
+                "institution_name",
+                "year",
+                "total_revenue",
+                "total_expenses",
+                "tuition_revenue",
+                "state_appropriations",
+                "federal_grants",
+                "endowment_income",
+                "instruction_expenses",
+                "research_expenses",
+                "student_services_expenses",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -551,7 +613,7 @@ class IPEDSConnector(BaseConnector):
         year: Optional[int] = None,
         award_level: Optional[int] = None,
         state: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get completions/degrees awarded data.
@@ -572,7 +634,7 @@ class IPEDSConnector(BaseConnector):
             >>> print(degrees[['institution_name', 'total_awards', 'major_field']])
         """
         cache_key = f"completions_{unitid}_{year}_{award_level}_{state}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -581,22 +643,35 @@ class IPEDSConnector(BaseConnector):
 
         filters = {}
         if unitid:
-            filters['unitid'] = unitid
+            filters["unitid"] = unitid
         if year:
-            filters['year'] = year
+            filters["year"] = year
         if award_level:
-            filters['award_level'] = award_level
+            filters["award_level"] = award_level
         if state:
-            filters['state'] = state.upper()
+            filters["state"] = state.upper()
 
         self.logger.info(f"Fetching completions data: {filters}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'unitid', 'institution_name', 'year', 'award_level',
-            'cipcode', 'major_field', 'total_awards', 'male', 'female',
-            'american_indian', 'asian', 'black', 'hispanic', 'white'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "unitid",
+                "institution_name",
+                "year",
+                "award_level",
+                "cipcode",
+                "major_field",
+                "total_awards",
+                "male",
+                "female",
+                "american_indian",
+                "asian",
+                "black",
+                "hispanic",
+                "white",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -620,7 +695,7 @@ class IPEDSConnector(BaseConnector):
             >>> print(universities[['institution_name', 'city', 'state']])
         """
         cache_key = f"search_name_{name}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -628,12 +703,21 @@ class IPEDSConnector(BaseConnector):
             return cached_data
 
         self.logger.info(f"Searching for institutions matching: {name}")
-        
+
         # Return expected structure
-        df = pd.DataFrame(columns=[
-            'unitid', 'institution_name', 'city', 'state', 'zip',
-            'control', 'level', 'website', 'enrollment_total'
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "unitid",
+                "institution_name",
+                "city",
+                "state",
+                "zip",
+                "control",
+                "level",
+                "website",
+                "enrollment_total",
+            ]
+        )
 
         # Cache and return
         self.cache.set(cache_key, df)
@@ -658,7 +742,9 @@ class IPEDSConnector(BaseConnector):
         """
         return self.get_institutions(state=state, limit=limit)
 
-    def get_public_institutions(self, state: Optional[str] = None, limit: int = 1000) -> pd.DataFrame:
+    def get_public_institutions(
+        self, state: Optional[str] = None, limit: int = 1000
+    ) -> pd.DataFrame:
         """
         Get public institutions.
 

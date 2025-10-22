@@ -105,7 +105,9 @@ class SECConnector(BaseConnector):
     BASE_URL = "https://www.sec.gov"
     API_BASE_URL = "https://data.sec.gov"
 
-    def __init__(self, user_agent: str = "KRL-Data-Connectors info@krlabs.dev", timeout: int = 30, **kwargs):
+    def __init__(
+        self, user_agent: str = "KRL-Data-Connectors info@krlabs.dev", timeout: int = 30, **kwargs
+    ):
         """
         Initialize the SECConnector.
 
@@ -166,20 +168,20 @@ class SECConnector(BaseConnector):
         Raises:
             requests.HTTPError: If API request fails
         """
-        endpoint = kwargs.pop('endpoint', None)
-        
+        endpoint = kwargs.pop("endpoint", None)
+
         if not endpoint:
             raise ValueError("endpoint parameter is required")
-        
+
         if not self.session:
             self.connect()
 
         url = f"{self.api_url}/{endpoint}"
-        
+
         try:
             response = self.session.get(url, params=kwargs, timeout=self.timeout)
             response.raise_for_status()
-            
+
             # Try JSON first
             try:
                 data = response.json()
@@ -192,12 +194,12 @@ class SECConnector(BaseConnector):
                 return pd.DataFrame(data)
             elif isinstance(data, dict):
                 # Handle different response structures
-                if 'filings' in data and 'recent' in data['filings']:
-                    return pd.DataFrame(data['filings']['recent'])
-                elif 'data' in data:
-                    return pd.DataFrame(data['data'])
-                elif 'results' in data:
-                    return pd.DataFrame(data['results'])
+                if "filings" in data and "recent" in data["filings"]:
+                    return pd.DataFrame(data["filings"]["recent"])
+                elif "data" in data:
+                    return pd.DataFrame(data["data"])
+                elif "results" in data:
+                    return pd.DataFrame(data["results"])
                 else:
                     return pd.DataFrame([data])
             else:
@@ -231,7 +233,7 @@ class SECConnector(BaseConnector):
         """
         # Ensure CIK is 10 digits with leading zeros
         cik = cik.zfill(10)
-        
+
         params: Dict[str, Any] = {"count": limit}
         if form_type:
             params["type"] = form_type
@@ -260,7 +262,7 @@ class SECConnector(BaseConnector):
             >>> facts = connector.get_company_facts(cik="0000320193")
         """
         cik = cik.zfill(10)
-        
+
         logger.info(f"Fetching facts for CIK {cik}, taxonomy: {taxonomy}")
         endpoint = f"api/xbrl/companyfacts/CIK{cik}.json"
         return self.fetch(endpoint=endpoint)
@@ -320,7 +322,7 @@ class SECConnector(BaseConnector):
             >>> insider = connector.get_insider_trading(cik="0000320193")
         """
         cik = cik.zfill(10)
-        
+
         logger.info(f"Fetching insider trading for CIK {cik}")
         return self.get_company_filings(cik=cik, form_type="4", limit=limit)
 
@@ -344,7 +346,7 @@ class SECConnector(BaseConnector):
             >>> holdings = connector.get_mutual_fund_holdings(cik="0001166559")  # Vanguard
         """
         cik = cik.zfill(10)
-        
+
         logger.info(f"Fetching mutual fund holdings for CIK {cik}")
         return self.get_company_filings(cik=cik, form_type="NPORT-P", limit=limit)
 
@@ -447,15 +449,15 @@ class SECConnector(BaseConnector):
             >>> company = connector.get_company_by_ticker("AAPL")
         """
         logger.info(f"Fetching company info for ticker: {ticker}")
-        
+
         # Get all tickers first
         tickers_df = self.get_company_tickers()
-        
+
         # Filter by ticker
         if not tickers_df.empty:
-            result = tickers_df[tickers_df['ticker'].str.upper() == ticker.upper()]
+            result = tickers_df[tickers_df["ticker"].str.upper() == ticker.upper()]
             return result
-        
+
         return pd.DataFrame()
 
     def close(self) -> None:

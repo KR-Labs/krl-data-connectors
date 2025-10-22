@@ -627,11 +627,9 @@ class TestHRSAConnectorTypeContracts:
     def test_load_hpsa_data_return_type(self, mock_read_csv, mock_exists):
         """Test that load_hpsa_data returns DataFrame."""
         mock_exists.return_value = True
-        mock_read_csv.return_value = pd.DataFrame({
-            "State": ["RI"],
-            "County": ["Providence"],
-            "Discipline": ["Primary Care"]
-        })
+        mock_read_csv.return_value = pd.DataFrame(
+            {"State": ["RI"], "County": ["Providence"], "Discipline": ["Primary Care"]}
+        )
 
         hrsa = HRSAConnector()
 
@@ -644,11 +642,9 @@ class TestHRSAConnectorTypeContracts:
     def test_load_mua_data_return_type(self, mock_read_csv, mock_exists):
         """Test that load_mua_data returns DataFrame."""
         mock_exists.return_value = True
-        mock_read_csv.return_value = pd.DataFrame({
-            "State": ["RI"],
-            "County": ["Providence"],
-            "MUA_Type": ["Rural"]
-        })
+        mock_read_csv.return_value = pd.DataFrame(
+            {"State": ["RI"], "County": ["Providence"], "MUA_Type": ["Rural"]}
+        )
 
         hrsa = HRSAConnector()
 
@@ -661,11 +657,9 @@ class TestHRSAConnectorTypeContracts:
     def test_load_health_center_data_return_type(self, mock_read_csv, mock_exists):
         """Test that load_health_center_data returns DataFrame."""
         mock_exists.return_value = True
-        mock_read_csv.return_value = pd.DataFrame({
-            "State": ["RI"],
-            "Center_Name": ["Providence Health"],
-            "Patients": [5000]
-        })
+        mock_read_csv.return_value = pd.DataFrame(
+            {"State": ["RI"], "Center_Name": ["Providence Health"], "Patients": [5000]}
+        )
 
         hrsa = HRSAConnector()
 
@@ -677,10 +671,7 @@ class TestHRSAConnectorTypeContracts:
         """Test that get_state_data returns DataFrame."""
         hrsa = HRSAConnector()
 
-        df = pd.DataFrame({
-            "State_Abbr": ["RI", "MA"],
-            "County_Name": ["Providence", "Suffolk"]
-        })
+        df = pd.DataFrame({"State_Abbr": ["RI", "MA"], "County_Name": ["Providence", "Suffolk"]})
 
         result = hrsa.get_state_data(df, "RI")
 
@@ -690,10 +681,7 @@ class TestHRSAConnectorTypeContracts:
         """Test that get_county_data returns DataFrame."""
         hrsa = HRSAConnector()
 
-        df = pd.DataFrame({
-            "State_Abbr": ["RI", "RI"],
-            "County_Name": ["Providence", "Kent"]
-        })
+        df = pd.DataFrame({"State_Abbr": ["RI", "RI"], "County_Name": ["Providence", "Kent"]})
 
         result = hrsa.get_county_data(df, "Providence", state="RI")
 

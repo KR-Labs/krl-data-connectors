@@ -497,11 +497,9 @@ class TestEJScreenConnectorTypeContracts:
     def test_load_data_return_type(self, mock_read_csv, mock_exists):
         """Test that load_data returns DataFrame."""
         mock_exists.return_value = True
-        mock_read_csv.return_value = pd.DataFrame({
-            "ID": ["06075010100"],
-            "STATE_NAME": ["Rhode Island"],
-            "P_PM25": [45.2]
-        })
+        mock_read_csv.return_value = pd.DataFrame(
+            {"ID": ["06075010100"], "STATE_NAME": ["Rhode Island"], "P_PM25": [45.2]}
+        )
         ej = EJScreenConnector()
         result = ej.load_data("test.csv")
         assert isinstance(result, pd.DataFrame)
@@ -509,43 +507,32 @@ class TestEJScreenConnectorTypeContracts:
     def test_get_state_data_return_type(self):
         """Test that get_state_data returns DataFrame."""
         ej = EJScreenConnector()
-        df = pd.DataFrame({
-            "ST_ABBREV": ["RI", "MA"],
-            "COUNTY": ["Providence", "Suffolk"],
-            "P_PM25": [45.2, 55.1]
-        })
+        df = pd.DataFrame(
+            {"ST_ABBREV": ["RI", "MA"], "COUNTY": ["Providence", "Suffolk"], "P_PM25": [45.2, 55.1]}
+        )
         result = ej.get_state_data(df, "RI")
         assert isinstance(result, pd.DataFrame)
 
     def test_get_county_data_return_type(self):
         """Test that get_county_data returns DataFrame."""
         ej = EJScreenConnector()
-        df = pd.DataFrame({
-            "ST_ABBREV": ["RI", "RI"],
-            "CNTY_FIPS": ["44007", "44003"],
-            "P_PM25": [45.2, 40.1]
-        })
+        df = pd.DataFrame(
+            {"ST_ABBREV": ["RI", "RI"], "CNTY_FIPS": ["44007", "44003"], "P_PM25": [45.2, 40.1]}
+        )
         result = ej.get_county_data(df, "44007")
         assert isinstance(result, pd.DataFrame)
 
     def test_filter_by_threshold_return_type(self):
         """Test that filter_by_threshold returns DataFrame."""
         ej = EJScreenConnector()
-        df = pd.DataFrame({
-            "P_PM25": [25.0, 55.0, 75.0, 90.0],
-            "COUNTY": ["A", "B", "C", "D"]
-        })
+        df = pd.DataFrame({"P_PM25": [25.0, 55.0, 75.0, 90.0], "COUNTY": ["A", "B", "C", "D"]})
         result = ej.filter_by_threshold(df, "P_PM25", 50.0)
         assert isinstance(result, pd.DataFrame)
 
     def test_get_available_indicators_return_type(self):
         """Test that get_available_indicators returns Dict."""
         ej = EJScreenConnector()
-        df = pd.DataFrame({
-            "P_PM25": [45.2],
-            "P_OZONE": [55.1],
-            "D2_PM25": [2.1]
-        })
+        df = pd.DataFrame({"P_PM25": [45.2], "P_OZONE": [55.1], "D2_PM25": [2.1]})
         result = ej.get_available_indicators(df)
         assert isinstance(result, dict)
 

@@ -597,12 +597,14 @@ class TestHUDFMRConnectorTypeContracts:
     def test_get_state_fmrs_return_type(self, mock_read_csv, mock_exists):
         """Test that get_state_fmrs returns DataFrame."""
         mock_exists.return_value = True
-        mock_read_csv.return_value = pd.DataFrame({
-            "State": ["RI", "RI"],
-            "Metro": ["Providence", "Newport"],
-            "FMR_0BR": [800, 850],
-            "FMR_2BR": [1200, 1300]
-        })
+        mock_read_csv.return_value = pd.DataFrame(
+            {
+                "State": ["RI", "RI"],
+                "Metro": ["Providence", "Newport"],
+                "FMR_0BR": [800, 850],
+                "FMR_2BR": [1200, 1300],
+            }
+        )
         hud = HUDFMRConnector()
         result = hud.get_state_fmrs("RI")
         assert isinstance(result, pd.DataFrame)
@@ -616,23 +618,22 @@ class TestHUDFMRConnectorTypeContracts:
     def test_get_county_fmrs_return_type(self):
         """Test that get_county_fmrs returns DataFrame."""
         hud = HUDFMRConnector()
-        df = pd.DataFrame({
-            "state_alpha": ["RI", "RI"],
-            "county_name": ["Providence", "Kent"],
-            "fmr_2": [1200, 1100]
-        })
+        df = pd.DataFrame(
+            {
+                "state_alpha": ["RI", "RI"],
+                "county_name": ["Providence", "Kent"],
+                "fmr_2": [1200, 1100],
+            }
+        )
         result = hud.get_county_fmrs("RI", "Providence", data=df)
         assert isinstance(result, pd.DataFrame)
 
     def test_get_fmr_by_bedrooms_return_type(self):
         """Test that get_fmr_by_bedrooms returns DataFrame."""
         hud = HUDFMRConnector()
-        df = pd.DataFrame({
-            "county_name": ["Providence"],
-            "fmr_0": [800],
-            "fmr_1": [950],
-            "fmr_2": [1200]
-        })
+        df = pd.DataFrame(
+            {"county_name": ["Providence"], "fmr_0": [800], "fmr_1": [950], "fmr_2": [1200]}
+        )
         result = hud.get_fmr_by_bedrooms(df, 2)
         assert isinstance(result, pd.DataFrame)
 

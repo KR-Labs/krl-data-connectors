@@ -28,12 +28,12 @@ from krl_data_connectors.housing.eviction_lab_connector import EvictionLabConnec
 
 class TestEvictionLabConnectorContracts:
     """Contract tests verifying EvictionLabConnector interface compliance."""
-    
+
     @pytest.fixture
     def connector(self):
         """Create connector instance for testing."""
         return EvictionLabConnector()
-    
+
     @pytest.fixture
     def sample_tract_data(self, tmp_path):
         """Create sample tract-level CSV data."""
@@ -49,7 +49,7 @@ class TestEvictionLabConnectorContracts:
             "17031010100,2017,Census Tract 101,Cook County,195,72,7.2,19.5,1000,70.2,980,39000,21.5,14.5,60.5\n"
         )
         return csv_path
-    
+
     @pytest.fixture
     def sample_county_data(self, tmp_path):
         """Create sample county-level CSV data."""
@@ -64,226 +64,213 @@ class TestEvictionLabConnectorContracts:
             "17031,2017,Cook County,82000,30000,6.0,16.4,500000\n"
         )
         return csv_path
-    
+
     def test_connect_return_type(self, connector):
         """
         Verify connect() returns None and doesn't raise unexpected errors.
-        
+
         Contract: connect() should complete successfully and return None.
         Layer 8: Contract testing - interface validation.
         """
         result = connector.connect()
         assert result is None, "connect() should return None"
-    
+
     def test_load_tract_data_return_type(self, connector, sample_tract_data):
         """
         Verify load_tract_data() returns DataFrame with correct structure.
-        
+
         Contract: load_tract_data() should return pandas DataFrame with
         expected columns when given valid CSV file.
-        
+
         Layer 8: Contract testing - return type validation.
         """
         connector.connect()
         result = connector.load_tract_data(sample_tract_data)
-        
+
         # Verify return type
         assert isinstance(result, pd.DataFrame), "Should return DataFrame"
-        
+
         # Verify expected columns exist
         expected_columns = [
-            'GEOID', 'year', 'name', 'parent-location', 'eviction-filings',
-            'evictions', 'eviction-rate', 'eviction-filing-rate',
-            'renter-occupied-households'
+            "GEOID",
+            "year",
+            "name",
+            "parent-location",
+            "eviction-filings",
+            "evictions",
+            "eviction-rate",
+            "eviction-filing-rate",
+            "renter-occupied-households",
         ]
         for col in expected_columns:
             assert col in result.columns, f"Missing expected column: {col}"
-        
+
         # Verify data loaded
         assert len(result) == 5, "Should load 5 test records"
-        
+
         # Verify GEOID preserved as string
-        assert result['GEOID'].dtype == 'object', "GEOID should be string type"
-    
+        assert result["GEOID"].dtype == "object", "GEOID should be string type"
+
     def test_load_county_data_return_type(self, connector, sample_county_data):
         """
         Verify load_county_data() returns DataFrame with correct structure.
-        
+
         Contract: load_county_data() should return DataFrame with county-level
         eviction data.
-        
+
         Layer 8: Contract testing - method interface validation.
         """
         connector.connect()
         result = connector.load_county_data(sample_county_data)
-        
+
         assert isinstance(result, pd.DataFrame), "Should return DataFrame"
-        
+
         # Verify key columns
         expected_columns = [
-            'GEOID', 'year', 'name', 'eviction-filings', 'evictions', 'eviction-rate'
+            "GEOID",
+            "year",
+            "name",
+            "eviction-filings",
+            "evictions",
+            "eviction-rate",
         ]
         for col in expected_columns:
             assert col in result.columns, f"Missing expected column: {col}"
-        
+
         assert len(result) == 5, "Should load 5 county-year observations"
-        assert result['GEOID'].dtype == 'object', "GEOID should be string"
-    
-    def test_get_eviction_by_geography_return_type(
-        self,
-        connector,
-        sample_tract_data
-    ):
+        assert result["GEOID"].dtype == "object", "GEOID should be string"
+
+    def test_get_eviction_by_geography_return_type(self, connector, sample_tract_data):
         """
         Verify get_eviction_by_geography() returns filtered DataFrame.
-        
+
         Contract: get_eviction_by_geography() should return DataFrame with
         data for specified geography.
-        
+
         Layer 8: Contract testing - filtering logic validation.
         """
         connector.connect()
         connector.load_tract_data(sample_tract_data)
-        
+
         # Test tract-level query
-        result = connector.get_eviction_by_geography(
-            geoid='06037206100',
-            level='tract'
-        )
-        
+        result = connector.get_eviction_by_geography(geoid="06037206100", level="tract")
+
         assert isinstance(result, pd.DataFrame), "Should return DataFrame"
         assert len(result) == 3, "Should return 3 years for this tract"
-        assert all(result['GEOID'] == '06037206100'), "All records should match GEOID"
-        
+        assert all(result["GEOID"] == "06037206100"), "All records should match GEOID"
+
         # Test year filtering
         result_2018 = connector.get_eviction_by_geography(
-            geoid='06037206100',
-            level='tract',
-            year=2018
+            geoid="06037206100", level="tract", year=2018
         )
         assert len(result_2018) == 1, "Should return 1 record for 2018"
-        assert result_2018.iloc[0]['year'] == 2018, "Year should be 2018"
-    
-    def test_get_eviction_trends_return_type(
-        self,
-        connector,
-        sample_tract_data
-    ):
+        assert result_2018.iloc[0]["year"] == 2018, "Year should be 2018"
+
+    def test_get_eviction_trends_return_type(self, connector, sample_tract_data):
         """
         Verify get_eviction_trends() returns time series DataFrame.
-        
+
         Contract: get_eviction_trends() should return DataFrame with
         year and eviction metrics sorted chronologically.
-        
+
         Layer 8: Contract testing - time series output validation.
         """
         connector.connect()
         connector.load_tract_data(sample_tract_data)
-        
-        result = connector.get_eviction_trends(
-            geoid='06037206100',
-            level='tract'
-        )
-        
+
+        result = connector.get_eviction_trends(geoid="06037206100", level="tract")
+
         assert isinstance(result, pd.DataFrame), "Should return DataFrame"
-        
+
         # Verify expected columns
         expected_columns = [
-            'year', 'evictions', 'eviction-filings',
-            'eviction-rate', 'eviction-filing-rate'
+            "year",
+            "evictions",
+            "eviction-filings",
+            "eviction-rate",
+            "eviction-filing-rate",
         ]
         for col in expected_columns:
             assert col in result.columns, f"Missing expected column: {col}"
-        
+
         # Verify chronological order
-        years = result['year'].tolist()
+        years = result["year"].tolist()
         assert years == sorted(years), "Years should be in chronological order"
-        
+
         # Verify data for LA tract
         assert len(result) == 3, "Should have 3 years of data"
-        assert result.iloc[0]['year'] == 2016, "First year should be 2016"
-        assert result.iloc[-1]['year'] == 2018, "Last year should be 2018"
-    
-    def test_get_high_eviction_areas_return_type(
-        self,
-        connector,
-        sample_tract_data
-    ):
+        assert result.iloc[0]["year"] == 2016, "First year should be 2016"
+        assert result.iloc[-1]["year"] == 2018, "Last year should be 2018"
+
+    def test_get_high_eviction_areas_return_type(self, connector, sample_tract_data):
         """
         Verify get_high_eviction_areas() returns filtered DataFrame.
-        
+
         Contract: get_high_eviction_areas() should return DataFrame of
         geographies exceeding eviction rate threshold.
-        
+
         Layer 8: Contract testing - threshold filtering validation.
         """
         connector.connect()
         connector.load_tract_data(sample_tract_data)
-        
+
         # Test with 5% threshold (should find Cook County tract)
-        result = connector.get_high_eviction_areas(
-            threshold=5.0,
-            level='tract'
-        )
-        
+        result = connector.get_high_eviction_areas(threshold=5.0, level="tract")
+
         assert isinstance(result, pd.DataFrame), "Should return DataFrame"
-        assert 'eviction-rate' in result.columns, "Should include eviction-rate"
-        
+        assert "eviction-rate" in result.columns, "Should include eviction-rate"
+
         # Verify all returned areas meet threshold
-        assert all(result['eviction-rate'] >= 5.0), "All areas should meet 5% threshold"
-        
+        assert all(result["eviction-rate"] >= 5.0), "All areas should meet 5% threshold"
+
         # Verify Cook County tract included (7.2% in most recent year)
-        cook_tracts = result[result['GEOID'] == '17031010100']
+        cook_tracts = result[result["GEOID"] == "17031010100"]
         assert len(cook_tracts) > 0, "Cook County tract should be in high eviction areas"
-        
+
         # Test with higher threshold (should find fewer areas)
-        result_high = connector.get_high_eviction_areas(
-            threshold=7.0,
-            level='tract'
-        )
+        result_high = connector.get_high_eviction_areas(threshold=7.0, level="tract")
         assert len(result_high) <= len(result), "Higher threshold should return fewer areas"
-    
-    def test_get_eviction_statistics_return_type(
-        self,
-        connector,
-        sample_county_data
-    ):
+
+    def test_get_eviction_statistics_return_type(self, connector, sample_county_data):
         """
         Verify get_eviction_statistics() returns Dict with summary stats.
-        
+
         Contract: get_eviction_statistics() should return dictionary with
         mean, median, std, and totals for eviction metrics.
-        
+
         Layer 8: Contract testing - aggregation output validation.
         """
         connector.connect()
         connector.load_county_data(sample_county_data)
-        
-        result = connector.get_eviction_statistics(
-            level='county',
-            year=2016
-        )
-        
+
+        result = connector.get_eviction_statistics(level="county", year=2016)
+
         assert isinstance(result, dict), "Should return dictionary"
-        
+
         # Verify expected keys
         expected_keys = [
-            'mean_eviction_rate',
-            'median_eviction_rate',
-            'std_eviction_rate',
-            'total_evictions',
-            'total_filings',
-            'observations'
+            "mean_eviction_rate",
+            "median_eviction_rate",
+            "std_eviction_rate",
+            "total_evictions",
+            "total_filings",
+            "observations",
         ]
         for key in expected_keys:
             assert key in result, f"Missing expected key: {key}"
-        
+
         # Verify types (accept numpy types too)
-        assert isinstance(result['mean_eviction_rate'], (float, int, np.number)), "Mean should be numeric"
-        assert isinstance(result['median_eviction_rate'], (float, int, np.number)), "Median should be numeric"
-        assert isinstance(result['total_evictions'], (float, int, np.number)), "Total should be numeric"
-        assert isinstance(result['observations'], (int, np.integer)), "Observations should be int"
-        
+        assert isinstance(
+            result["mean_eviction_rate"], (float, int, np.number)
+        ), "Mean should be numeric"
+        assert isinstance(
+            result["median_eviction_rate"], (float, int, np.number)
+        ), "Median should be numeric"
+        assert isinstance(
+            result["total_evictions"], (float, int, np.number)
+        ), "Total should be numeric"
+        assert isinstance(result["observations"], (int, np.integer)), "Observations should be int"
+
         # Verify 2016 data
-        assert result['observations'] == 2, "Should have 2 counties in 2016"
-        assert result['total_evictions'] == 74000, "Should sum evictions (42000 + 32000)"
+        assert result["observations"] == 2, "Should have 2 counties in 2016"
+        assert result["total_evictions"] == 74000, "Should sum evictions (42000 + 32000)"

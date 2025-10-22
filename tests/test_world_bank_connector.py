@@ -822,9 +822,7 @@ class TestWorldBankConnectorTypeContracts:
         wb = WorldBankConnector()
 
         with patch.object(wb, "_init_session", return_value=mock_session):
-            result = wb.get_multiple_indicators(
-                indicators=["SP.POP.TOTL"], countries=["USA"]
-            )
+            result = wb.get_multiple_indicators(indicators=["SP.POP.TOTL"], countries=["USA"])
 
         assert isinstance(result, list)
         if result:

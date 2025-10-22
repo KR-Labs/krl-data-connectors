@@ -29,6 +29,7 @@ from krl_data_connectors.environment.water_quality_connector import WaterQuality
 
 # Fixtures
 
+
 @pytest.fixture
 def sample_water_system():
     """Sample water system data."""
@@ -99,6 +100,7 @@ def water_quality_connector():
 
 # Test Classes
 
+
 class TestWaterQualityConnectorInit:
     """Test connector initialization."""
 
@@ -128,7 +130,9 @@ class TestWaterQualityConnectorInit:
 class TestWaterQualityConnectorConnection:
     """Test connection handling."""
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector._init_session')
+    @patch(
+        "krl_data_connectors.environment.water_quality_connector.WaterQualityConnector._init_session"
+    )
     def test_connect_success(self, mock_init_session):
         """Test successful connection."""
         mock_session = MagicMock()
@@ -144,7 +148,9 @@ class TestWaterQualityConnectorConnection:
         assert connector.session is not None
         mock_init_session.assert_called_once()
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector._init_session')
+    @patch(
+        "krl_data_connectors.environment.water_quality_connector.WaterQualityConnector._init_session"
+    )
     def test_connect_already_connected(self, mock_init_session):
         """Test connect when already connected."""
         connector = WaterQualityConnector()
@@ -159,7 +165,7 @@ class TestWaterQualityConnectorConnection:
 class TestWaterQualityConnectorGetSystemsByState:
     """Test get_water_systems_by_state method."""
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_systems_by_state_success(self, mock_fetch, sample_water_system):
         """Test successful retrieval of systems by state."""
         mock_fetch.return_value = [sample_water_system]
@@ -172,7 +178,7 @@ class TestWaterQualityConnectorGetSystemsByState:
         assert result["PWSID"].iloc[0] == "CA1234567"
         mock_fetch.assert_called_once()
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_systems_by_state_with_type_filter(self, mock_fetch, sample_water_system):
         """Test systems query with system type filter."""
         mock_fetch.return_value = [sample_water_system]
@@ -184,7 +190,7 @@ class TestWaterQualityConnectorGetSystemsByState:
         assert len(result) == 1
         mock_fetch.assert_called_once()
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_systems_by_state_empty(self, mock_fetch):
         """Test systems query with no results."""
         mock_fetch.return_value = []
@@ -195,16 +201,16 @@ class TestWaterQualityConnectorGetSystemsByState:
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 0
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_systems_by_state_cached(self, mock_fetch, sample_water_system):
         """Test that cached data is returned on second call."""
         mock_fetch.return_value = [sample_water_system]
 
         connector = WaterQualityConnector(cache_enabled=True)
-        
+
         # First call - should fetch
         result1 = connector.get_water_systems_by_state("CA")
-        
+
         # Second call - should use cache
         result2 = connector.get_water_systems_by_state("CA")
 
@@ -216,7 +222,7 @@ class TestWaterQualityConnectorGetSystemsByState:
 class TestWaterQualityConnectorGetSystemById:
     """Test get_system_by_id method."""
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_system_by_id_success(self, mock_fetch, sample_water_system):
         """Test successful retrieval of system by ID."""
         mock_fetch.return_value = sample_water_system
@@ -229,7 +235,7 @@ class TestWaterQualityConnectorGetSystemById:
         assert result["PWSID"].iloc[0] == "CA1234567"
         assert result["PWS_NAME"].iloc[0] == "San Francisco Water System"
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_system_by_id_list_response(self, mock_fetch, sample_water_system):
         """Test system query with list response."""
         mock_fetch.return_value = [sample_water_system]
@@ -244,7 +250,7 @@ class TestWaterQualityConnectorGetSystemById:
 class TestWaterQualityConnectorGetViolations:
     """Test get_violations_by_system method."""
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_violations_success(self, mock_fetch, sample_violation):
         """Test successful retrieval of violations."""
         mock_fetch.return_value = [sample_violation]
@@ -256,7 +262,7 @@ class TestWaterQualityConnectorGetViolations:
         assert len(result) == 1
         assert result["VIOLATION_CODE"].iloc[0] == "MCL"
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_violations_empty(self, mock_fetch):
         """Test violations query with no results."""
         mock_fetch.return_value = []
@@ -271,7 +277,7 @@ class TestWaterQualityConnectorGetViolations:
 class TestWaterQualityConnectorGetSystemsByCity:
     """Test get_systems_by_city method."""
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_systems_by_city_success(self, mock_fetch, sample_water_system):
         """Test successful retrieval of systems by city."""
         mock_fetch.return_value = [sample_water_system]
@@ -283,7 +289,7 @@ class TestWaterQualityConnectorGetSystemsByCity:
         assert len(result) == 1
         assert result["CITY_NAME"].iloc[0] == "SAN FRANCISCO"
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_systems_by_city_with_spaces(self, mock_fetch, sample_water_system):
         """Test city query with spaces in name."""
         mock_fetch.return_value = [sample_water_system]
@@ -297,7 +303,7 @@ class TestWaterQualityConnectorGetSystemsByCity:
 class TestWaterQualityConnectorGetSystemsByZip:
     """Test get_systems_by_zip method."""
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_systems_by_zip_success(self, mock_fetch, sample_water_system):
         """Test successful retrieval of systems by ZIP."""
         mock_fetch.return_value = [sample_water_system]
@@ -313,7 +319,7 @@ class TestWaterQualityConnectorGetSystemsByZip:
 class TestWaterQualityConnectorGetCWS:
     """Test get_community_water_systems method."""
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_cws_with_state(self, mock_fetch, sample_water_system):
         """Test CWS query with state filter."""
         mock_fetch.return_value = [sample_water_system]
@@ -325,7 +331,7 @@ class TestWaterQualityConnectorGetCWS:
         assert len(result) == 1
         assert result["PWS_TYPE_CODE"].iloc[0] == "CWS"
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_cws_no_state(self, mock_fetch, sample_water_system):
         """Test CWS query without state filter."""
         mock_fetch.return_value = [sample_water_system]
@@ -340,7 +346,7 @@ class TestWaterQualityConnectorGetCWS:
 class TestWaterQualityConnectorGetHealthViolations:
     """Test get_health_based_violations method."""
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_health_violations_success(self, mock_fetch, sample_violation):
         """Test successful retrieval of health-based violations."""
         mock_fetch.return_value = [sample_violation]
@@ -356,7 +362,7 @@ class TestWaterQualityConnectorGetHealthViolations:
 class TestWaterQualityConnectorSearchByName:
     """Test search_systems_by_name method."""
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_search_by_name_success(self, mock_fetch, sample_water_system):
         """Test successful system name search."""
         mock_fetch.return_value = [sample_water_system]
@@ -367,7 +373,7 @@ class TestWaterQualityConnectorSearchByName:
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 1
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_search_by_name_with_state(self, mock_fetch, sample_water_system):
         """Test system name search with state filter."""
         mock_fetch.return_value = [sample_water_system]
@@ -381,7 +387,7 @@ class TestWaterQualityConnectorSearchByName:
 class TestWaterQualityConnectorGetEnforcement:
     """Test get_enforcement_actions method."""
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_enforcement_success(self, mock_fetch, sample_enforcement):
         """Test successful retrieval of enforcement actions."""
         mock_fetch.return_value = [sample_enforcement]
@@ -397,7 +403,9 @@ class TestWaterQualityConnectorGetEnforcement:
 class TestWaterQualityConnectorGetPopulation:
     """Test get_system_population_served method."""
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.get_system_by_id')
+    @patch(
+        "krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.get_system_by_id"
+    )
     def test_get_population_success(self, mock_get_system, sample_water_system):
         """Test successful population retrieval."""
         mock_get_system.return_value = pd.DataFrame([sample_water_system])
@@ -407,7 +415,9 @@ class TestWaterQualityConnectorGetPopulation:
 
         assert result == 850000
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.get_system_by_id')
+    @patch(
+        "krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.get_system_by_id"
+    )
     def test_get_population_empty(self, mock_get_system):
         """Test population retrieval with no data."""
         mock_get_system.return_value = pd.DataFrame()
@@ -417,7 +427,9 @@ class TestWaterQualityConnectorGetPopulation:
 
         assert result is None
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.get_system_by_id')
+    @patch(
+        "krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.get_system_by_id"
+    )
     def test_get_population_none(self, mock_get_system):
         """Test population retrieval when field is None."""
         mock_get_system.return_value = pd.DataFrame([{"PWSID": "CA1234567"}])
@@ -452,10 +464,11 @@ class TestWaterQualityConnectorClose:
 
 # Phase 4 Layer 8: Contract Tests
 
+
 class TestWaterQualityConnectorTypeContracts:
     """Contract tests for return types (Phase 4 Layer 8)."""
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_systems_by_state_returns_dataframe(self, mock_fetch):
         """Contract: get_water_systems_by_state returns DataFrame."""
         mock_fetch.return_value = []
@@ -463,7 +476,7 @@ class TestWaterQualityConnectorTypeContracts:
         result = connector.get_water_systems_by_state("CA")
         assert isinstance(result, pd.DataFrame)
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_system_by_id_returns_dataframe(self, mock_fetch):
         """Contract: get_system_by_id returns DataFrame."""
         mock_fetch.return_value = {}
@@ -471,7 +484,7 @@ class TestWaterQualityConnectorTypeContracts:
         result = connector.get_system_by_id("CA1234567")
         assert isinstance(result, pd.DataFrame)
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_violations_returns_dataframe(self, mock_fetch):
         """Contract: get_violations_by_system returns DataFrame."""
         mock_fetch.return_value = []
@@ -479,7 +492,7 @@ class TestWaterQualityConnectorTypeContracts:
         result = connector.get_violations_by_system("CA1234567")
         assert isinstance(result, pd.DataFrame)
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_systems_by_city_returns_dataframe(self, mock_fetch):
         """Contract: get_systems_by_city returns DataFrame."""
         mock_fetch.return_value = []
@@ -487,7 +500,7 @@ class TestWaterQualityConnectorTypeContracts:
         result = connector.get_systems_by_city("San Francisco", "CA")
         assert isinstance(result, pd.DataFrame)
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_systems_by_zip_returns_dataframe(self, mock_fetch):
         """Contract: get_systems_by_zip returns DataFrame."""
         mock_fetch.return_value = []
@@ -495,7 +508,7 @@ class TestWaterQualityConnectorTypeContracts:
         result = connector.get_systems_by_zip("94102")
         assert isinstance(result, pd.DataFrame)
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_cws_returns_dataframe(self, mock_fetch):
         """Contract: get_community_water_systems returns DataFrame."""
         mock_fetch.return_value = []
@@ -503,7 +516,7 @@ class TestWaterQualityConnectorTypeContracts:
         result = connector.get_community_water_systems()
         assert isinstance(result, pd.DataFrame)
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_health_violations_returns_dataframe(self, mock_fetch):
         """Contract: get_health_based_violations returns DataFrame."""
         mock_fetch.return_value = []
@@ -511,7 +524,7 @@ class TestWaterQualityConnectorTypeContracts:
         result = connector.get_health_based_violations("CA")
         assert isinstance(result, pd.DataFrame)
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_search_by_name_returns_dataframe(self, mock_fetch):
         """Contract: search_systems_by_name returns DataFrame."""
         mock_fetch.return_value = []
@@ -519,7 +532,7 @@ class TestWaterQualityConnectorTypeContracts:
         result = connector.search_systems_by_name("Municipal")
         assert isinstance(result, pd.DataFrame)
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch')
+    @patch("krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.fetch")
     def test_get_enforcement_returns_dataframe(self, mock_fetch):
         """Contract: get_enforcement_actions returns DataFrame."""
         mock_fetch.return_value = []
@@ -527,7 +540,9 @@ class TestWaterQualityConnectorTypeContracts:
         result = connector.get_enforcement_actions("CA1234567")
         assert isinstance(result, pd.DataFrame)
 
-    @patch('krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.get_system_by_id')
+    @patch(
+        "krl_data_connectors.environment.water_quality_connector.WaterQualityConnector.get_system_by_id"
+    )
     def test_get_population_returns_int_or_none(self, mock_get_system):
         """Contract: get_system_population_served returns int or None."""
         mock_get_system.return_value = pd.DataFrame([{"POPULATION_SERVED_COUNT": 100000}])

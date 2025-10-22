@@ -11,4 +11,4 @@ from .ssa_connector import SSAConnector
 from .acf_connector import ACFConnector
 from .irs990_connector import IRS990Connector
 
-__all__ = ['SSAConnector', 'ACFConnector', 'IRS990Connector']
+__all__ = ["SSAConnector", "ACFConnector", "IRS990Connector"]

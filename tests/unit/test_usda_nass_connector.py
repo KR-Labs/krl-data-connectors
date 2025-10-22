@@ -71,9 +71,7 @@ class TestUSDANASSConnectorTypeContracts:
     def test_get_param_values_return_type(self, mock_get):
         """Test that get_param_values returns list of strings."""
         mock_response = Mock()
-        mock_response.json.return_value = {
-            "state_name": ["CALIFORNIA", "TEXAS", "FLORIDA"]
-        }
+        mock_response.json.return_value = {"state_name": ["CALIFORNIA", "TEXAS", "FLORIDA"]}
         mock_response.raise_for_status = Mock()
         mock_get.return_value = mock_response
 

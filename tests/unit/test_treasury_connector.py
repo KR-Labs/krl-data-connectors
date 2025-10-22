@@ -81,7 +81,7 @@ class TestTreasuryConnectorInit:
 class TestTreasuryConnectorConnection:
     """Test TreasuryConnector connection management."""
 
-    @patch('krl_data_connectors.financial.treasury_connector.TreasuryConnector._init_session')
+    @patch("krl_data_connectors.financial.treasury_connector.TreasuryConnector._init_session")
     def test_connect_success(self, mock_init_session, treasury_connector):
         """Test successful connection."""
         mock_session = MagicMock()
@@ -92,7 +92,7 @@ class TestTreasuryConnectorConnection:
         assert treasury_connector.session == mock_session
         mock_init_session.assert_called_once()
 
-    @patch('krl_data_connectors.financial.treasury_connector.TreasuryConnector._init_session')
+    @patch("krl_data_connectors.financial.treasury_connector.TreasuryConnector._init_session")
     def test_connect_already_connected(self, mock_init_session, treasury_connector):
         """Test connect when already connected."""
         treasury_connector.session = MagicMock()
@@ -101,7 +101,7 @@ class TestTreasuryConnectorConnection:
 
         mock_init_session.assert_not_called()
 
-    @patch('krl_data_connectors.financial.treasury_connector.TreasuryConnector._init_session')
+    @patch("krl_data_connectors.financial.treasury_connector.TreasuryConnector._init_session")
     def test_connect_failure(self, mock_init_session, treasury_connector):
         """Test connection failure."""
         mock_init_session.side_effect = Exception("Connection error")
@@ -113,10 +113,10 @@ class TestTreasuryConnectorConnection:
 class TestTreasuryConnectorGetDailyTreasuryRates:
     """Test get_daily_treasury_rates method."""
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_daily_treasury_rates_no_filters(self, mock_fetch, treasury_connector):
         """Test getting daily rates without filters."""
-        mock_data = pd.DataFrame({'rate': [1.5, 2.0], 'date': ['2023-01-01', '2023-01-02']})
+        mock_data = pd.DataFrame({"rate": [1.5, 2.0], "date": ["2023-01-01", "2023-01-02"]})
         mock_fetch.return_value = mock_data
 
         result = treasury_connector.get_daily_treasury_rates()
@@ -125,31 +125,30 @@ class TestTreasuryConnectorGetDailyTreasuryRates:
         assert len(result) == 2
         mock_fetch.assert_called_once()
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_daily_treasury_rates_with_dates(self, mock_fetch, treasury_connector):
         """Test getting daily rates with date filters."""
-        mock_data = pd.DataFrame({'rate': [1.5], 'date': ['2023-01-01']})
+        mock_data = pd.DataFrame({"rate": [1.5], "date": ["2023-01-01"]})
         mock_fetch.return_value = mock_data
 
         result = treasury_connector.get_daily_treasury_rates(
-            start_date="2023-01-01",
-            end_date="2023-01-31"
+            start_date="2023-01-01", end_date="2023-01-31"
         )
 
         assert isinstance(result, pd.DataFrame)
         mock_fetch.assert_called_once()
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_daily_treasury_rates_with_limit(self, mock_fetch, treasury_connector):
         """Test getting daily rates with custom limit."""
-        mock_data = pd.DataFrame({'rate': [1.5]})
+        mock_data = pd.DataFrame({"rate": [1.5]})
         mock_fetch.return_value = mock_data
 
         treasury_connector.get_daily_treasury_rates(limit=500)
 
         mock_fetch.assert_called_once()
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_daily_treasury_rates_empty_result(self, mock_fetch, treasury_connector):
         """Test getting daily rates with empty result."""
         mock_fetch.return_value = pd.DataFrame()
@@ -163,10 +162,10 @@ class TestTreasuryConnectorGetDailyTreasuryRates:
 class TestTreasuryConnectorGetMonthlyTreasuryRates:
     """Test get_monthly_treasury_rates method."""
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_monthly_treasury_rates_no_filters(self, mock_fetch, treasury_connector):
         """Test getting monthly rates without filters."""
-        mock_data = pd.DataFrame({'rate': [1.5, 2.0]})
+        mock_data = pd.DataFrame({"rate": [1.5, 2.0]})
         mock_fetch.return_value = mock_data
 
         result = treasury_connector.get_monthly_treasury_rates()
@@ -174,16 +173,13 @@ class TestTreasuryConnectorGetMonthlyTreasuryRates:
         assert isinstance(result, pd.DataFrame)
         mock_fetch.assert_called_once()
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_monthly_treasury_rates_with_dates(self, mock_fetch, treasury_connector):
         """Test getting monthly rates with date filters."""
-        mock_data = pd.DataFrame({'rate': [1.5]})
+        mock_data = pd.DataFrame({"rate": [1.5]})
         mock_fetch.return_value = mock_data
 
-        treasury_connector.get_monthly_treasury_rates(
-            start_date="2023-01",
-            end_date="2023-12"
-        )
+        treasury_connector.get_monthly_treasury_rates(start_date="2023-01", end_date="2023-12")
 
         mock_fetch.assert_called_once()
 
@@ -191,10 +187,10 @@ class TestTreasuryConnectorGetMonthlyTreasuryRates:
 class TestTreasuryConnectorGetFederalDebt:
     """Test get_federal_debt method."""
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_federal_debt_no_filters(self, mock_fetch, treasury_connector):
         """Test getting federal debt without filters."""
-        mock_data = pd.DataFrame({'debt_amount': [30000000000000]})
+        mock_data = pd.DataFrame({"debt_amount": [30000000000000]})
         mock_fetch.return_value = mock_data
 
         result = treasury_connector.get_federal_debt()
@@ -202,26 +198,23 @@ class TestTreasuryConnectorGetFederalDebt:
         assert isinstance(result, pd.DataFrame)
         mock_fetch.assert_called_once()
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_federal_debt_with_fiscal_year(self, mock_fetch, treasury_connector):
         """Test getting federal debt for specific fiscal year."""
-        mock_data = pd.DataFrame({'debt_amount': [30000000000000]})
+        mock_data = pd.DataFrame({"debt_amount": [30000000000000]})
         mock_fetch.return_value = mock_data
 
         treasury_connector.get_federal_debt(fiscal_year=2023)
 
         mock_fetch.assert_called_once()
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_federal_debt_with_dates(self, mock_fetch, treasury_connector):
         """Test getting federal debt with date range."""
-        mock_data = pd.DataFrame({'debt_amount': [30000000000000]})
+        mock_data = pd.DataFrame({"debt_amount": [30000000000000]})
         mock_fetch.return_value = mock_data
 
-        treasury_connector.get_federal_debt(
-            start_date="2023-01-01",
-            end_date="2023-12-31"
-        )
+        treasury_connector.get_federal_debt(start_date="2023-01-01", end_date="2023-12-31")
 
         mock_fetch.assert_called_once()
 
@@ -229,10 +222,10 @@ class TestTreasuryConnectorGetFederalDebt:
 class TestTreasuryConnectorGetFederalRevenue:
     """Test get_federal_revenue method."""
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_federal_revenue_no_filters(self, mock_fetch, treasury_connector):
         """Test getting federal revenue without filters."""
-        mock_data = pd.DataFrame({'revenue': [4000000000000]})
+        mock_data = pd.DataFrame({"revenue": [4000000000000]})
         mock_fetch.return_value = mock_data
 
         result = treasury_connector.get_federal_revenue()
@@ -240,10 +233,10 @@ class TestTreasuryConnectorGetFederalRevenue:
         assert isinstance(result, pd.DataFrame)
         mock_fetch.assert_called_once()
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_federal_revenue_with_fiscal_year(self, mock_fetch, treasury_connector):
         """Test getting revenue for specific fiscal year."""
-        mock_data = pd.DataFrame({'revenue': [4000000000000]})
+        mock_data = pd.DataFrame({"revenue": [4000000000000]})
         mock_fetch.return_value = mock_data
 
         treasury_connector.get_federal_revenue(fiscal_year=2023)
@@ -254,10 +247,10 @@ class TestTreasuryConnectorGetFederalRevenue:
 class TestTreasuryConnectorGetFederalSpending:
     """Test get_federal_spending method."""
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_federal_spending_no_filters(self, mock_fetch, treasury_connector):
         """Test getting federal spending without filters."""
-        mock_data = pd.DataFrame({'spending': [5000000000000]})
+        mock_data = pd.DataFrame({"spending": [5000000000000]})
         mock_fetch.return_value = mock_data
 
         result = treasury_connector.get_federal_spending()
@@ -265,10 +258,10 @@ class TestTreasuryConnectorGetFederalSpending:
         assert isinstance(result, pd.DataFrame)
         mock_fetch.assert_called_once()
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_federal_spending_with_fiscal_year(self, mock_fetch, treasury_connector):
         """Test getting spending for specific fiscal year."""
-        mock_data = pd.DataFrame({'spending': [5000000000000]})
+        mock_data = pd.DataFrame({"spending": [5000000000000]})
         mock_fetch.return_value = mock_data
 
         treasury_connector.get_federal_spending(fiscal_year=2023)
@@ -279,10 +272,10 @@ class TestTreasuryConnectorGetFederalSpending:
 class TestTreasuryConnectorGetExchangeRates:
     """Test get_exchange_rates method."""
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_exchange_rates_no_filters(self, mock_fetch, treasury_connector):
         """Test getting exchange rates without filters."""
-        mock_data = pd.DataFrame({'rate': [6.5], 'country': ['China']})
+        mock_data = pd.DataFrame({"rate": [6.5], "country": ["China"]})
         mock_fetch.return_value = mock_data
 
         result = treasury_connector.get_exchange_rates()
@@ -290,26 +283,23 @@ class TestTreasuryConnectorGetExchangeRates:
         assert isinstance(result, pd.DataFrame)
         mock_fetch.assert_called_once()
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_exchange_rates_with_country(self, mock_fetch, treasury_connector):
         """Test getting exchange rates for specific country."""
-        mock_data = pd.DataFrame({'rate': [6.5]})
+        mock_data = pd.DataFrame({"rate": [6.5]})
         mock_fetch.return_value = mock_data
 
         treasury_connector.get_exchange_rates(country="China")
 
         mock_fetch.assert_called_once()
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_exchange_rates_with_dates(self, mock_fetch, treasury_connector):
         """Test getting exchange rates with date range."""
-        mock_data = pd.DataFrame({'rate': [6.5]})
+        mock_data = pd.DataFrame({"rate": [6.5]})
         mock_fetch.return_value = mock_data
 
-        treasury_connector.get_exchange_rates(
-            start_date="2023-01-01",
-            end_date="2023-12-31"
-        )
+        treasury_connector.get_exchange_rates(start_date="2023-01-01", end_date="2023-12-31")
 
         mock_fetch.assert_called_once()
 
@@ -317,10 +307,10 @@ class TestTreasuryConnectorGetExchangeRates:
 class TestTreasuryConnectorGetTreasuryAuctions:
     """Test get_treasury_auctions method."""
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_treasury_auctions_no_filters(self, mock_fetch, treasury_connector):
         """Test getting treasury auctions without filters."""
-        mock_data = pd.DataFrame({'security_type': ['Bill'], 'amount': [1000000000]})
+        mock_data = pd.DataFrame({"security_type": ["Bill"], "amount": [1000000000]})
         mock_fetch.return_value = mock_data
 
         result = treasury_connector.get_treasury_auctions()
@@ -328,10 +318,10 @@ class TestTreasuryConnectorGetTreasuryAuctions:
         assert isinstance(result, pd.DataFrame)
         mock_fetch.assert_called_once()
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_treasury_auctions_with_security_type(self, mock_fetch, treasury_connector):
         """Test getting auctions for specific security type."""
-        mock_data = pd.DataFrame({'security_type': ['Bill']})
+        mock_data = pd.DataFrame({"security_type": ["Bill"]})
         mock_fetch.return_value = mock_data
 
         treasury_connector.get_treasury_auctions(security_type="Bill")
@@ -342,10 +332,10 @@ class TestTreasuryConnectorGetTreasuryAuctions:
 class TestTreasuryConnectorGetInterestExpense:
     """Test get_interest_expense method."""
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_interest_expense_no_filters(self, mock_fetch, treasury_connector):
         """Test getting interest expense without filters."""
-        mock_data = pd.DataFrame({'expense': [500000000000]})
+        mock_data = pd.DataFrame({"expense": [500000000000]})
         mock_fetch.return_value = mock_data
 
         result = treasury_connector.get_interest_expense()
@@ -353,10 +343,10 @@ class TestTreasuryConnectorGetInterestExpense:
         assert isinstance(result, pd.DataFrame)
         mock_fetch.assert_called_once()
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_interest_expense_with_fiscal_year(self, mock_fetch, treasury_connector):
         """Test getting interest expense for specific fiscal year."""
-        mock_data = pd.DataFrame({'expense': [500000000000]})
+        mock_data = pd.DataFrame({"expense": [500000000000]})
         mock_fetch.return_value = mock_data
 
         treasury_connector.get_interest_expense(fiscal_year=2023)
@@ -367,10 +357,10 @@ class TestTreasuryConnectorGetInterestExpense:
 class TestTreasuryConnectorGetGiftContributions:
     """Test get_gift_contributions method."""
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_gift_contributions_no_filters(self, mock_fetch, treasury_connector):
         """Test getting gift contributions without filters."""
-        mock_data = pd.DataFrame({'amount': [1000000]})
+        mock_data = pd.DataFrame({"amount": [1000000]})
         mock_fetch.return_value = mock_data
 
         result = treasury_connector.get_gift_contributions()
@@ -378,16 +368,13 @@ class TestTreasuryConnectorGetGiftContributions:
         assert isinstance(result, pd.DataFrame)
         mock_fetch.assert_called_once()
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_gift_contributions_with_dates(self, mock_fetch, treasury_connector):
         """Test getting gift contributions with date range."""
-        mock_data = pd.DataFrame({'amount': [1000000]})
+        mock_data = pd.DataFrame({"amount": [1000000]})
         mock_fetch.return_value = mock_data
 
-        treasury_connector.get_gift_contributions(
-            start_date="2023-01-01",
-            end_date="2023-12-31"
-        )
+        treasury_connector.get_gift_contributions(start_date="2023-01-01", end_date="2023-12-31")
 
         mock_fetch.assert_called_once()
 
@@ -395,10 +382,10 @@ class TestTreasuryConnectorGetGiftContributions:
 class TestTreasuryConnectorGetBudgetOutlook:
     """Test get_budget_outlook method."""
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_budget_outlook_no_filters(self, mock_fetch, treasury_connector):
         """Test getting budget outlook without filters."""
-        mock_data = pd.DataFrame({'outlook': ['deficit']})
+        mock_data = pd.DataFrame({"outlook": ["deficit"]})
         mock_fetch.return_value = mock_data
 
         result = treasury_connector.get_budget_outlook()
@@ -406,10 +393,10 @@ class TestTreasuryConnectorGetBudgetOutlook:
         assert isinstance(result, pd.DataFrame)
         mock_fetch.assert_called_once()
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_budget_outlook_with_fiscal_year(self, mock_fetch, treasury_connector):
         """Test getting budget outlook for specific fiscal year."""
-        mock_data = pd.DataFrame({'outlook': ['deficit']})
+        mock_data = pd.DataFrame({"outlook": ["deficit"]})
         mock_fetch.return_value = mock_data
 
         treasury_connector.get_budget_outlook(fiscal_year=2024)
@@ -441,70 +428,70 @@ class TestTreasuryConnectorClose:
 class TestTreasuryConnectorTypeContracts:
     """Test type contracts for Phase 4 Layer 8 validation."""
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_daily_treasury_rates_returns_dataframe(self, mock_fetch, treasury_connector):
         """Test that get_daily_treasury_rates returns DataFrame."""
         mock_fetch.return_value = pd.DataFrame()
         result = treasury_connector.get_daily_treasury_rates()
         assert isinstance(result, pd.DataFrame)
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_monthly_treasury_rates_returns_dataframe(self, mock_fetch, treasury_connector):
         """Test that get_monthly_treasury_rates returns DataFrame."""
         mock_fetch.return_value = pd.DataFrame()
         result = treasury_connector.get_monthly_treasury_rates()
         assert isinstance(result, pd.DataFrame)
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_federal_debt_returns_dataframe(self, mock_fetch, treasury_connector):
         """Test that get_federal_debt returns DataFrame."""
         mock_fetch.return_value = pd.DataFrame()
         result = treasury_connector.get_federal_debt()
         assert isinstance(result, pd.DataFrame)
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_federal_revenue_returns_dataframe(self, mock_fetch, treasury_connector):
         """Test that get_federal_revenue returns DataFrame."""
         mock_fetch.return_value = pd.DataFrame()
         result = treasury_connector.get_federal_revenue()
         assert isinstance(result, pd.DataFrame)
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_federal_spending_returns_dataframe(self, mock_fetch, treasury_connector):
         """Test that get_federal_spending returns DataFrame."""
         mock_fetch.return_value = pd.DataFrame()
         result = treasury_connector.get_federal_spending()
         assert isinstance(result, pd.DataFrame)
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_exchange_rates_returns_dataframe(self, mock_fetch, treasury_connector):
         """Test that get_exchange_rates returns DataFrame."""
         mock_fetch.return_value = pd.DataFrame()
         result = treasury_connector.get_exchange_rates()
         assert isinstance(result, pd.DataFrame)
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_treasury_auctions_returns_dataframe(self, mock_fetch, treasury_connector):
         """Test that get_treasury_auctions returns DataFrame."""
         mock_fetch.return_value = pd.DataFrame()
         result = treasury_connector.get_treasury_auctions()
         assert isinstance(result, pd.DataFrame)
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_interest_expense_returns_dataframe(self, mock_fetch, treasury_connector):
         """Test that get_interest_expense returns DataFrame."""
         mock_fetch.return_value = pd.DataFrame()
         result = treasury_connector.get_interest_expense()
         assert isinstance(result, pd.DataFrame)
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_gift_contributions_returns_dataframe(self, mock_fetch, treasury_connector):
         """Test that get_gift_contributions returns DataFrame."""
         mock_fetch.return_value = pd.DataFrame()
         result = treasury_connector.get_gift_contributions()
         assert isinstance(result, pd.DataFrame)
 
-    @patch.object(TreasuryConnector, 'fetch')
+    @patch.object(TreasuryConnector, "fetch")
     def test_get_budget_outlook_returns_dataframe(self, mock_fetch, treasury_connector):
         """Test that get_budget_outlook returns DataFrame."""
         mock_fetch.return_value = pd.DataFrame()

@@ -83,9 +83,7 @@ class TestCensusConnectorTypeContracts:
         census = CensusConnector(api_key="test_key")
         census.connect()
 
-        result = census.fetch(
-            dataset="acs/acs5", year=2019, variables=["NAME", "B01001_001E"]
-        )
+        result = census.fetch(dataset="acs/acs5", year=2019, variables=["NAME", "B01001_001E"])
 
         assert isinstance(result, pd.DataFrame)
 
@@ -94,9 +92,7 @@ class TestCensusConnectorTypeContracts:
         """Test that list_variables returns DataFrame."""
         mock_response = Mock()
         mock_response.json.return_value = {
-            "variables": {
-                "B01001_001E": {"label": "Total Population", "concept": "Sex by Age"}
-            }
+            "variables": {"B01001_001E": {"label": "Total Population", "concept": "Sex by Age"}}
         }
         mock_response.raise_for_status = Mock()
         mock_get.return_value = mock_response

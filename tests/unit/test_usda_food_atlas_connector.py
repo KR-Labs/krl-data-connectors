@@ -69,9 +69,7 @@ class TestUSDAFoodAtlasConnectorTypeContracts:
     @patch.object(USDAFoodAtlasConnector, "_make_request")
     def test_get_indicators_return_type(self, mock_request):
         """Test that get_indicators returns DataFrame."""
-        mock_request.return_value = {
-            "data": [{"FIPS": "01001", "PCT_LACCESS_POP15": 5.2}]
-        }
+        mock_request.return_value = {"data": [{"FIPS": "01001", "PCT_LACCESS_POP15": 5.2}]}
 
         atlas = USDAFoodAtlasConnector()
 

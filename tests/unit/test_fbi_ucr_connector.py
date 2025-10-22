@@ -618,11 +618,9 @@ class TestFBIUCRConnectorTypeContracts:
     @patch("krl_data_connectors.crime.fbi_ucr_connector.FBIUCRConnector.get_state_crime_data")
     def test_fetch_return_type(self, mock_get_state):
         """Test that fetch returns DataFrame."""
-        mock_get_state.return_value = pd.DataFrame({
-            "State": ["RI"],
-            "Year": [2023],
-            "ViolentCrime": [1000]
-        })
+        mock_get_state.return_value = pd.DataFrame(
+            {"State": ["RI"], "Year": [2023], "ViolentCrime": [1000]}
+        )
         fbi = FBIUCRConnector()
         result = fbi.fetch(state="RI", year=2023, data_type="state")
         assert isinstance(result, pd.DataFrame)
@@ -632,10 +630,7 @@ class TestFBIUCRConnectorTypeContracts:
     def test_load_crime_data_return_type(self, mock_read_csv, mock_exists):
         """Test that load_crime_data returns DataFrame."""
         mock_exists.return_value = True
-        mock_read_csv.return_value = pd.DataFrame({
-            "State": ["RI"],
-            "ViolentCrime": [1000]
-        })
+        mock_read_csv.return_value = pd.DataFrame({"State": ["RI"], "ViolentCrime": [1000]})
         fbi = FBIUCRConnector()
         result = fbi.load_crime_data("test.csv")
         assert isinstance(result, pd.DataFrame)
@@ -645,9 +640,7 @@ class TestFBIUCRConnectorTypeContracts:
         """Test that get_state_crime_data returns DataFrame."""
         mock_response = Mock()
         mock_response.status_code = 200
-        mock_response.json.return_value = {
-            "results": [{"State": "RI", "ViolentCrime": 1000}]
-        }
+        mock_response.json.return_value = {"results": [{"State": "RI", "ViolentCrime": 1000}]}
         mock_get.return_value = mock_response
 
         fbi = FBIUCRConnector(api_key="test_key")
@@ -657,35 +650,23 @@ class TestFBIUCRConnectorTypeContracts:
     def test_get_violent_crime_return_type(self):
         """Test that get_violent_crime returns DataFrame."""
         fbi = FBIUCRConnector()
-        df = pd.DataFrame({
-            "State": ["RI"],
-            "Murder": [10],
-            "Robbery": [100],
-            "Assault": [500]
-        })
+        df = pd.DataFrame({"State": ["RI"], "Murder": [10], "Robbery": [100], "Assault": [500]})
         result = fbi.get_violent_crime(df)
         assert isinstance(result, pd.DataFrame)
 
     def test_get_property_crime_return_type(self):
         """Test that get_property_crime returns DataFrame."""
         fbi = FBIUCRConnector()
-        df = pd.DataFrame({
-            "State": ["RI"],
-            "Burglary": [200],
-            "Larceny": [1000],
-            "MotorVehicleTheft": [150]
-        })
+        df = pd.DataFrame(
+            {"State": ["RI"], "Burglary": [200], "Larceny": [1000], "MotorVehicleTheft": [150]}
+        )
         result = fbi.get_property_crime(df)
         assert isinstance(result, pd.DataFrame)
 
     def test_calculate_crime_rate_return_type(self):
         """Test that calculate_crime_rate returns DataFrame."""
         fbi = FBIUCRConnector()
-        df = pd.DataFrame({
-            "State": ["RI"],
-            "ViolentCrime": [1000],
-            "Population": [1000000]
-        })
+        df = pd.DataFrame({"State": ["RI"], "ViolentCrime": [1000], "Population": [1000000]})
         result = fbi.calculate_crime_rate(df, "ViolentCrime", "Population")
         assert isinstance(result, pd.DataFrame)
 
@@ -694,7 +675,7 @@ class TestFBIUCRConnectorTypeContracts:
         """Test that compare_states returns DataFrame."""
         mock_get_state.side_effect = [
             pd.DataFrame({"State": ["RI"], "ViolentCrime": [1000]}),
-            pd.DataFrame({"State": ["MA"], "ViolentCrime": [2000]})
+            pd.DataFrame({"State": ["MA"], "ViolentCrime": [2000]}),
         ]
         fbi = FBIUCRConnector()
         result = fbi.compare_states(["RI", "MA"], 2023)
@@ -703,14 +684,8 @@ class TestFBIUCRConnectorTypeContracts:
     def test_calculate_yoy_change_return_type(self):
         """Test that calculate_yoy_change returns DataFrame."""
         fbi = FBIUCRConnector()
-        df_2022 = pd.DataFrame({
-            "state": ["RI"],
-            "ViolentCrime": [900]
-        })
-        df_2023 = pd.DataFrame({
-            "state": ["RI"],
-            "ViolentCrime": [1000]
-        })
+        df_2022 = pd.DataFrame({"state": ["RI"], "ViolentCrime": [900]})
+        df_2023 = pd.DataFrame({"state": ["RI"], "ViolentCrime": [1000]})
         result = fbi.calculate_yoy_change(df_2023, df_2022, "ViolentCrime")
         assert isinstance(result, pd.DataFrame)
 
@@ -720,7 +695,7 @@ class TestFBIUCRConnectorTypeContracts:
         mock_get_state.side_effect = [
             pd.DataFrame({"Year": [2021], "ViolentCrime": [900]}),
             pd.DataFrame({"Year": [2022], "ViolentCrime": [950]}),
-            pd.DataFrame({"Year": [2023], "ViolentCrime": [1000]})
+            pd.DataFrame({"Year": [2023], "ViolentCrime": [1000]}),
         ]
         fbi = FBIUCRConnector()
         result = fbi.get_trend_data("RI", 2021, 2023)

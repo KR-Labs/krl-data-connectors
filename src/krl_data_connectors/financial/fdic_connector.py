@@ -157,24 +157,24 @@ class FDICConnector(BaseConnector):
         Raises:
             requests.HTTPError: If API request fails
         """
-        endpoint = kwargs.pop('endpoint', None)
-        
+        endpoint = kwargs.pop("endpoint", None)
+
         if not endpoint:
             raise ValueError("endpoint parameter is required")
-        
+
         if not self.session:
             self.connect()
 
         url = f"{self.api_url}/{endpoint}"
-        
+
         # Add format parameter if not specified
-        if 'format' not in kwargs:
-            kwargs['format'] = 'json'
-        
+        if "format" not in kwargs:
+            kwargs["format"] = "json"
+
         try:
             response = self.session.get(url, params=kwargs, timeout=self.timeout)
             response.raise_for_status()
-            
+
             # Try JSON first
             try:
                 data = response.json()
@@ -187,12 +187,12 @@ class FDICConnector(BaseConnector):
                 return pd.DataFrame(data)
             elif isinstance(data, dict):
                 # Handle different response structures
-                if 'data' in data:
-                    return pd.DataFrame(data['data'])
-                elif 'results' in data:
-                    return pd.DataFrame(data['results'])
-                elif 'institutions' in data:
-                    return pd.DataFrame(data['institutions'])
+                if "data" in data:
+                    return pd.DataFrame(data["data"])
+                elif "results" in data:
+                    return pd.DataFrame(data["results"])
+                elif "institutions" in data:
+                    return pd.DataFrame(data["institutions"])
                 else:
                     return pd.DataFrame([data])
             else:
@@ -231,7 +231,7 @@ class FDICConnector(BaseConnector):
             "sort_by": "FAILDATE",
             "sort_order": "DESC",
         }
-        
+
         filters = []
         if start_date:
             filters.append(f"FAILDATE:[{start_date} TO *]")
@@ -239,7 +239,7 @@ class FDICConnector(BaseConnector):
             filters.append(f"FAILDATE:[* TO {end_date}]")
         if state:
             filters.append(f"STALP:{state}")
-        
+
         if filters:
             params["filters"] = " AND ".join(filters)
 
@@ -276,7 +276,7 @@ class FDICConnector(BaseConnector):
             "sort_by": "NAME",
             "sort_order": "ASC",
         }
-        
+
         filters = []
         if state:
             filters.append(f"STALP:{state}")
@@ -286,7 +286,7 @@ class FDICConnector(BaseConnector):
             filters.append(f"INSTCLASS:{institution_type}")
         if active:
             filters.append("ACTIVE:1")
-        
+
         if filters:
             params["filters"] = " AND ".join(filters)
 
@@ -319,7 +319,7 @@ class FDICConnector(BaseConnector):
             "sort_by": "REPDTE",
             "sort_order": "DESC",
         }
-        
+
         filters = []
         if cert:
             filters.append(f"CERT:{cert}")
@@ -327,7 +327,7 @@ class FDICConnector(BaseConnector):
             # Convert date format if needed
             clean_date = report_date.replace("-", "")
             filters.append(f"REPDTE:{clean_date}")
-        
+
         if filters:
             params["filters"] = " AND ".join(filters)
 
@@ -362,7 +362,7 @@ class FDICConnector(BaseConnector):
             "sort_by": "YEAR",
             "sort_order": "DESC",
         }
-        
+
         filters = []
         if year:
             filters.append(f"YEAR:{year}")
@@ -370,7 +370,7 @@ class FDICConnector(BaseConnector):
             filters.append(f"STNAME:{state}")
         if county:
             filters.append(f"COUNTY:{county}")
-        
+
         if filters:
             params["filters"] = " AND ".join(filters)
 
@@ -403,13 +403,13 @@ class FDICConnector(BaseConnector):
             "sort_by": "BKCLASS",
             "sort_order": "ASC",
         }
-        
+
         filters = []
         if cert:
             filters.append(f"CERT:{cert}")
         if state:
             filters.append(f"STALP:{state}")
-        
+
         if filters:
             params["filters"] = " AND ".join(filters)
 
@@ -444,7 +444,7 @@ class FDICConnector(BaseConnector):
             "sort_by": "EFFDATE",
             "sort_order": "DESC",
         }
-        
+
         filters = []
         if start_date:
             clean_date = start_date.replace("-", "")
@@ -454,7 +454,7 @@ class FDICConnector(BaseConnector):
             filters.append(f"EFFDATE:[* TO {clean_date}]")
         if change_type:
             filters.append(f"CHANGETYPE:{change_type}")
-        
+
         if filters:
             params["filters"] = " AND ".join(filters)
 
@@ -544,7 +544,7 @@ class FDICConnector(BaseConnector):
             "sort_by": "REPDTE",
             "sort_order": "DESC",
         }
-        
+
         # Add date filters if provided
         if start_date or end_date:
             date_filters = [f"CERT:{cert}"]
@@ -583,13 +583,13 @@ class FDICConnector(BaseConnector):
             "sort_by": "NAME",
             "sort_order": "ASC",
         }
-        
+
         filters = []
         if state:
             filters.append(f"STALP:{state}")
         # Filter for bank holding companies
         filters.append("SUBCHAPS:1")
-        
+
         if filters:
             params["filters"] = " AND ".join(filters)
 

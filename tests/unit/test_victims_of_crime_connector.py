@@ -33,6 +33,7 @@ from krl_data_connectors.crime.victims_of_crime_connector import VictimsOfCrimeC
 
 # Fixtures
 
+
 @pytest.fixture
 def ovc_connector():
     """Create VictimsOfCrimeConnector instance."""
@@ -40,6 +41,7 @@ def ovc_connector():
 
 
 # Test Classes
+
 
 class TestOVCConnectorInit:
     """Test connector initialization."""
@@ -65,7 +67,9 @@ class TestOVCConnectorInit:
 class TestOVCConnectorConnection:
     """Test connection handling."""
 
-    @patch('krl_data_connectors.crime.victims_of_crime_connector.VictimsOfCrimeConnector._init_session')
+    @patch(
+        "krl_data_connectors.crime.victims_of_crime_connector.VictimsOfCrimeConnector._init_session"
+    )
     def test_connect_success(self, mock_init_session):
         """Test successful connection."""
         mock_session = MagicMock()
@@ -77,7 +81,9 @@ class TestOVCConnectorConnection:
         assert connector.session is not None
         mock_init_session.assert_called_once()
 
-    @patch('krl_data_connectors.crime.victims_of_crime_connector.VictimsOfCrimeConnector._init_session')
+    @patch(
+        "krl_data_connectors.crime.victims_of_crime_connector.VictimsOfCrimeConnector._init_session"
+    )
     def test_connect_already_connected(self, mock_init_session):
         """Test connect when already connected."""
         connector = VictimsOfCrimeConnector()
@@ -116,7 +122,7 @@ class TestOVCConnectorGetCompensationData:
         """Test that cached data is returned on second call."""
         # First call
         result1 = ovc_connector.get_compensation_data(year=2023)
-        
+
         # Second call - should use cache
         result2 = ovc_connector.get_compensation_data(year=2023)
 
@@ -277,6 +283,7 @@ class TestOVCConnectorClose:
 
 
 # Phase 4 Layer 8: Contract Tests
+
 
 class TestOVCConnectorTypeContracts:
     """Contract tests for return types (Phase 4 Layer 8)."""

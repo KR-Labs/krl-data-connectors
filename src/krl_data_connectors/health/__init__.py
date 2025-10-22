@@ -20,4 +20,12 @@ from .hrsa_connector import HRSAConnector
 from .nih_connector import NIHConnector
 from .samhsa_connector import SAMHSAConnector
 
-__all__ = ["BRFSSConnector", "CDCWonderConnector", "CountyHealthRankingsConnector", "FDAConnector", "HRSAConnector", "NIHConnector", "SAMHSAConnector"]
+__all__ = [
+    "BRFSSConnector",
+    "CDCWonderConnector",
+    "CountyHealthRankingsConnector",
+    "FDAConnector",
+    "HRSAConnector",
+    "NIHConnector",
+    "SAMHSAConnector",
+]

@@ -68,9 +68,7 @@ class TestCensusConnectorInitialization:
 
     def test_initialization_with_cache_params(self):
         """Test connector accepts custom cache parameters."""
-        census = CensusConnector(
-            api_key="test_key", cache_dir="/tmp/census_cache", cache_ttl=7200
-        )
+        census = CensusConnector(api_key="test_key", cache_dir="/tmp/census_cache", cache_ttl=7200)
 
         assert census.base_url == "https://api.census.gov/data"
         # Cache parameters are handled by BaseConnector
@@ -683,9 +681,7 @@ class TestCensusConnectorTypeContracts:
     def test_list_variables_return_type(self, mock_request):
         """Test that list_variables returns DataFrame."""
         mock_request.return_value = {
-            "variables": {
-                "B01001_001E": {"label": "Total Population", "concept": "Sex by Age"}
-            }
+            "variables": {"B01001_001E": {"label": "Total Population", "concept": "Sex by Age"}}
         }
 
         census = CensusConnector(api_key="test_key")

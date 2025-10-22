@@ -161,29 +161,29 @@ class SuperfundConnector(BaseConnector):
         Raises:
             requests.HTTPError: If API request fails
         """
-        endpoint = kwargs.get('endpoint')
-        params = kwargs.get('params')
-        
+        endpoint = kwargs.get("endpoint")
+        params = kwargs.get("params")
+
         if not endpoint:
             raise ValueError("endpoint parameter is required")
-        
+
         if not self.session:
             self.connect()
 
         url = f"{self.base_url}/{endpoint}"
         session = self._init_session()
-        
+
         try:
             response = session.get(url, params=params, timeout=self.timeout)
             response.raise_for_status()
-            
+
             # Try JSON first
             try:
                 return response.json()
             except ValueError:
                 # Fall back to text for non-JSON responses
                 return {"data": response.text}
-                
+
         except requests.HTTPError as e:
             self.logger.error(f"HTTP error fetching data: {e}")
             raise
@@ -212,7 +212,7 @@ class SuperfundConnector(BaseConnector):
         """
         state = state.upper()
         cache_key = f"sites_state_{state}_{status}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -256,7 +256,7 @@ class SuperfundConnector(BaseConnector):
             >>> print(site['SITE_NAME'].iloc[0])
         """
         cache_key = f"site_detail_{site_id}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -296,7 +296,7 @@ class SuperfundConnector(BaseConnector):
         city = city.upper().replace(" ", "%20")
         state = state.upper()
         cache_key = f"sites_city_{city}_{state}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -336,7 +336,7 @@ class SuperfundConnector(BaseConnector):
             >>> print(sites[['SITE_NAME', 'ADDRESS']])
         """
         cache_key = f"sites_zip_{zip_code}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -376,7 +376,7 @@ class SuperfundConnector(BaseConnector):
             >>> print(npl_sites['NPL_STATUS'].value_counts())
         """
         cache_key = f"npl_sites_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -399,7 +399,9 @@ class SuperfundConnector(BaseConnector):
         self.logger.info(f"Retrieved {len(df)} NPL sites")
         return df
 
-    def get_construction_complete_sites(self, state: Optional[str] = None, limit: int = 1000) -> pd.DataFrame:
+    def get_construction_complete_sites(
+        self, state: Optional[str] = None, limit: int = 1000
+    ) -> pd.DataFrame:
         """
         Get sites with construction complete status.
 
@@ -416,7 +418,7 @@ class SuperfundConnector(BaseConnector):
             >>> print(f"Construction complete sites in CA: {len(complete_sites)}")
         """
         cache_key = f"construction_complete_{state}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -461,7 +463,7 @@ class SuperfundConnector(BaseConnector):
             >>> print(sites[['SITE_NAME', 'CITY', 'STATE']])
         """
         cache_key = f"search_name_{site_name}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -471,7 +473,7 @@ class SuperfundConnector(BaseConnector):
         # Fetch data (using LIKE operator in Envirofacts)
         site_name_encoded = site_name.upper().replace(" ", "%20")
         endpoint = f"SEMS/SITE_NAME/BEGINNING/{site_name_encoded}/ROWS/0:{limit}/JSON"
-        
+
         self.logger.info(f"Searching for sites matching: {site_name}")
         data = self.fetch(endpoint=endpoint)
 
@@ -503,13 +505,13 @@ class SuperfundConnector(BaseConnector):
             ...     print(f"Location: {coords[0]}, {coords[1]}")
         """
         site_data = self.get_site_by_id(site_id)
-        
+
         if site_data.empty:
             return None
-            
-        lat = site_data.get('LATITUDE', pd.Series([None])).iloc[0]
-        lon = site_data.get('LONGITUDE', pd.Series([None])).iloc[0]
-        
+
+        lat = site_data.get("LATITUDE", pd.Series([None])).iloc[0]
+        lon = site_data.get("LONGITUDE", pd.Series([None])).iloc[0]
+
         return (float(lat), float(lon)) if (lat is not None and lon is not None) else None
 
     def close(self):

@@ -11,4 +11,4 @@ from .usgs_connector import USGSConnector
 from .nsf_connector import NSFConnector
 from .uspto_connector import USPTOConnector
 
-__all__ = ['USGSConnector', 'NSFConnector', 'USPTOConnector']
+__all__ = ["USGSConnector", "NSFConnector", "USPTOConnector"]

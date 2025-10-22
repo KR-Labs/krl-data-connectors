@@ -133,11 +133,10 @@ class NOAAClimateConnector(BaseConnector):
         """
         super().__init__(api_key=api_key, **kwargs)
         self.base_url = self.BASE_URL
-        
+
         if not self.api_key:
             self.logger.warning(
-                "No API key provided. Get free token at: "
-                "https://www.ncdc.noaa.gov/cdo-web/token"
+                "No API key provided. Get free token at: " "https://www.ncdc.noaa.gov/cdo-web/token"
             )
 
     def _get_api_key(self) -> Optional[str]:
@@ -171,16 +170,18 @@ class NOAAClimateConnector(BaseConnector):
             self.session = self._init_session()
             # Add token to headers
             self.session.headers.update({"token": self.api_key})
-            
+
             # Test connection
             test_url = f"{self.base_url}/datasets"
             response = self.session.get(test_url, params={"limit": 1}, timeout=self.timeout)
             response.raise_for_status()
-            
+
             self.logger.info("Successfully connected to NOAA CDO API")
         except requests.HTTPError as e:
             if e.response.status_code == 401:
-                raise ConnectionError("Invalid API token. Get free token at: https://www.ncdc.noaa.gov/cdo-web/token")
+                raise ConnectionError(
+                    "Invalid API token. Get free token at: https://www.ncdc.noaa.gov/cdo-web/token"
+                )
             raise ConnectionError(f"Could not connect to NOAA CDO API: {e}")
         except Exception as e:
             self.logger.error(f"Failed to connect to NOAA CDO API: {e}")
@@ -200,17 +201,17 @@ class NOAAClimateConnector(BaseConnector):
         Raises:
             requests.HTTPError: If API request fails
         """
-        endpoint = kwargs.get('endpoint')
-        params = kwargs.get('params', {})
-        
+        endpoint = kwargs.get("endpoint")
+        params = kwargs.get("params", {})
+
         if not endpoint:
             raise ValueError("endpoint parameter is required")
-        
+
         if not self.session:
             self.connect()
 
         url = f"{self.base_url}/{endpoint}"
-        
+
         try:
             response = self.session.get(url, params=params, timeout=self.timeout)
             response.raise_for_status()
@@ -241,7 +242,7 @@ class NOAAClimateConnector(BaseConnector):
             >>> print(datasets[['id', 'name', 'mindate', 'maxdate']])
         """
         cache_key = f"datasets_{dataset_id}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -273,7 +274,9 @@ class NOAAClimateConnector(BaseConnector):
         self.logger.info(f"Retrieved {len(df)} datasets")
         return df
 
-    def get_data_categories(self, category_id: Optional[str] = None, limit: int = 100) -> pd.DataFrame:
+    def get_data_categories(
+        self, category_id: Optional[str] = None, limit: int = 100
+    ) -> pd.DataFrame:
         """
         Get data categories.
 
@@ -290,7 +293,7 @@ class NOAAClimateConnector(BaseConnector):
             >>> print(categories[['id', 'name']])
         """
         cache_key = f"categories_{category_id}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -306,7 +309,9 @@ class NOAAClimateConnector(BaseConnector):
         params = {"limit": min(limit, self.MAX_LIMIT)}
 
         # Fetch data
-        self.logger.info(f"Fetching data categories{f' (ID: {category_id})' if category_id else ''}")
+        self.logger.info(
+            f"Fetching data categories{f' (ID: {category_id})' if category_id else ''}"
+        )
         data = self.fetch(endpoint=endpoint, params=params)
 
         # Convert to DataFrame
@@ -323,10 +328,7 @@ class NOAAClimateConnector(BaseConnector):
         return df
 
     def get_data_types(
-        self, 
-        datatype_id: Optional[str] = None,
-        dataset_id: Optional[str] = None,
-        limit: int = 100
+        self, datatype_id: Optional[str] = None, dataset_id: Optional[str] = None, limit: int = 100
     ) -> pd.DataFrame:
         """
         Get available data types.
@@ -345,7 +347,7 @@ class NOAAClimateConnector(BaseConnector):
             >>> print(types[['id', 'name', 'mindate', 'maxdate']])
         """
         cache_key = f"datatypes_{datatype_id}_{dataset_id}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -385,7 +387,7 @@ class NOAAClimateConnector(BaseConnector):
         dataset_id: Optional[str] = None,
         locationid: Optional[str] = None,
         extent: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get weather station information.
@@ -406,7 +408,7 @@ class NOAAClimateConnector(BaseConnector):
             >>> print(stations[['id', 'name', 'latitude', 'longitude']])
         """
         cache_key = f"stations_{station_id}_{dataset_id}_{locationid}_{extent}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -449,7 +451,7 @@ class NOAAClimateConnector(BaseConnector):
         location_id: Optional[str] = None,
         dataset_id: Optional[str] = None,
         locationcategoryid: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get location information.
@@ -469,7 +471,7 @@ class NOAAClimateConnector(BaseConnector):
             >>> print(locations[['id', 'name']])
         """
         cache_key = f"locations_{location_id}_{dataset_id}_{locationcategoryid}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -489,7 +491,9 @@ class NOAAClimateConnector(BaseConnector):
             params["locationcategoryid"] = locationcategoryid
 
         # Fetch data
-        self.logger.info(f"Fetching locations{f' (category: {locationcategoryid})' if locationcategoryid else ''}")
+        self.logger.info(
+            f"Fetching locations{f' (category: {locationcategoryid})' if locationcategoryid else ''}"
+        )
         data = self.fetch(endpoint=endpoint, params=params)
 
         # Convert to DataFrame
@@ -514,7 +518,7 @@ class NOAAClimateConnector(BaseConnector):
         locationid: Optional[str] = None,
         stationid: Optional[str] = None,
         units: str = "standard",
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get climate/weather data observations.
@@ -544,7 +548,7 @@ class NOAAClimateConnector(BaseConnector):
             >>> print(data[['date', 'datatype', 'value', 'station']])
         """
         cache_key = f"data_{dataset_id}_{start_date}_{end_date}_{datatype_id}_{locationid}_{stationid}_{units}_{limit}"
-        
+
         # Check cache
         cached_data = self.cache.get(cache_key)
         if cached_data is not None:
@@ -557,9 +561,9 @@ class NOAAClimateConnector(BaseConnector):
             "startdate": start_date,
             "enddate": end_date,
             "units": units,
-            "limit": min(limit, self.MAX_LIMIT)
+            "limit": min(limit, self.MAX_LIMIT),
         }
-        
+
         if datatype_id:
             params["datatypeid"] = datatype_id
         if locationid:
@@ -575,8 +579,8 @@ class NOAAClimateConnector(BaseConnector):
         if "results" in data:
             df = pd.DataFrame(data["results"])
             # Convert date strings to datetime
-            if 'date' in df.columns:
-                df['date'] = pd.to_datetime(df['date'])
+            if "date" in df.columns:
+                df["date"] = pd.to_datetime(df["date"])
         else:
             df = pd.DataFrame()
 
@@ -605,7 +609,7 @@ class NOAAClimateConnector(BaseConnector):
         end_date: str,
         stationid: Optional[str] = None,
         locationid: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get temperature data (TMAX, TMIN, TAVG).
@@ -636,7 +640,7 @@ class NOAAClimateConnector(BaseConnector):
             end_date=end_date,
             stationid=stationid,
             locationid=locationid,
-            limit=limit
+            limit=limit,
         )
 
     def get_precipitation_data(
@@ -645,7 +649,7 @@ class NOAAClimateConnector(BaseConnector):
         end_date: str,
         stationid: Optional[str] = None,
         locationid: Optional[str] = None,
-        limit: int = 1000
+        limit: int = 1000,
     ) -> pd.DataFrame:
         """
         Get precipitation data.
@@ -676,7 +680,7 @@ class NOAAClimateConnector(BaseConnector):
             datatype_id="PRCP",
             stationid=stationid,
             locationid=locationid,
-            limit=limit
+            limit=limit,
         )
 
     def close(self):

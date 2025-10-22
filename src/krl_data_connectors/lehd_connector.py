@@ -204,15 +204,15 @@ class LEHDConnector(BaseConnector):
         # State code validation
         if not state or not isinstance(state, str):
             raise ValueError(f"Invalid state code: '{state}'. Must be non-empty string.")
-        
+
         state = state.strip().lower()
         if not state or len(state) != 2:
             raise ValueError(f"Invalid state code: '{state}'. Must be 2-letter state abbreviation.")
-        
+
         # Year validation
         if not isinstance(year, int):
             raise TypeError(f"Invalid year type: {type(year).__name__}. Year must be an integer.")
-        
+
         # LEHD LODES data is available from 2002-2021 (as of 2025)
         if year < 2002 or year > 2021:
             raise ValueError(f"Invalid year: {year}. LEHD data is available from 2002-2021.")
@@ -273,14 +273,14 @@ class LEHDConnector(BaseConnector):
         # Validate inputs before making HTTP request
         if not state or not isinstance(state, str):
             raise ValueError(f"Invalid state code: '{state}'. Must be non-empty string.")
-        
+
         state = state.strip().lower()
         if not state or len(state) != 2:
             raise ValueError(f"Invalid state code: '{state}'. Must be 2-letter state abbreviation.")
-        
+
         if not isinstance(year, int):
             raise TypeError(f"Invalid year type: {type(year).__name__}. Year must be an integer.")
-        
+
         if year < 2002 or year > 2021:
             raise ValueError(f"Invalid year: {year}. LEHD data is available from 2002-2021.")
 
@@ -329,14 +329,14 @@ class LEHDConnector(BaseConnector):
         # Validate inputs before making HTTP request
         if not state or not isinstance(state, str):
             raise ValueError(f"Invalid state code: '{state}'. Must be non-empty string.")
-        
+
         state = state.strip().lower()
         if not state or len(state) != 2:
             raise ValueError(f"Invalid state code: '{state}'. Must be 2-letter state abbreviation.")
-        
+
         if not isinstance(year, int):
             raise TypeError(f"Invalid year type: {type(year).__name__}. Year must be an integer.")
-        
+
         if year < 2002 or year > 2021:
             raise ValueError(f"Invalid year: {year}. LEHD data is available from 2002-2021.")
 

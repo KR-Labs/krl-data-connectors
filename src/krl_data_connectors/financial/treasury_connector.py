@@ -157,20 +157,20 @@ class TreasuryConnector(BaseConnector):
         Raises:
             requests.HTTPError: If API request fails
         """
-        endpoint = kwargs.pop('endpoint', None)
-        
+        endpoint = kwargs.pop("endpoint", None)
+
         if not endpoint:
             raise ValueError("endpoint parameter is required")
-        
+
         if not self.session:
             self.connect()
 
         url = f"{self.api_url}/{endpoint}"
-        
+
         try:
             response = self.session.get(url, params=kwargs, timeout=self.timeout)
             response.raise_for_status()
-            
+
             # Try JSON first
             try:
                 data = response.json()
@@ -183,10 +183,10 @@ class TreasuryConnector(BaseConnector):
                 return pd.DataFrame(data)
             elif isinstance(data, dict):
                 # Handle different response structures
-                if 'data' in data:
-                    return pd.DataFrame(data['data'])
-                elif 'results' in data:
-                    return pd.DataFrame(data['results'])
+                if "data" in data:
+                    return pd.DataFrame(data["data"])
+                elif "results" in data:
+                    return pd.DataFrame(data["results"])
                 else:
                     return pd.DataFrame([data])
             else:
@@ -222,13 +222,13 @@ class TreasuryConnector(BaseConnector):
             "page[size]": limit,
             "sort": "-record_date",
         }
-        
+
         filters = []
         if start_date:
             filters.append(f"record_date:gte:{start_date}")
         if end_date:
             filters.append(f"record_date:lte:{end_date}")
-        
+
         if filters:
             params["filter"] = ",".join(filters)
 
@@ -260,13 +260,13 @@ class TreasuryConnector(BaseConnector):
             "page[size]": limit,
             "sort": "-record_date",
         }
-        
+
         filters = []
         if start_date:
             filters.append(f"record_date:gte:{start_date}")
         if end_date:
             filters.append(f"record_date:lte:{end_date}")
-        
+
         if filters:
             params["filter"] = ",".join(filters)
 
@@ -300,7 +300,7 @@ class TreasuryConnector(BaseConnector):
             "page[size]": limit,
             "sort": "-record_date",
         }
-        
+
         filters = []
         if fiscal_year:
             filters.append(f"record_fiscal_year:eq:{fiscal_year}")
@@ -308,7 +308,7 @@ class TreasuryConnector(BaseConnector):
             filters.append(f"record_date:gte:{start_date}")
         if end_date:
             filters.append(f"record_date:lte:{end_date}")
-        
+
         if filters:
             params["filter"] = ",".join(filters)
 
@@ -342,7 +342,7 @@ class TreasuryConnector(BaseConnector):
             "page[size]": limit,
             "sort": "-record_date",
         }
-        
+
         filters = []
         if fiscal_year:
             filters.append(f"record_fiscal_year:eq:{fiscal_year}")
@@ -350,7 +350,7 @@ class TreasuryConnector(BaseConnector):
             filters.append(f"record_date:gte:{start_date}")
         if end_date:
             filters.append(f"record_date:lte:{end_date}")
-        
+
         if filters:
             params["filter"] = ",".join(filters)
 
@@ -384,7 +384,7 @@ class TreasuryConnector(BaseConnector):
             "page[size]": limit,
             "sort": "-record_date",
         }
-        
+
         filters = []
         if fiscal_year:
             filters.append(f"record_fiscal_year:eq:{fiscal_year}")
@@ -392,7 +392,7 @@ class TreasuryConnector(BaseConnector):
             filters.append(f"record_date:gte:{start_date}")
         if end_date:
             filters.append(f"record_date:lte:{end_date}")
-        
+
         if filters:
             params["filter"] = ",".join(filters)
 
@@ -426,7 +426,7 @@ class TreasuryConnector(BaseConnector):
             "page[size]": limit,
             "sort": "-record_date",
         }
-        
+
         filters = []
         if country:
             filters.append(f"country:eq:{country}")
@@ -434,7 +434,7 @@ class TreasuryConnector(BaseConnector):
             filters.append(f"record_date:gte:{start_date}")
         if end_date:
             filters.append(f"record_date:lte:{end_date}")
-        
+
         if filters:
             params["filter"] = ",".join(filters)
 
@@ -468,7 +468,7 @@ class TreasuryConnector(BaseConnector):
             "page[size]": limit,
             "sort": "-auction_date",
         }
-        
+
         filters = []
         if security_type:
             filters.append(f"security_type:eq:{security_type}")
@@ -476,7 +476,7 @@ class TreasuryConnector(BaseConnector):
             filters.append(f"auction_date:gte:{start_date}")
         if end_date:
             filters.append(f"auction_date:lte:{end_date}")
-        
+
         if filters:
             params["filter"] = ",".join(filters)
 
@@ -510,7 +510,7 @@ class TreasuryConnector(BaseConnector):
             "page[size]": limit,
             "sort": "-record_date",
         }
-        
+
         filters = []
         if fiscal_year:
             filters.append(f"record_fiscal_year:eq:{fiscal_year}")
@@ -518,7 +518,7 @@ class TreasuryConnector(BaseConnector):
             filters.append(f"record_date:gte:{start_date}")
         if end_date:
             filters.append(f"record_date:lte:{end_date}")
-        
+
         if filters:
             params["filter"] = ",".join(filters)
 
@@ -550,13 +550,13 @@ class TreasuryConnector(BaseConnector):
             "page[size]": limit,
             "sort": "-record_date",
         }
-        
+
         filters = []
         if start_date:
             filters.append(f"record_date:gte:{start_date}")
         if end_date:
             filters.append(f"record_date:lte:{end_date}")
-        
+
         if filters:
             params["filter"] = ",".join(filters)
 
@@ -586,7 +586,7 @@ class TreasuryConnector(BaseConnector):
             "page[size]": limit,
             "sort": "-record_fiscal_year",
         }
-        
+
         if fiscal_year:
             params["filter"] = f"record_fiscal_year:eq:{fiscal_year}"
 

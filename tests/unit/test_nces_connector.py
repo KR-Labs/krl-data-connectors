@@ -810,11 +810,9 @@ class TestNCESConnectorTypeContracts:
     @patch("pandas.read_csv")
     def test_fetch_return_type(self, mock_read_csv):
         """Test that fetch returns DataFrame."""
-        mock_read_csv.return_value = pd.DataFrame({
-            "NCESSCH": ["440001"],
-            "SCH_NAME": ["Test School"],
-            "ENROLLMENT": [500]
-        })
+        mock_read_csv.return_value = pd.DataFrame(
+            {"NCESSCH": ["440001"], "SCH_NAME": ["Test School"], "ENROLLMENT": [500]}
+        )
 
         nces = NCESConnector()
 
@@ -825,10 +823,9 @@ class TestNCESConnectorTypeContracts:
     @patch("pandas.read_csv")
     def test_load_school_data_return_type(self, mock_read_csv):
         """Test that load_school_data returns DataFrame."""
-        mock_read_csv.return_value = pd.DataFrame({
-            "NCESSCH": ["440001"],
-            "SCH_NAME": ["Test School"]
-        })
+        mock_read_csv.return_value = pd.DataFrame(
+            {"NCESSCH": ["440001"], "SCH_NAME": ["Test School"]}
+        )
 
         nces = NCESConnector()
 
@@ -839,11 +836,9 @@ class TestNCESConnectorTypeContracts:
     @patch("pandas.read_csv")
     def test_get_state_schools_return_type(self, mock_read_csv):
         """Test that get_state_schools returns DataFrame."""
-        mock_read_csv.return_value = pd.DataFrame({
-            "NCESSCH": ["440001"],
-            "SCH_NAME": ["Test School"],
-            "STATE": ["OH"]
-        })
+        mock_read_csv.return_value = pd.DataFrame(
+            {"NCESSCH": ["440001"], "SCH_NAME": ["Test School"], "STATE": ["OH"]}
+        )
 
         nces = NCESConnector()
 
@@ -854,10 +849,7 @@ class TestNCESConnectorTypeContracts:
     @patch("pandas.read_csv")
     def test_get_enrollment_data_return_type(self, mock_read_csv):
         """Test that get_enrollment_data returns DataFrame."""
-        mock_read_csv.return_value = pd.DataFrame({
-            "NCESSCH": ["440001"],
-            "ENROLLMENT": [500]
-        })
+        mock_read_csv.return_value = pd.DataFrame({"NCESSCH": ["440001"], "ENROLLMENT": [500]})
 
         nces = NCESConnector()
 
@@ -869,12 +861,9 @@ class TestNCESConnectorTypeContracts:
         """Test that get_demographics returns DataFrame."""
         nces = NCESConnector()
 
-        schools_df = pd.DataFrame({
-            "NCESSCH": ["440001"],
-            "WHITE": [50],
-            "BLACK": [30],
-            "HISPANIC": [15]
-        })
+        schools_df = pd.DataFrame(
+            {"NCESSCH": ["440001"], "WHITE": [50], "BLACK": [30], "HISPANIC": [15]}
+        )
 
         result = nces.get_demographics(schools_df)
 
@@ -883,10 +872,7 @@ class TestNCESConnectorTypeContracts:
     @patch("pandas.read_csv")
     def test_get_graduation_rates_return_type(self, mock_read_csv):
         """Test that get_graduation_rates returns DataFrame."""
-        mock_read_csv.return_value = pd.DataFrame({
-            "NCESSCH": ["440001"],
-            "GRAD_RATE": [85.5]
-        })
+        mock_read_csv.return_value = pd.DataFrame({"NCESSCH": ["440001"], "GRAD_RATE": [85.5]})
 
         nces = NCESConnector()
 
@@ -897,11 +883,9 @@ class TestNCESConnectorTypeContracts:
     @patch("pandas.read_csv")
     def test_get_district_finance_return_type(self, mock_read_csv):
         """Test that get_district_finance returns DataFrame."""
-        mock_read_csv.return_value = pd.DataFrame({
-            "LEAID": ["4400001"],
-            "TOTALREV": [1000000],
-            "TOTALEXP": [950000]
-        })
+        mock_read_csv.return_value = pd.DataFrame(
+            {"LEAID": ["4400001"], "TOTALREV": [1000000], "TOTALEXP": [950000]}
+        )
 
         nces = NCESConnector()
 

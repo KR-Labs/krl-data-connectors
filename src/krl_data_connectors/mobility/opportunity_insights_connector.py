@@ -66,20 +66,20 @@ class OpportunityInsightsConnector(BaseConnector):
     Example:
         >>> from krl_data_connectors import OpportunityInsightsConnector
         >>> oi = OpportunityInsightsConnector()
-        >>> 
+        >>>
         >>> # Fetch mobility data for California
         >>> ca_mobility = oi.fetch_opportunity_atlas(
         ...     geography="tract",
         ...     state="06",
         ...     metrics=["kfr_pooled_p25", "kfr_pooled_p50"]
         ... )
-        >>> 
+        >>>
         >>> # Fetch social capital data
         >>> social_capital = oi.fetch_social_capital(
         ...     geography="county",
         ...     metrics=["ec_county", "clustering_county"]
         ... )
-        >>> 
+        >>>
         >>> # Aggregate to county level
         >>> county_data = oi.aggregate_to_county(ca_mobility)
     """
@@ -87,35 +87,35 @@ class OpportunityInsightsConnector(BaseConnector):
     # Data source URLs - STATA format (.dta files)
     # Opportunity Atlas data from "The Opportunity Atlas" paper
     BASE_URL = "https://opportunityinsights.org/wp-content/uploads/"
-    
+
     # All Outcomes by Geography - STATA files with simplified outcomes
     ATLAS_TRACT_URL = f"{BASE_URL}2018/10/tract_outcomes_simple.dta"
     ATLAS_COUNTY_URL = f"{BASE_URL}2018/10/county_outcomes_simple.dta"
     ATLAS_CZ_URL = f"{BASE_URL}2018/10/cz_outcomes_simple.dta"
     ATLAS_NATIONAL_URL = f"{BASE_URL}2018/10/national_percentile_outcomes.dta"
-    
+
     # Tract covariates (neighborhood characteristics)
     TRACT_COVARIATES_URL = f"{BASE_URL}2018/10/tract_covariates.dta"
     COUNTY_COVARIATES_URL = f"{BASE_URL}2018/12/cty_covariates.dta"
     CZ_COVARIATES_URL = f"{BASE_URL}2018/12/cz_covariates.dta"
-    
+
     # Late cohort data (1984-1989 birth cohorts)
     ATLAS_TRACT_LATE_URL = f"{BASE_URL}2024/08/tract_outcomes_late_simple.dta"
-    
+
     # Crosswalk files
     TRACT_2010_2020_CROSSWALK = f"{BASE_URL}2021/05/us_tract_2010_2020_crosswalk.dta"
-    
+
     # Social Capital Atlas (Nature 2022 paper)
     # Data hosted on Humanitarian Data Exchange (HDX)
     # Using correct dataset ID and resource URLs from HDX metadata
     HDX_DATASET_ID = "85ee8e10-0c66-4635-b997-79b6fad44c71"
-    
+
     # HDX Download URLs (from official metadata)
     SOCIAL_CAPITAL_COUNTY = "https://data.humdata.org/dataset/85ee8e10-0c66-4635-b997-79b6fad44c71/resource/ec896b64-c922-4737-b759-e4bd7f73b8cc/download/social_capital_county.csv"
     SOCIAL_CAPITAL_ZIP = "https://data.humdata.org/dataset/85ee8e10-0c66-4635-b997-79b6fad44c71/resource/ab878625-279b-4bef-a2b3-c132168d536e/download/social_capital_zip.csv"
     SOCIAL_CAPITAL_COLLEGE = "https://data.humdata.org/dataset/85ee8e10-0c66-4635-b997-79b6fad44c71/resource/7bd697cf-c572-47a6-b15b-8450cc5c7ef8/download/social_capital_college.csv"
     SOCIAL_CAPITAL_HS = "https://data.humdata.org/dataset/85ee8e10-0c66-4635-b997-79b6fad44c71/resource/0de85271-031d-4849-bda8-c8582a67e11b/download/social_capital_high_school.csv"
-    
+
     def __init__(
         self,
         cache_dir: Optional[str] = None,
@@ -128,7 +128,7 @@ class OpportunityInsightsConnector(BaseConnector):
         # Set default cache directory for mobility data
         if cache_dir is None:
             cache_dir = str(Path.home() / ".krl_cache" / "mobility")
-        
+
         super().__init__(
             api_key=None,  # No API key required
             cache_dir=cache_dir,
@@ -136,11 +136,11 @@ class OpportunityInsightsConnector(BaseConnector):
             timeout=timeout,
             max_retries=max_retries,
         )
-        
+
         self.data_version = data_version
         self._atlas_data: Optional[pd.DataFrame] = None
         self._social_capital_data: Optional[pd.DataFrame] = None
-        
+
         self.logger.info(
             "OpportunityInsightsConnector initialized",
             extra={
@@ -185,56 +185,58 @@ class OpportunityInsightsConnector(BaseConnector):
     def _normalize_column_names(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         Normalize column names from STATA files.
-        
-        The STATA files use a naming convention with extra '_pooled' 
+
+        The STATA files use a naming convention with extra '_pooled'
         (e.g., 'kfr_pooled_pooled_p25' instead of 'kfr_pooled_p25').
         This method creates simplified aliases for easier use.
-        
+
         Args:
             df: DataFrame with original STATA column names
-            
+
         Returns:
             DataFrame with additional simplified column names
         """
         # Create column name mappings for common metrics
         # Pattern: kfr_RACE_GENDER_PERCENTILE -> simplified version
         rename_map = {}
-        
+
         for col in df.columns:
             # Handle double-pooled patterns: kfr_pooled_pooled_p25 -> kfr_pooled_p25
-            if '_pooled_pooled_' in col:
-                simplified = col.replace('_pooled_pooled_', '_pooled_')
+            if "_pooled_pooled_" in col:
+                simplified = col.replace("_pooled_pooled_", "_pooled_")
                 rename_map[col] = simplified
             # Handle race-pooled patterns: kfr_white_pooled_p25 -> kfr_white_p25
-            elif '_pooled_p' in col and any(race in col for race in ['black', 'white', 'hisp', 'asian', 'natam']):
-                simplified = col.replace('_pooled_', '_')
+            elif "_pooled_p" in col and any(
+                race in col for race in ["black", "white", "hisp", "asian", "natam"]
+            ):
+                simplified = col.replace("_pooled_", "_")
                 rename_map[col] = simplified
             # Handle jail patterns similarly
-            elif 'jail_' in col and '_pooled_p' in col:
-                if '_pooled_pooled_' in col:
-                    simplified = col.replace('_pooled_pooled_', '_pooled_')
+            elif "jail_" in col and "_pooled_p" in col:
+                if "_pooled_pooled_" in col:
+                    simplified = col.replace("_pooled_pooled_", "_pooled_")
                     rename_map[col] = simplified
-                elif any(race in col for race in ['black', 'white', 'hisp', 'asian', 'natam']):
-                    simplified = col.replace('_pooled_', '_')
+                elif any(race in col for race in ["black", "white", "hisp", "asian", "natam"]):
+                    simplified = col.replace("_pooled_", "_")
                     rename_map[col] = simplified
-        
+
         # Apply renaming
         if rename_map:
             df = df.rename(columns=rename_map)
             self.logger.debug(f"Normalized {len(rename_map)} column names")
-        
+
         return df
 
     def _get_hdx_download_url(self, resource_id: str) -> str:
         """
         Get download URL for HDX resource.
-        
+
         HDX resources use signed S3 URLs that expire. This method constructs
         the HDX download endpoint that provides a fresh signed URL.
-        
+
         Args:
             resource_id: HDX resource identifier
-            
+
         Returns:
             Download URL (redirects to signed S3 URL)
         """
@@ -245,12 +247,7 @@ class OpportunityInsightsConnector(BaseConnector):
 
     def _get_expected_size(self, geography: str) -> str:
         """Get expected file size for geography (from HDX metadata)."""
-        sizes = {
-            "county": "701KB",
-            "zip": "3.9MB", 
-            "high_school": "2.8MB",
-            "college": "504KB"
-        }
+        sizes = {"county": "701KB", "zip": "3.9MB", "high_school": "2.8MB", "college": "504KB"}
         return sizes.get(geography, "unknown")
 
     def fetch(self, **kwargs) -> pd.DataFrame:
@@ -273,7 +270,7 @@ class OpportunityInsightsConnector(BaseConnector):
             >>> data = oi.fetch(data_product="atlas", state="06")
         """
         data_product = kwargs.pop("data_product", "atlas")
-        
+
         if data_product == "atlas":
             return self.fetch_opportunity_atlas(**kwargs)
         elif data_product == "social_capital":
@@ -310,17 +307,17 @@ class OpportunityInsightsConnector(BaseConnector):
         # Security: Validate filename to prevent path traversal
         # Remove any path separators and resolve to just the filename
         clean_filename = Path(filename).name
-        if not clean_filename or clean_filename in ('.', '..'):
+        if not clean_filename or clean_filename in (".", ".."):
             raise ValueError(f"Invalid filename: {filename}")
-        
+
         # Validate URL scheme (only HTTPS allowed for security)
-        if not url.startswith(('http://', 'https://')):
+        if not url.startswith(("http://", "https://")):
             raise ValueError(f"Invalid URL scheme: {url}. Only HTTP/HTTPS allowed.")
-        
+
         # Build cache path and ensure it's within cache directory
         cache_dir = Path(self.cache.cache_dir).resolve()
         cache_path = (cache_dir / clean_filename).resolve()
-        
+
         # Security: Ensure resolved path is within cache directory
         try:
             cache_path.relative_to(cache_dir)
@@ -328,43 +325,44 @@ class OpportunityInsightsConnector(BaseConnector):
             raise ValueError(
                 f"Security violation: Path '{filename}' attempts to escape cache directory"
             )
-        
+
         # Check if file exists and is not expired
         if cache_path.exists() and not force_download:
-            file_age = (pd.Timestamp.now() - pd.Timestamp(cache_path.stat().st_mtime, unit='s')).total_seconds()
+            file_age = (
+                pd.Timestamp.now() - pd.Timestamp(cache_path.stat().st_mtime, unit="s")
+            ).total_seconds()
             cache_ttl = 2592000  # Default 30 days for large datasets
             if self.cache.default_ttl is not None:
                 cache_ttl = self.cache.default_ttl
             if file_age < cache_ttl:
                 self.logger.info(
-                    f"Using cached file: {filename}",
-                    extra={"age_days": file_age / 86400}
+                    f"Using cached file: {filename}", extra={"age_days": file_age / 86400}
                 )
                 return cache_path
-        
+
         # Download file
         self.logger.info(f"Downloading {filename} from {url}")
-        
+
         # Ensure session is initialized
         if self.session is None:
             self.connect()
-        
+
         # Download file (session is guaranteed to be initialized here)
         session = self.session
         if session is None:
             raise RuntimeError("Failed to initialize session")
-        
+
         response = session.get(url, stream=True, timeout=self.timeout)
         response.raise_for_status()
-        
+
         # Create cache directory if it doesn't exist
         cache_path.parent.mkdir(parents=True, exist_ok=True)
-        
+
         # Download with progress indication for large files
-        total_size = int(response.headers.get('content-length', 0))
+        total_size = int(response.headers.get("content-length", 0))
         block_size = 1024 * 1024  # 1MB chunks
-        
-        with open(cache_path, 'wb') as f:
+
+        with open(cache_path, "wb") as f:
             downloaded = 0
             for chunk in response.iter_content(chunk_size=block_size):
                 if chunk:
@@ -374,12 +372,11 @@ class OpportunityInsightsConnector(BaseConnector):
                         progress = (downloaded / total_size) * 100
                         if downloaded % (block_size * 10) == 0:  # Log every 10MB
                             self.logger.debug(f"Download progress: {progress:.1f}%")
-        
+
         self.logger.info(
-            f"Downloaded {filename}",
-            extra={"size_mb": cache_path.stat().st_size / (1024 * 1024)}
+            f"Downloaded {filename}", extra={"size_mb": cache_path.stat().st_size / (1024 * 1024)}
         )
-        
+
         return cache_path
 
     def fetch_opportunity_atlas(
@@ -418,7 +415,7 @@ class OpportunityInsightsConnector(BaseConnector):
             - jail_pooled: Incarceration rate (pooled)
             - frac_coll_plus_pooled: College attendance rate (pooled)
             - married_pooled: Marriage rate (pooled)
-            
+
         Example:
             >>> oi = OpportunityInsightsConnector()
             >>> # Get mobility data for California
@@ -433,10 +430,9 @@ class OpportunityInsightsConnector(BaseConnector):
         valid_geographies = ["tract", "county", "cz", "state"]
         if geography not in valid_geographies:
             raise ValueError(
-                f"Invalid geography: {geography}. "
-                f"Must be one of {valid_geographies}"
+                f"Invalid geography: {geography}. " f"Must be one of {valid_geographies}"
             )
-        
+
         # Download Opportunity Atlas data if not cached
         if self._atlas_data is None or force_download:
             # Select the appropriate geography file (STATA format)
@@ -444,62 +440,69 @@ class OpportunityInsightsConnector(BaseConnector):
                 "tract": (self.ATLAS_TRACT_URL, "tract_outcomes_simple.dta"),
                 "county": (self.ATLAS_COUNTY_URL, "county_outcomes_simple.dta"),
                 "cz": (self.ATLAS_CZ_URL, "cz_outcomes_simple.dta"),
-                "state": (self.ATLAS_CZ_URL, "cz_outcomes_simple.dta"),  # Use CZ file, will aggregate
+                "state": (
+                    self.ATLAS_CZ_URL,
+                    "cz_outcomes_simple.dta",
+                ),  # Use CZ file, will aggregate
             }
-            
+
             url, filename = url_map[geography]
             atlas_path = self._download_file(url, filename, force_download=force_download)
-            
+
             self.logger.info(f"Loading Opportunity Atlas {geography}-level data from STATA file")
             # Read STATA file - pandas handles .dta format natively
             self._atlas_data = pd.read_stata(
-                atlas_path,
-                convert_categoricals=True,
-                preserve_dtypes=False
+                atlas_path, convert_categoricals=True, preserve_dtypes=False
             )
-            
+
             # Normalize column names (STATA files use different naming convention)
             self._atlas_data = self._normalize_column_names(self._atlas_data)
-            
+
             # Convert geographic identifiers to strings for filtering
             # STATA files store these as floats, need to convert to int first, then string
-            if 'state' in self._atlas_data.columns:
+            if "state" in self._atlas_data.columns:
                 # State is 2 digits
-                self._atlas_data['state'] = self._atlas_data['state'].fillna(0).astype(int).astype(str).str.zfill(2)
-            
-            if 'county' in self._atlas_data.columns and 'state' in self._atlas_data.columns:
+                self._atlas_data["state"] = (
+                    self._atlas_data["state"].fillna(0).astype(int).astype(str).str.zfill(2)
+                )
+
+            if "county" in self._atlas_data.columns and "state" in self._atlas_data.columns:
                 # County in STATA file is only 3 digits (county suffix)
                 # Need to combine with state to get 5-digit FIPS code
-                county_suffix = self._atlas_data['county'].fillna(0).astype(int).astype(str).str.zfill(3)
-                self._atlas_data['county'] = self._atlas_data['state'] + county_suffix
-            
-            if geography == "tract" and 'tract' in self._atlas_data.columns:
+                county_suffix = (
+                    self._atlas_data["county"].fillna(0).astype(int).astype(str).str.zfill(3)
+                )
+                self._atlas_data["county"] = self._atlas_data["state"] + county_suffix
+
+            if geography == "tract" and "tract" in self._atlas_data.columns:
                 # Tract in STATA file is only 6 digits (tract suffix)
-                # Need to combine with county to get full 11-digit code  
-                tract_suffix = self._atlas_data['tract'].fillna(0).astype(int).astype(str).str.zfill(6)
-                self._atlas_data['tract'] = self._atlas_data['county'] + tract_suffix
-        
+                # Need to combine with county to get full 11-digit code
+                tract_suffix = (
+                    self._atlas_data["tract"].fillna(0).astype(int).astype(str).str.zfill(6)
+                )
+                self._atlas_data["tract"] = self._atlas_data["county"] + tract_suffix
+
         df = self._atlas_data.copy()
-        
+
         # Filter by state if specified
         if state is not None:
-            df = df[df['state'] == str(state).zfill(2)]
-        
+            df = df[df["state"] == str(state).zfill(2)]
+
         # Filter by county if specified
         if county is not None:
-            df = df[df['county'] == str(county).zfill(5)]
-        
+            df = df[df["county"] == str(county).zfill(5)]
+
         # Select metrics if specified
         if metrics is not None:
             # Always include geographic identifiers
-            geo_cols = ['tract', 'county', 'state', 'cz', 'czname']
+            geo_cols = ["tract", "county", "state", "cz", "czname"]
             cols_to_keep = [col for col in geo_cols if col in df.columns] + metrics
             df = df[cols_to_keep]
-        
+
         # Aggregate to requested geography if not tract
         if geography != "tract":
             df = self._aggregate_atlas(df, geography)
-        
+
         self.logger.info(
             "Fetched Opportunity Atlas data",
             extra={
@@ -510,7 +513,7 @@ class OpportunityInsightsConnector(BaseConnector):
                 "county_filter": county,
             },
         )
-        
+
         return df
 
     def fetch_social_capital(
@@ -556,14 +559,13 @@ class OpportunityInsightsConnector(BaseConnector):
         valid_geographies = ["zip", "county", "college", "high_school"]
         if geography not in valid_geographies:
             raise ValueError(
-                f"Invalid geography: {geography}. "
-                f"Must be one of {valid_geographies}"
+                f"Invalid geography: {geography}. " f"Must be one of {valid_geographies}"
             )
-        
+
         # Initialize cache if needed
-        if not hasattr(self, '_social_capital_cache'):
+        if not hasattr(self, "_social_capital_cache"):
             self._social_capital_cache = {}
-        
+
         # Download Social Capital data if not cached for this geography
         if geography not in self._social_capital_cache or force_download:
             # Map geography to signed S3 URL and filename
@@ -573,36 +575,33 @@ class OpportunityInsightsConnector(BaseConnector):
                 "college": (self.SOCIAL_CAPITAL_COLLEGE, "social_capital_college.csv"),
                 "high_school": (self.SOCIAL_CAPITAL_HS, "social_capital_high_school.csv"),
             }
-            
+
             if geography == "college":
                 raise NotImplementedError(
                     "College-level social capital data not yet implemented. "
                     "This will be added in Week 3."
                 )
-            
+
             if geography == "high_school":
                 raise NotImplementedError(
                     "High school-level social capital data not yet implemented. "
                     "This will be added in Week 3."
                 )
-            
+
             url, filename = url_map[geography]
-            
+
             self.logger.info(
                 f"Downloading Social Capital {geography} data from HDX S3",
-                extra={"geography": geography}
+                extra={"geography": geography},
             )
-            
+
             # Download from signed S3 URL
             sc_path = self._download_file(url, filename, force_download=force_download)
-            
+
             self.logger.info(f"Loading Social Capital {geography}-level data from CSV")
             # Read CSV file - Social Capital data is in CSV format
             try:
-                data = pd.read_csv(
-                    sc_path,
-                    low_memory=False
-                )
+                data = pd.read_csv(sc_path, low_memory=False)
             except pd.errors.EmptyDataError:
                 # HDX has bot protection - provide manual download instructions
                 manual_msg = f"""
@@ -620,39 +619,31 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
 """
                 self.logger.error(
                     f"HDX download blocked - manual download required",
-                    extra={"geography": geography, "file": Path(sc_path).name}
+                    extra={"geography": geography, "file": Path(sc_path).name},
                 )
                 raise FileNotFoundError(manual_msg)
-            
+
             # Convert geographic identifiers to strings if needed
-            if 'county' in data.columns:
+            if "county" in data.columns:
                 # County FIPS codes
-                data['county'] = (
-                    data['county']
-                    .astype(str)
-                    .str.zfill(5)
-                )
-            
-            if 'zip' in data.columns:
+                data["county"] = data["county"].astype(str).str.zfill(5)
+
+            if "zip" in data.columns:
                 # ZIP codes
-                data['zip'] = (
-                    data['zip']
-                    .astype(str)
-                    .str.zfill(5)
-                )
-            
+                data["zip"] = data["zip"].astype(str).str.zfill(5)
+
             # Cache the data for this geography
             self._social_capital_cache[geography] = data
-        
+
         df = self._social_capital_cache[geography].copy()
-        
+
         # Select metrics if specified
         if metrics is not None:
             # Always include geographic identifier
-            geo_cols = ['county', 'zip', 'college']
+            geo_cols = ["county", "zip", "college"]
             cols_to_keep = [col for col in geo_cols if col in df.columns] + metrics
             df = df[cols_to_keep]
-        
+
         self.logger.info(
             "Fetched Social Capital data",
             extra={
@@ -661,7 +652,7 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
                 "columns": len(df.columns),
             },
         )
-        
+
         return df
 
     def fetch_economic_connectedness(
@@ -693,18 +684,15 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
         """
         # Economic connectedness is part of Social Capital data
         # Just fetch Social Capital and filter to EC metrics
-        sc_data = self.fetch_social_capital(
-            geography=geography,
-            force_download=force_download
-        )
-        
+        sc_data = self.fetch_social_capital(geography=geography, force_download=force_download)
+
         # Filter to economic connectedness metrics
-        ec_cols = [col for col in sc_data.columns if col.startswith('ec_')]
-        geo_cols = ['county', 'zip']
+        ec_cols = [col for col in sc_data.columns if col.startswith("ec_")]
+        geo_cols = ["county", "zip"]
         cols_to_keep = [col for col in geo_cols if col in sc_data.columns] + ec_cols
-        
+
         df = sc_data[cols_to_keep]
-        
+
         self.logger.info(
             "Fetched Economic Connectedness data",
             extra={
@@ -713,7 +701,7 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
                 "ec_metrics": len(ec_cols),
             },
         )
-        
+
         return df
 
     def _aggregate_atlas(
@@ -737,51 +725,50 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
         """
         if target_geography == "tract":
             return df
-        
+
         group_col = {
             "county": "county",
             "cz": "cz",
             "state": "state",
         }[target_geography]
-        
+
         # If grouping by state but no state column, derive from county or tract
         if group_col == "state" and "state" not in df.columns:
             if "county" in df.columns:
                 # State is first 2 digits of 5-digit county FIPS
                 df = df.copy()
-                df['state'] = df['county'].astype(str).str[:2]
+                df["state"] = df["county"].astype(str).str[:2]
             elif "tract" in df.columns:
                 # State is first 2 digits of 11-digit tract FIPS
                 df = df.copy()
-                df['state'] = df['tract'].astype(str).str[:2]
+                df["state"] = df["tract"].astype(str).str[:2]
             else:
                 raise ValueError("Cannot derive state: no county or tract column found")
-        
+
         # Identify numeric columns for aggregation (exclude the group column)
-        numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns.tolist()
+        numeric_cols = df.select_dtypes(include=["float64", "int64"]).columns.tolist()
         # Remove group column from aggregation to avoid duplication
         if group_col in numeric_cols:
             numeric_cols.remove(group_col)
-        
+
         # Separate count columns (should be summed) from metric columns (should be averaged)
-        count_cols = [col for col in numeric_cols if 'count' in col.lower() or 'pooled_pooled_count' in col]
+        count_cols = [
+            col for col in numeric_cols if "count" in col.lower() or "pooled_pooled_count" in col
+        ]
         metric_cols = [col for col in numeric_cols if col not in count_cols]
-        
+
         # Build aggregation dict
         agg_dict = {}
         for col in metric_cols:
-            agg_dict[col] = 'mean'
+            agg_dict[col] = "mean"
         for col in count_cols:
-            agg_dict[col] = 'sum'
-        
+            agg_dict[col] = "sum"
+
         # Group and aggregate
         agg_df = df.groupby(group_col).agg(agg_dict).reset_index()
-        
-        self.logger.info(
-            f"Aggregated to {target_geography} level",
-            extra={"rows": len(agg_df)}
-        )
-        
+
+        self.logger.info(f"Aggregated to {target_geography} level", extra={"rows": len(agg_df)})
+
         return agg_df
 
     def aggregate_to_county(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -854,7 +841,7 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
             >>> metrics = oi.get_available_metrics("atlas")
             >>> print(metrics[:3])
             ['kfr_pooled_p25', 'kfr_pooled_p50', 'kfr_pooled_p75']
-            >>> 
+            >>>
             >>> # Week 4 Enhancement: Get social capital analysis methods
             >>> methods = oi.get_available_methods("social_capital")
             >>> print(methods[:3])
@@ -916,20 +903,20 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
             "rank_areas_by_ec",
             "compare_mobility_and_social_capital",
         ]
-        
+
         mobility_methods = [
             "fetch_opportunity_atlas",
             "aggregate_to_county",
             "aggregate_to_cz",
             "aggregate_to_state",
         ]
-        
+
         data_methods = [
             "fetch",
             "fetch_social_capital",
             "fetch_economic_connectedness",
         ]
-        
+
         if category == "social_capital":
             return social_capital_methods
         elif category == "mobility":
@@ -943,7 +930,6 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
                 f"Unknown category: {category}. "
                 f"Must be one of: all, social_capital, mobility, data"
             )
-
 
     def __repr__(self) -> str:
         """String representation of the connector."""
@@ -985,25 +971,22 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
             Found 314 counties with high EC (top 10%)
         """
         # Fetch social capital data
-        sc_data = self.fetch_social_capital(
-            geography=geography,
-            force_download=force_download
-        )
-        
+        sc_data = self.fetch_social_capital(geography=geography, force_download=force_download)
+
         # Identify EC column for this geography
         ec_col = f"ec_{geography}"
         if ec_col not in sc_data.columns:
             raise ValueError(f"Economic connectedness column '{ec_col}' not found")
-        
+
         # Calculate threshold
         threshold = sc_data[ec_col].quantile(threshold_percentile / 100.0)
-        
+
         # Filter to high-EC areas
         high_ec = sc_data[sc_data[ec_col] >= threshold].copy()
-        
+
         # Sort by EC descending
         high_ec = high_ec.sort_values(ec_col, ascending=False)
-        
+
         self.logger.info(
             f"Identified {len(high_ec)} high-EC areas",
             extra={
@@ -1013,7 +996,7 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
                 "max_ec": high_ec[ec_col].max(),
             },
         )
-        
+
         return high_ec
 
     def get_low_ec_areas(
@@ -1043,25 +1026,22 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
             Found 314 counties with low EC (bottom 10%)
         """
         # Fetch social capital data
-        sc_data = self.fetch_social_capital(
-            geography=geography,
-            force_download=force_download
-        )
-        
+        sc_data = self.fetch_social_capital(geography=geography, force_download=force_download)
+
         # Identify EC column for this geography
         ec_col = f"ec_{geography}"
         if ec_col not in sc_data.columns:
             raise ValueError(f"Economic connectedness column '{ec_col}' not found")
-        
+
         # Calculate threshold
         threshold = sc_data[ec_col].quantile(threshold_percentile / 100.0)
-        
+
         # Filter to low-EC areas
         low_ec = sc_data[sc_data[ec_col] <= threshold].copy()
-        
+
         # Sort by EC ascending
         low_ec = low_ec.sort_values(ec_col, ascending=True)
-        
+
         self.logger.info(
             f"Identified {len(low_ec)} low-EC areas",
             extra={
@@ -1071,7 +1051,7 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
                 "min_ec": low_ec[ec_col].min(),
             },
         )
-        
+
         return low_ec
 
     def compare_ec_by_state(
@@ -1101,43 +1081,46 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
             2     48    0.798      0.795
         """
         # Fetch county-level data
-        county_data = self.fetch_social_capital(
-            geography="county",
-            force_download=force_download
-        )
-        
+        county_data = self.fetch_social_capital(geography="county", force_download=force_download)
+
         # Extract state from county FIPS (first 2 digits)
         county_data = county_data.copy()
-        county_data['state'] = county_data['county'].str[:2]
-        
+        county_data["state"] = county_data["county"].str[:2]
+
         # Filter to requested states
         if states is not None:
             states_formatted = [str(s).zfill(2) for s in states]
-            county_data = county_data[county_data['state'].isin(states_formatted)]
-        
+            county_data = county_data[county_data["state"].isin(states_formatted)]
+
         # Aggregate to state level
-        ec_col = 'ec_county'
-        state_stats = county_data.groupby('state')[ec_col].agg([
-            ('ec_mean', 'mean'),
-            ('ec_median', 'median'),
-            ('ec_min', 'min'),
-            ('ec_max', 'max'),
-            ('ec_std', 'std'),
-            ('county_count', 'count'),
-        ]).reset_index()
-        
+        ec_col = "ec_county"
+        state_stats = (
+            county_data.groupby("state")[ec_col]
+            .agg(
+                [
+                    ("ec_mean", "mean"),
+                    ("ec_median", "median"),
+                    ("ec_min", "min"),
+                    ("ec_max", "max"),
+                    ("ec_std", "std"),
+                    ("county_count", "count"),
+                ]
+            )
+            .reset_index()
+        )
+
         # Sort by mean EC descending
-        state_stats = state_stats.sort_values('ec_mean', ascending=False)
-        
+        state_stats = state_stats.sort_values("ec_mean", ascending=False)
+
         self.logger.info(
             f"Compared EC across {len(state_stats)} states",
             extra={
                 "states_analyzed": len(state_stats),
-                "highest_ec_state": state_stats.iloc[0]['state'],
-                "highest_ec_mean": state_stats.iloc[0]['ec_mean'],
+                "highest_ec_state": state_stats.iloc[0]["state"],
+                "highest_ec_mean": state_stats.iloc[0]["ec_mean"],
             },
         )
-        
+
         return state_stats
 
     def get_ec_clustering_correlation(
@@ -1166,37 +1149,34 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
             Pearson r: 0.245
         """
         # Fetch social capital data
-        sc_data = self.fetch_social_capital(
-            geography=geography,
-            force_download=force_download
-        )
-        
+        sc_data = self.fetch_social_capital(geography=geography, force_download=force_download)
+
         # Identify relevant columns
         ec_col = f"ec_{geography}"
         clustering_col = f"clustering_{geography}"
-        
+
         if ec_col not in sc_data.columns:
             raise ValueError(f"Economic connectedness column '{ec_col}' not found")
         if clustering_col not in sc_data.columns:
             raise ValueError(f"Clustering column '{clustering_col}' not found")
-        
+
         # Remove missing values
         valid_data = sc_data[[ec_col, clustering_col]].dropna()
-        
+
         # Calculate Pearson correlation (no scipy dependency)
-        pearson_r = valid_data[ec_col].corr(valid_data[clustering_col], method='pearson')
-        
+        pearson_r = valid_data[ec_col].corr(valid_data[clustering_col], method="pearson")
+
         result = {
-            'pearson_r': pearson_r,
-            'sample_size': len(valid_data),
-            'geography': geography,
+            "pearson_r": pearson_r,
+            "sample_size": len(valid_data),
+            "geography": geography,
         }
-        
+
         self.logger.info(
             "Calculated EC-clustering correlation",
             extra=result,
         )
-        
+
         return result
 
     def get_social_capital_summary(
@@ -1232,16 +1212,13 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
             LA EC: 0.892
         """
         # Fetch social capital data
-        sc_data = self.fetch_social_capital(
-            geography=geography,
-            force_download=force_download
-        )
-        
+        sc_data = self.fetch_social_capital(geography=geography, force_download=force_download)
+
         # Identify geographic identifier column
         geo_col = geography  # 'county' or 'zip'
         if geo_col not in sc_data.columns:
             raise ValueError(f"Geographic column '{geo_col}' not found")
-        
+
         # Format geo_id appropriately
         if geography == "county":
             geo_id_formatted = str(geo_id).zfill(5)
@@ -1249,18 +1226,16 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
             geo_id_formatted = str(geo_id).zfill(5)
         else:
             geo_id_formatted = str(geo_id)
-        
+
         # Find the area
         area_data = sc_data[sc_data[geo_col] == geo_id_formatted]
-        
+
         if len(area_data) == 0:
-            raise ValueError(
-                f"Geographic ID '{geo_id}' not found in {geography}-level data"
-            )
-        
+            raise ValueError(f"Geographic ID '{geo_id}' not found in {geography}-level data")
+
         # Convert to dict (first row if multiple matches)
         summary = area_data.iloc[0].to_dict()
-        
+
         self.logger.info(
             f"Retrieved social capital summary for {geography} {geo_id}",
             extra={
@@ -1269,7 +1244,7 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
                 "metrics_count": len(summary),
             },
         )
-        
+
         return summary
 
     def rank_areas_by_ec(
@@ -1297,26 +1272,23 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
             >>> print(top_counties[['county', 'ec_county', 'ec_rank']])
         """
         # Fetch social capital data
-        sc_data = self.fetch_social_capital(
-            geography=geography,
-            force_download=force_download
-        )
-        
+        sc_data = self.fetch_social_capital(geography=geography, force_download=force_download)
+
         # Identify EC column
         ec_col = f"ec_{geography}"
         if ec_col not in sc_data.columns:
             raise ValueError(f"Economic connectedness column '{ec_col}' not found")
-        
+
         # Sort by EC
         ranked = sc_data.sort_values(ec_col, ascending=ascending).copy()
-        
+
         # Add rank column
-        ranked['ec_rank'] = range(1, len(ranked) + 1)
-        
+        ranked["ec_rank"] = range(1, len(ranked) + 1)
+
         # Limit to top N if specified
         if top_n is not None:
             ranked = ranked.head(top_n)
-        
+
         direction = "lowest" if ascending else "highest"
         self.logger.info(
             f"Ranked areas by EC ({direction})",
@@ -1327,7 +1299,7 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
                 "top_ec": ranked.iloc[0][ec_col],
             },
         )
-        
+
         return ranked
 
     def compare_mobility_and_social_capital(
@@ -1369,41 +1341,31 @@ See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
                 "Currently only county-level comparison supported. "
                 "Tract-level joining coming in future enhancement."
             )
-        
+
         # Fetch Opportunity Atlas data
-        atlas_data = self.fetch_opportunity_atlas(
-            geography="county",
-            force_download=force_download
-        )
-        
+        atlas_data = self.fetch_opportunity_atlas(geography="county", force_download=force_download)
+
         # Fetch Social Capital data
-        sc_data = self.fetch_social_capital(
-            geography="county",
-            force_download=force_download
-        )
-        
+        sc_data = self.fetch_social_capital(geography="county", force_download=force_download)
+
         # Merge on county FIPS
         combined = pd.merge(
-            atlas_data,
-            sc_data,
-            on='county',
-            how='inner',
-            suffixes=('_atlas', '_sc')
+            atlas_data, sc_data, on="county", how="inner", suffixes=("_atlas", "_sc")
         )
-        
+
         # Filter by state if specified
         if states is not None:
             states_formatted = [str(s).zfill(2) for s in states]
-            combined = combined[combined['state'].isin(states_formatted)]
-        
+            combined = combined[combined["state"].isin(states_formatted)]
+
         self.logger.info(
             "Merged mobility and social capital data",
             extra={
                 "geography": geography,
                 "total_counties": len(combined),
-                "atlas_metrics": len([c for c in atlas_data.columns if c != 'county']),
-                "sc_metrics": len([c for c in sc_data.columns if c != 'county']),
+                "atlas_metrics": len([c for c in atlas_data.columns if c != "county"]),
+                "sc_metrics": len([c for c in sc_data.columns if c != "county"]),
             },
         )
-        
+
         return combined

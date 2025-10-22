@@ -157,24 +157,24 @@ class FDAConnector(BaseConnector):
         Raises:
             requests.HTTPError: If API request fails
         """
-        endpoint = kwargs.pop('endpoint', None)
-        
+        endpoint = kwargs.pop("endpoint", None)
+
         if not endpoint:
             raise ValueError("endpoint parameter is required")
-        
+
         if not self.session:
             self.connect()
 
         url = f"{self.api_url}/{endpoint}"
-        
+
         # Add API key if available
         if self.api_key:
-            kwargs['api_key'] = self.api_key
-        
+            kwargs["api_key"] = self.api_key
+
         try:
             response = self.session.get(url, params=kwargs, timeout=self.timeout)
             response.raise_for_status()
-            
+
             # Try JSON first
             try:
                 data = response.json()
@@ -184,10 +184,10 @@ class FDAConnector(BaseConnector):
 
             # Convert to DataFrame
             if isinstance(data, dict):
-                if 'results' in data:
-                    return pd.DataFrame(data['results'])
-                elif 'data' in data:
-                    return pd.DataFrame(data['data'])
+                if "results" in data:
+                    return pd.DataFrame(data["results"])
+                elif "data" in data:
+                    return pd.DataFrame(data["data"])
                 else:
                     return pd.DataFrame([data])
             elif isinstance(data, list):
@@ -226,7 +226,7 @@ class FDAConnector(BaseConnector):
         params: Dict[str, Any] = {
             "limit": limit,
         }
-        
+
         search_terms = []
         if start_date:
             search_terms.append(f"report_date:[{start_date} TO *]")
@@ -234,7 +234,7 @@ class FDAConnector(BaseConnector):
             search_terms.append(f"report_date:[* TO {end_date}]")
         if classification:
             search_terms.append(f'classification:"{classification}"')
-        
+
         if search_terms:
             params["search"] = " AND ".join(search_terms)
 
@@ -269,7 +269,7 @@ class FDAConnector(BaseConnector):
         params: Dict[str, Any] = {
             "limit": limit,
         }
-        
+
         search_terms = []
         if brand_name:
             search_terms.append(f'patient.drug.openfda.brand_name:"{brand_name}"')
@@ -279,7 +279,7 @@ class FDAConnector(BaseConnector):
             search_terms.append(f"receivedate:[{start_date} TO *]")
         if end_date:
             search_terms.append(f"receivedate:[* TO {end_date}]")
-        
+
         if search_terms:
             params["search"] = " AND ".join(search_terms)
 
@@ -312,7 +312,7 @@ class FDAConnector(BaseConnector):
         params: Dict[str, Any] = {
             "limit": limit,
         }
-        
+
         search_terms = []
         if start_date:
             search_terms.append(f"report_date:[{start_date} TO *]")
@@ -320,7 +320,7 @@ class FDAConnector(BaseConnector):
             search_terms.append(f"report_date:[* TO {end_date}]")
         if classification:
             search_terms.append(f'classification:"{classification}"')
-        
+
         if search_terms:
             params["search"] = " AND ".join(search_terms)
 
@@ -351,13 +351,13 @@ class FDAConnector(BaseConnector):
         params: Dict[str, Any] = {
             "limit": limit,
         }
-        
+
         search_terms = []
         if device_class:
             search_terms.append(f'device_class:"{device_class}"')
         if medical_specialty:
             search_terms.append(f'medical_specialty:"{medical_specialty}"')
-        
+
         if search_terms:
             params["search"] = " AND ".join(search_terms)
 
@@ -390,7 +390,7 @@ class FDAConnector(BaseConnector):
         params: Dict[str, Any] = {
             "limit": limit,
         }
-        
+
         search_terms = []
         if device_name:
             search_terms.append(f'device.brand_name:"{device_name}"')
@@ -398,7 +398,7 @@ class FDAConnector(BaseConnector):
             search_terms.append(f"date_received:[{start_date} TO *]")
         if end_date:
             search_terms.append(f"date_received:[* TO {end_date}]")
-        
+
         if search_terms:
             params["search"] = " AND ".join(search_terms)
 
@@ -431,7 +431,7 @@ class FDAConnector(BaseConnector):
         params: Dict[str, Any] = {
             "limit": limit,
         }
-        
+
         search_terms = []
         if start_date:
             search_terms.append(f"report_date:[{start_date} TO *]")
@@ -439,7 +439,7 @@ class FDAConnector(BaseConnector):
             search_terms.append(f"report_date:[* TO {end_date}]")
         if classification:
             search_terms.append(f'classification:"{classification}"')
-        
+
         if search_terms:
             params["search"] = " AND ".join(search_terms)
 
@@ -470,13 +470,13 @@ class FDAConnector(BaseConnector):
         params: Dict[str, Any] = {
             "limit": limit,
         }
-        
+
         search_terms = []
         if year:
             search_terms.append(f"submissions.submission_status_date:[{year}0101 TO {year}1231]")
         if sponsor_name:
             search_terms.append(f'sponsor_name:"{sponsor_name}"')
-        
+
         if search_terms:
             params["search"] = " AND ".join(search_terms)
 
@@ -507,13 +507,13 @@ class FDAConnector(BaseConnector):
         params: Dict[str, Any] = {
             "limit": limit,
         }
-        
+
         search_terms = []
         if brand_name:
             search_terms.append(f'openfda.brand_name:"{brand_name}"')
         if generic_name:
             search_terms.append(f'openfda.generic_name:"{generic_name}"')
-        
+
         if search_terms:
             params["search"] = " AND ".join(search_terms)
 
@@ -544,13 +544,13 @@ class FDAConnector(BaseConnector):
         params: Dict[str, Any] = {
             "limit": limit,
         }
-        
+
         search_terms = []
         if registration_number:
             search_terms.append(f'registration_number:"{registration_number}"')
         if proprietary_name:
             search_terms.append(f'proprietary_name:"{proprietary_name}"')
-        
+
         if search_terms:
             params["search"] = " AND ".join(search_terms)
 
@@ -581,13 +581,13 @@ class FDAConnector(BaseConnector):
         params: Dict[str, Any] = {
             "limit": limit,
         }
-        
+
         search_terms = []
         if start_date:
             search_terms.append(f"date_submitted:[{start_date} TO *]")
         if end_date:
             search_terms.append(f"date_submitted:[* TO {end_date}]")
-        
+
         if search_terms:
             params["search"] = " AND ".join(search_terms)
 

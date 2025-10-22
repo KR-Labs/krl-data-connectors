@@ -245,7 +245,9 @@ class TestCollegeScorecardConnectorSchoolSearch:
         """Test school search with specific fields."""
         mock_response = Mock()
         mock_response.json.return_value = {
-            "results": [{"id": 123456, "school.name": "Test", "latest.cost.tuition.in_state": 10000}],
+            "results": [
+                {"id": 123456, "school.name": "Test", "latest.cost.tuition.in_state": 10000}
+            ],
             "metadata": {"total": 1},
         }
         mock_response.raise_for_status = Mock()
@@ -398,7 +400,9 @@ class TestCollegeScorecardConnectorSchoolById:
         """Test retrieving school with specific fields."""
         mock_response = Mock()
         mock_response.json.return_value = {
-            "results": [{"id": 166683, "school.name": "MIT", "latest.cost.tuition.in_state": 57590}],
+            "results": [
+                {"id": 166683, "school.name": "MIT", "latest.cost.tuition.in_state": 57590}
+            ],
             "metadata": {"total": 1},
         }
         mock_response.raise_for_status = Mock()

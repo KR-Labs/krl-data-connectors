@@ -33,6 +33,7 @@ from krl_data_connectors.education.ipeds_connector import IPEDSConnector
 
 # Fixtures
 
+
 @pytest.fixture
 def sample_institution():
     """Sample institution data."""
@@ -48,7 +49,7 @@ def sample_institution():
         "carnegie_basic": 15,
         "website": "www.berkeley.edu",
         "enrollment_total": 45000,
-        "Founded": 1868
+        "Founded": 1868,
     }
 
 
@@ -65,7 +66,7 @@ def sample_enrollment():
         "undergraduate": 32000,
         "graduate": 13000,
         "male": 22000,
-        "female": 23000
+        "female": 23000,
     }
 
 
@@ -78,7 +79,7 @@ def sample_graduation():
         "cohort_year": 2020,
         "cohort_size": 8000,
         "grad_rate_4yr": 75.5,
-        "grad_rate_6yr": 92.3
+        "grad_rate_6yr": 92.3,
     }
 
 
@@ -91,7 +92,7 @@ def sample_financial_aid():
         "year": 2023,
         "percent_receiving_aid": 65.5,
         "avg_net_price": 15000,
-        "avg_grant_amount": 20000
+        "avg_grant_amount": 20000,
     }
 
 
@@ -104,7 +105,7 @@ def sample_tuition():
         "year": 2024,
         "in_state_tuition": 14000,
         "out_state_tuition": 44000,
-        "room_board": 18000
+        "room_board": 18000,
     }
 
 
@@ -115,6 +116,7 @@ def ipeds_connector():
 
 
 # Test Classes
+
 
 class TestIPEDSConnectorInit:
     """Test connector initialization."""
@@ -140,7 +142,7 @@ class TestIPEDSConnectorInit:
 class TestIPEDSConnectorConnection:
     """Test connection handling."""
 
-    @patch('krl_data_connectors.education.ipeds_connector.IPEDSConnector._init_session')
+    @patch("krl_data_connectors.education.ipeds_connector.IPEDSConnector._init_session")
     def test_connect_success(self, mock_init_session):
         """Test successful connection."""
         mock_session = MagicMock()
@@ -152,7 +154,7 @@ class TestIPEDSConnectorConnection:
         assert connector.session is not None
         mock_init_session.assert_called_once()
 
-    @patch('krl_data_connectors.education.ipeds_connector.IPEDSConnector._init_session')
+    @patch("krl_data_connectors.education.ipeds_connector.IPEDSConnector._init_session")
     def test_connect_already_connected(self, mock_init_session):
         """Test connect when already connected."""
         connector = IPEDSConnector()
@@ -191,7 +193,7 @@ class TestIPEDSConnectorGetInstitutions:
         """Test that cached data is returned on second call."""
         # First call
         result1 = ipeds_connector.get_institutions(state="CA")
-        
+
         # Second call - should use cache
         result2 = ipeds_connector.get_institutions(state="CA")
 
@@ -309,7 +311,7 @@ class TestIPEDSConnectorGetInstitutionByName:
         """Test that cached search results are returned."""
         # First call
         result1 = ipeds_connector.get_institution_by_name("Stanford")
-        
+
         # Second call - should use cache
         result2 = ipeds_connector.get_institution_by_name("Stanford")
 
@@ -362,6 +364,7 @@ class TestIPEDSConnectorClose:
 
 
 # Phase 4 Layer 8: Contract Tests
+
 
 class TestIPEDSConnectorTypeContracts:
     """Contract tests for return types (Phase 4 Layer 8)."""

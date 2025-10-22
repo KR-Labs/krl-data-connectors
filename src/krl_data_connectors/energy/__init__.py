@@ -9,4 +9,4 @@
 
 from .eia_connector import EIAConnector
 
-__all__ = ['EIAConnector']
+__all__ = ["EIAConnector"]

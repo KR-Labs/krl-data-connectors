@@ -65,13 +65,13 @@ class NHTSConnector(BaseConnector):
     Example:
         >>> from krl_data_connectors import NHTSConnector
         >>> nhts = NHTSConnector()
-        >>> 
+        >>>
         >>> # Get household data
         >>> households = nhts.load_household_data()
-        >>> 
+        >>>
         >>> # Get trip data for California
         >>> ca_trips = nhts.get_trips_by_state(state_fips="06")
-        >>> 
+        >>>
         >>> # Analyze commute patterns
         >>> commute_stats = nhts.get_commute_statistics(geography="state")
     """
@@ -79,21 +79,23 @@ class NHTSConnector(BaseConnector):
     # NHTS 2017 Data Download URLs (FHWA)
     # Public use files hosted at Oak Ridge National Laboratory (ORNL)
     BASE_URL = "https://nhts.ornl.gov/assets/2016/"
-    
+
     # Main data files (CSV format)
-    HOUSEHOLD_FILE_URL = f"{BASE_URL}download/csv.zip"  # Contains household, person, trip, vehicle files
-    
+    HOUSEHOLD_FILE_URL = (
+        f"{BASE_URL}download/csv.zip"  # Contains household, person, trip, vehicle files
+    )
+
     # 2017 Survey year (most recent)
     SURVEY_YEAR_2017 = "2017"
     SURVEY_YEAR_2009 = "2009"
     SURVEY_YEAR_2001 = "2001"
-    
+
     # Data file names within the ZIP
     HOUSEHOLD_CSV = "hhpub.csv"
     PERSON_CSV = "perpub.csv"
     TRIP_CSV = "trippub.csv"
     VEHICLE_CSV = "vehpub.csv"
-    
+
     def __init__(
         self,
         cache_dir: Optional[str] = None,
@@ -106,7 +108,7 @@ class NHTSConnector(BaseConnector):
         # Set default cache directory for transportation data
         if cache_dir is None:
             cache_dir = str(Path.home() / ".krl_cache" / "transportation")
-        
+
         super().__init__(
             api_key=None,  # No API key required
             cache_dir=cache_dir,
@@ -114,13 +116,13 @@ class NHTSConnector(BaseConnector):
             timeout=timeout,
             max_retries=max_retries,
         )
-        
+
         self.survey_year = survey_year
         self._household_data: Optional[pd.DataFrame] = None
         self._person_data: Optional[pd.DataFrame] = None
         self._trip_data: Optional[pd.DataFrame] = None
         self._vehicle_data: Optional[pd.DataFrame] = None
-        
+
         self.logger.info(
             "NHTSConnector initialized",
             extra={
@@ -181,7 +183,7 @@ class NHTSConnector(BaseConnector):
             >>> trips = nhts.fetch(data_type="trip", state_fips="06")
         """
         data_type = kwargs.pop("data_type", "household")
-        
+
         if data_type == "household":
             return self.load_household_data(**kwargs)
         elif data_type == "person":
@@ -215,40 +217,40 @@ class NHTSConnector(BaseConnector):
         # Build cache path
         cache_dir = Path(self.cache.cache_dir)
         extract_dir = cache_dir / f"nhts_{self.survey_year}"
-        
+
         # Check if already extracted
         household_file = extract_dir / self.HOUSEHOLD_CSV
         if household_file.exists() and not force_download:
             self.logger.info(f"Using cached NHTS data from {extract_dir}")
             return extract_dir
-        
+
         # Download ZIP file
         zip_filename = f"nhts_{self.survey_year}.zip"
         zip_path = cache_dir / zip_filename
-        
+
         if not zip_path.exists() or force_download:
             self.logger.info(f"Downloading NHTS {self.survey_year} data")
-            
+
             # Ensure session is initialized
             if self.session is None:
                 self.connect()
-            
+
             # Download file
             session = self.session
             if session is None:
                 raise RuntimeError("Failed to initialize session")
-            
+
             response = session.get(self.HOUSEHOLD_FILE_URL, stream=True, timeout=self.timeout)
             response.raise_for_status()
-            
+
             # Create cache directory
             cache_dir.mkdir(parents=True, exist_ok=True)
-            
+
             # Download with progress indication
-            total_size = int(response.headers.get('content-length', 0))
+            total_size = int(response.headers.get("content-length", 0))
             block_size = 1024 * 1024  # 1MB chunks
-            
-            with open(zip_path, 'wb') as f:
+
+            with open(zip_path, "wb") as f:
                 downloaded = 0
                 for chunk in response.iter_content(chunk_size=block_size):
                     if chunk:
@@ -257,22 +259,22 @@ class NHTSConnector(BaseConnector):
                         if total_size > 0 and downloaded % (block_size * 10) == 0:
                             progress = (downloaded / total_size) * 100
                             self.logger.debug(f"Download progress: {progress:.1f}%")
-            
+
             self.logger.info(
                 f"Downloaded NHTS {self.survey_year} data",
-                extra={"size_mb": zip_path.stat().st_size / (1024 * 1024)}
+                extra={"size_mb": zip_path.stat().st_size / (1024 * 1024)},
             )
-        
+
         # Extract ZIP file
         import zipfile
-        
+
         extract_dir.mkdir(parents=True, exist_ok=True)
-        
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
             zip_ref.extractall(extract_dir)
-        
+
         self.logger.info(f"Extracted NHTS data to {extract_dir}")
-        
+
         return extract_dir
 
     def load_household_data(
@@ -311,21 +313,18 @@ class NHTSConnector(BaseConnector):
         if self._household_data is None or force_download:
             extract_dir = self._download_and_extract_data(force_download)
             household_file = extract_dir / self.HOUSEHOLD_CSV
-            
+
             self.logger.info("Loading household data")
-            self._household_data = pd.read_csv(
-                household_file,
-                low_memory=False
-            )
-            
+            self._household_data = pd.read_csv(household_file, low_memory=False)
+
             self.logger.info(
                 "Loaded household data",
                 extra={
                     "rows": len(self._household_data),
                     "columns": len(self._household_data.columns),
-                }
+                },
             )
-        
+
         return self._household_data.copy()
 
     def load_person_data(
@@ -363,21 +362,18 @@ class NHTSConnector(BaseConnector):
         if self._person_data is None or force_download:
             extract_dir = self._download_and_extract_data(force_download)
             person_file = extract_dir / self.PERSON_CSV
-            
+
             self.logger.info("Loading person data")
-            self._person_data = pd.read_csv(
-                person_file,
-                low_memory=False
-            )
-            
+            self._person_data = pd.read_csv(person_file, low_memory=False)
+
             self.logger.info(
                 "Loaded person data",
                 extra={
                     "rows": len(self._person_data),
                     "columns": len(self._person_data.columns),
-                }
+                },
             )
-        
+
         return self._person_data.copy()
 
     def load_trip_data(
@@ -416,21 +412,18 @@ class NHTSConnector(BaseConnector):
         if self._trip_data is None or force_download:
             extract_dir = self._download_and_extract_data(force_download)
             trip_file = extract_dir / self.TRIP_CSV
-            
+
             self.logger.info("Loading trip data")
-            self._trip_data = pd.read_csv(
-                trip_file,
-                low_memory=False
-            )
-            
+            self._trip_data = pd.read_csv(trip_file, low_memory=False)
+
             self.logger.info(
                 "Loaded trip data",
                 extra={
                     "rows": len(self._trip_data),
                     "columns": len(self._trip_data.columns),
-                }
+                },
             )
-        
+
         return self._trip_data.copy()
 
     def load_vehicle_data(
@@ -468,21 +461,18 @@ class NHTSConnector(BaseConnector):
         if self._vehicle_data is None or force_download:
             extract_dir = self._download_and_extract_data(force_download)
             vehicle_file = extract_dir / self.VEHICLE_CSV
-            
+
             self.logger.info("Loading vehicle data")
-            self._vehicle_data = pd.read_csv(
-                vehicle_file,
-                low_memory=False
-            )
-            
+            self._vehicle_data = pd.read_csv(vehicle_file, low_memory=False)
+
             self.logger.info(
                 "Loaded vehicle data",
                 extra={
                     "rows": len(self._vehicle_data),
                     "columns": len(self._vehicle_data.columns),
-                }
+                },
             )
-        
+
         return self._vehicle_data.copy()
 
     def get_trips_by_state(
@@ -508,23 +498,23 @@ class NHTSConnector(BaseConnector):
         # Load household and trip data
         households = self.load_household_data(force_download)
         trips = self.load_trip_data(force_download)
-        
+
         # Filter households to state
         state_households = households[
-            households['HHSTATE'].astype(str).str.zfill(2) == str(state_fips).zfill(2)
+            households["HHSTATE"].astype(str).str.zfill(2) == str(state_fips).zfill(2)
         ]
-        
+
         # Filter trips to those households
-        state_trips = trips[trips['HOUSEID'].isin(state_households['HOUSEID'])]
-        
+        state_trips = trips[trips["HOUSEID"].isin(state_households["HOUSEID"])]
+
         self.logger.info(
             f"Filtered trips for state {state_fips}",
             extra={
                 "state_fips": state_fips,
                 "trips": len(state_trips),
-            }
+            },
         )
-        
+
         return state_trips
 
     def get_commute_statistics(
@@ -557,46 +547,54 @@ class NHTSConnector(BaseConnector):
         """
         # Load trip data
         trips = self.load_trip_data(force_download)
-        
+
         # Filter to commute trips (WHYTRP1S == 03 = To/from work)
-        commute_trips = trips[trips['WHYTRP1S'] == 3].copy()
-        
+        commute_trips = trips[trips["WHYTRP1S"] == 3].copy()
+
         # Filter by state if specified
         if geography == "state":
             if state_fips is None:
                 raise ValueError("state_fips required for state-level statistics")
-            
+
             households = self.load_household_data(force_download)
             state_households = households[
-                households['HHSTATE'].astype(str).str.zfill(2) == str(state_fips).zfill(2)
+                households["HHSTATE"].astype(str).str.zfill(2) == str(state_fips).zfill(2)
             ]
-            commute_trips = commute_trips[commute_trips['HOUSEID'].isin(state_households['HOUSEID'])]
-        
+            commute_trips = commute_trips[
+                commute_trips["HOUSEID"].isin(state_households["HOUSEID"])
+            ]
+
         # Calculate statistics by mode
-        stats = commute_trips.groupby('TRPTRANS').agg({
-            'TDTRPNUM': 'count',  # Count trips
-            'TRPMILES': 'mean',   # Average distance
-            'TRVLCMIN': 'mean',   # Average time
-        }).reset_index()
-        
-        stats.columns = ['mode', 'trips', 'avg_miles', 'avg_minutes']
-        
+        stats = (
+            commute_trips.groupby("TRPTRANS")
+            .agg(
+                {
+                    "TDTRPNUM": "count",  # Count trips
+                    "TRPMILES": "mean",  # Average distance
+                    "TRVLCMIN": "mean",  # Average time
+                }
+            )
+            .reset_index()
+        )
+
+        stats.columns = ["mode", "trips", "avg_miles", "avg_minutes"]
+
         # Calculate mode share
-        total_trips = stats['trips'].sum()
-        stats['mode_share'] = (stats['trips'] / total_trips * 100).round(2)
-        
+        total_trips = stats["trips"].sum()
+        stats["mode_share"] = (stats["trips"] / total_trips * 100).round(2)
+
         # Sort by mode share descending
-        stats = stats.sort_values('mode_share', ascending=False)
-        
+        stats = stats.sort_values("mode_share", ascending=False)
+
         self.logger.info(
             f"Calculated commute statistics ({geography})",
             extra={
                 "geography": geography,
                 "total_commute_trips": total_trips,
                 "modes": len(stats),
-            }
+            },
         )
-        
+
         return stats
 
     def get_mode_share(
@@ -628,38 +626,40 @@ class NHTSConnector(BaseConnector):
         """
         # Load trip data
         trips = self.load_trip_data(force_download)
-        
+
         # Filter by purpose if specified
         if trip_purpose is not None:
-            trips = trips[trips['WHYTRP1S'] == int(trip_purpose)]
-        
+            trips = trips[trips["WHYTRP1S"] == int(trip_purpose)]
+
         # Filter by state if specified
         if state_fips is not None:
             households = self.load_household_data(force_download)
             state_households = households[
-                households['HHSTATE'].astype(str).str.zfill(2) == str(state_fips).zfill(2)
+                households["HHSTATE"].astype(str).str.zfill(2) == str(state_fips).zfill(2)
             ]
-            trips = trips[trips['HOUSEID'].isin(state_households['HOUSEID'])]
-        
+            trips = trips[trips["HOUSEID"].isin(state_households["HOUSEID"])]
+
         # Calculate mode share
-        mode_counts = trips['TRPTRANS'].value_counts()
-        mode_share = pd.DataFrame({
-            'mode': mode_counts.index,
-            'trips': mode_counts.values,
-            'share_pct': (mode_counts / mode_counts.sum() * 100).round(2)
-        })
-        
-        mode_share = mode_share.sort_values('share_pct', ascending=False)
-        
+        mode_counts = trips["TRPTRANS"].value_counts()
+        mode_share = pd.DataFrame(
+            {
+                "mode": mode_counts.index,
+                "trips": mode_counts.values,
+                "share_pct": (mode_counts / mode_counts.sum() * 100).round(2),
+            }
+        )
+
+        mode_share = mode_share.sort_values("share_pct", ascending=False)
+
         self.logger.info(
             "Calculated mode share",
             extra={
                 "trip_purpose": trip_purpose,
                 "state_fips": state_fips,
-                "total_trips": mode_share['trips'].sum(),
-            }
+                "total_trips": mode_share["trips"].sum(),
+            },
         )
-        
+
         return mode_share
 
     def get_vehicle_ownership_by_state(
@@ -687,31 +687,38 @@ class NHTSConnector(BaseConnector):
         """
         # Load household data
         households = self.load_household_data(force_download)
-        
+
         # Calculate statistics by state
-        stats = households.groupby('HHSTATE').agg({
-            'HHVEHCNT': ['mean', lambda x: (x == 0).mean() * 100, lambda x: (x >= 2).mean() * 100],
-            'HOUSEID': 'count',
-        }).reset_index()
-        
-        stats.columns = ['state', 'avg_vehicles', 'zero_veh_pct', 'multi_veh_pct', 'households']
-        
-        # Format state FIPS as 2-digit string
-        stats['state'] = stats['state'].astype(str).str.zfill(2)
-        
-        # Round percentages
-        stats['avg_vehicles'] = stats['avg_vehicles'].round(2)
-        stats['zero_veh_pct'] = stats['zero_veh_pct'].round(2)
-        stats['multi_veh_pct'] = stats['multi_veh_pct'].round(2)
-        
-        # Sort by average vehicles descending
-        stats = stats.sort_values('avg_vehicles', ascending=False)
-        
-        self.logger.info(
-            "Calculated vehicle ownership by state",
-            extra={"states": len(stats)}
+        stats = (
+            households.groupby("HHSTATE")
+            .agg(
+                {
+                    "HHVEHCNT": [
+                        "mean",
+                        lambda x: (x == 0).mean() * 100,
+                        lambda x: (x >= 2).mean() * 100,
+                    ],
+                    "HOUSEID": "count",
+                }
+            )
+            .reset_index()
         )
-        
+
+        stats.columns = ["state", "avg_vehicles", "zero_veh_pct", "multi_veh_pct", "households"]
+
+        # Format state FIPS as 2-digit string
+        stats["state"] = stats["state"].astype(str).str.zfill(2)
+
+        # Round percentages
+        stats["avg_vehicles"] = stats["avg_vehicles"].round(2)
+        stats["zero_veh_pct"] = stats["zero_veh_pct"].round(2)
+        stats["multi_veh_pct"] = stats["multi_veh_pct"].round(2)
+
+        # Sort by average vehicles descending
+        stats = stats.sort_values("avg_vehicles", ascending=False)
+
+        self.logger.info("Calculated vehicle ownership by state", extra={"states": len(stats)})
+
         return stats
 
     def get_trip_purpose_distribution(
@@ -736,33 +743,35 @@ class NHTSConnector(BaseConnector):
         """
         # Load trip data
         trips = self.load_trip_data(force_download)
-        
+
         # Filter by state if specified
         if state_fips is not None:
             households = self.load_household_data(force_download)
             state_households = households[
-                households['HHSTATE'].astype(str).str.zfill(2) == str(state_fips).zfill(2)
+                households["HHSTATE"].astype(str).str.zfill(2) == str(state_fips).zfill(2)
             ]
-            trips = trips[trips['HOUSEID'].isin(state_households['HOUSEID'])]
-        
+            trips = trips[trips["HOUSEID"].isin(state_households["HOUSEID"])]
+
         # Calculate purpose distribution
-        purpose_counts = trips['WHYTRP1S'].value_counts()
-        purpose_dist = pd.DataFrame({
-            'purpose': purpose_counts.index,
-            'trips': purpose_counts.values,
-            'share_pct': (purpose_counts / purpose_counts.sum() * 100).round(2)
-        })
-        
-        purpose_dist = purpose_dist.sort_values('share_pct', ascending=False)
-        
+        purpose_counts = trips["WHYTRP1S"].value_counts()
+        purpose_dist = pd.DataFrame(
+            {
+                "purpose": purpose_counts.index,
+                "trips": purpose_counts.values,
+                "share_pct": (purpose_counts / purpose_counts.sum() * 100).round(2),
+            }
+        )
+
+        purpose_dist = purpose_dist.sort_values("share_pct", ascending=False)
+
         self.logger.info(
             "Calculated trip purpose distribution",
             extra={
                 "state_fips": state_fips,
-                "total_trips": purpose_dist['trips'].sum(),
-            }
+                "total_trips": purpose_dist["trips"].sum(),
+            },
         )
-        
+
         return purpose_dist
 
     def __repr__(self) -> str:
