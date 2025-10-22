@@ -40,21 +40,36 @@ description = "Detected generic secret variable"
 regex = '''(?i)(secret|password|token|api_key)\s*=\s*["'][^"']{8,}["']'''
 tags = ["secret"]
 
+[rules.allowlist]
+# Allowlist common placeholder patterns within the generic-secret rule
+regexes = [
+    '''(?i)(secret|password|token|api_key)\s*=\s*["'](YOUR_|DEMO_|TEST_|EXAMPLE_)''',  # Placeholder prefixes
+    '''(?i)(secret|password|token|api_key)\s*=\s*["'][A-Z_]+["']''',  # All caps placeholders
+]
+
 # Allowlist patterns to reduce false positives
 [allowlist]
 description = "Global allowlist"
 paths = [
     '''\.md$''',  # Markdown files (documentation)
+    '''\.rst$''',  # reStructuredText files (Sphinx docs)
     '''\.txt$''',  # Text files
     '''LICENSE''',  # License files
     '''CHANGELOG''',  # Changelog files
     '''^tests/fixtures/''',  # Test fixtures
+    '''^docs/''',  # Documentation directory
 ]
 
 regexes = [
     '''example\.com''',  # Example domains
-    '''your-api-key-here''',  # Placeholder text
+    '''your[_-]api[_-]key''',  # Placeholder text variations
+    '''YOUR_[A-Z_]+''',  # Placeholder environment variables
+    '''DEMO_KEY''',  # Demo API key placeholder
+    '''YOUR_KEY''',  # Generic placeholder
+    '''your_[a-z_]+_key''',  # Lowercase placeholder variations
+    '''secret_key_12345''',  # Example secret key
     '''xxx+''',  # Placeholder secrets
     '''123456789''',  # Example numeric values
     '''abcdefghijklmnop''',  # Example alphabetic values
+    '''8ec3c8309e60d874eae960d407f15460''',  # Example FRED API key in docs
 ]

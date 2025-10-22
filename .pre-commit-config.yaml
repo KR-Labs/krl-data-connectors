@@ -11,7 +11,7 @@
 # Run manually: pre-commit run --all-files
 
 default_language_version:
-  python: python3.11
+  python: python3
 
 repos:
   # Local hooks for KRL-specific checks
@@ -43,6 +43,14 @@ repos:
         language: python
         stages: [commit]
         args: ['--baseline', '.secrets.baseline']
+      
+      # Gitleaks secret scanning
+      - id: gitleaks
+        name: Gitleaks - detect hardcoded secrets
+        entry: gitleaks detect --config .gitleaks.toml --verbose --no-git --redact
+        language: system
+        pass_filenames: false
+        stages: [commit]
   
   # Standard Python formatting and linting
   - repo: https://github.com/psf/black
@@ -150,7 +158,11 @@ repos:
       # Ensure no internal documents are committed
       - id: check-internal-docs
         name: check-internal-docs (prevent leaking internal strategy)
-        entry: bash -c 'if git diff --cached --name-only | grep -E "(INTERNAL|_SUMMARY|_REPORT|_ROADMAP|_PLAN|_TODO|_NOTES|PHASE|WEEK|SESSION_|API_KEY_SETUP|BRANCH_PROTECTION)"; then echo "ERROR: Attempting to commit internal documentation. Please review .gitignore patterns."; exit 1; fi'
+        entry: >-
+          bash -c 'if git diff --cached --name-only | grep -E "(INTERNAL|_SUMMARY|_REPORT|_ROADMAP|_PLAN|_TODO|_NOTES|PHASE|WEEK|SESSION_|API_KEY_SETUP|BRANCH_PROTECTION)"; then 
+          echo "ERROR: Attempting to commit internal documentation. Please review .gitignore patterns."; 
+          exit 1; 
+          fi'
         language: system
         pass_filenames: false
         always_run: true
