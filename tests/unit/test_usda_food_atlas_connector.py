@@ -28,7 +28,6 @@ from krl_data_connectors.agricultural.usda_food_atlas_connector import (
     USDAFoodAtlasConnector,
 )
 
-
 # ============================================================================
 # Layer 8: Contract Tests
 # ============================================================================

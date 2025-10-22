@@ -17,10 +17,11 @@ These tests ensure the connector meets the interface contract defined by BaseCon
 and returns data in expected formats. They DO NOT validate data accuracy or business logic.
 """
 
-import pytest
-import pandas as pd
 from pathlib import Path
 from typing import Dict
+
+import pandas as pd
+import pytest
 
 from krl_data_connectors.technology.fcc_broadband_connector import FCCBroadbandConnector
 

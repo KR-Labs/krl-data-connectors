@@ -28,11 +28,12 @@ Tests cover:
 
 import inspect
 from typing import Optional
+
 import pandas as pd
 import pytest
+
 from krl_data_connectors.base_connector import BaseConnector
 from krl_data_connectors.mobility import OpportunityInsightsConnector
-
 
 # ============================================================
 # INTERFACE COMPLIANCE TESTS
@@ -216,8 +217,9 @@ class TestErrorHandlingContract:
 
     def test_network_errors_propagate(self):
         """Test that network errors propagate appropriately."""
+        from unittest.mock import Mock, patch
+
         import requests
-        from unittest.mock import patch, Mock
 
         oi = OpportunityInsightsConnector()
         oi.connect()

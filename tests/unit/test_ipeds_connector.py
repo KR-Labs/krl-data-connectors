@@ -30,7 +30,6 @@ import pytest
 
 from krl_data_connectors.education.ipeds_connector import IPEDSConnector
 
-
 # Fixtures
 
 

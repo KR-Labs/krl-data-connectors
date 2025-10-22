@@ -12,9 +12,10 @@ These tests validate the IRS990Connector interface and data structure contracts.
 They use mock data to ensure fast, reliable testing without external API dependencies.
 """
 
+from unittest.mock import MagicMock, patch
+
 import pandas as pd
 import pytest
-from unittest.mock import MagicMock, patch
 
 from krl_data_connectors.social.irs990_connector import IRS990Connector
 

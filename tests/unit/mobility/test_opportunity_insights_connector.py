@@ -22,12 +22,13 @@ Target: 90%+ code coverage
 
 import os
 from pathlib import Path
-from unittest.mock import Mock, MagicMock, patch, mock_open
+from unittest.mock import MagicMock, Mock, mock_open, patch
+
 import pandas as pd
 import pytest
 import requests
-from krl_data_connectors.mobility import OpportunityInsightsConnector
 
+from krl_data_connectors.mobility import OpportunityInsightsConnector
 
 # ============================================================
 # FIXTURES

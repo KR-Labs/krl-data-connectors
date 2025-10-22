@@ -7,14 +7,15 @@
 
 """Tests for EIA (Energy Information Administration) Connector."""
 
-import pytest
+from unittest.mock import MagicMock, Mock, patch
+
 import pandas as pd
-from unittest.mock import Mock, MagicMock, patch
+import pytest
 
 from krl_data_connectors.energy.eia_connector import (
-    EIAConnector,
-    ENERGY_SOURCES,
     ELECTRICITY_SECTORS,
+    ENERGY_SOURCES,
+    EIAConnector,
 )
 
 

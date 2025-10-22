@@ -20,13 +20,13 @@ Tests for:
 - API key/credential exposure prevention
 """
 
-import pytest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 import pandas as pd
+import pytest
 
 from krl_data_connectors.lehd_connector import LEHDConnector
-
 
 # ============================================================
 # INPUT VALIDATION SECURITY TESTS

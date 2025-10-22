@@ -43,9 +43,10 @@ Data Portal: https://dataverse.harvard.edu/dataverse/medsl
 Research: https://electionlab.mit.edu/research
 """
 
-from typing import Dict, List, Optional, Union
-import pandas as pd
 from pathlib import Path
+from typing import Dict, List, Optional, Union
+
+import pandas as pd
 
 from krl_data_connectors.base_connector import BaseConnector
 

@@ -28,7 +28,6 @@ import pytest
 
 from krl_data_connectors.financial.sec_connector import SECConnector
 
-
 # Fixtures
 
 

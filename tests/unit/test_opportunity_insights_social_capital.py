@@ -22,8 +22,8 @@ Layer 8 (Contract): Type validation and structural correctness.
 
 import pandas as pd
 import pytest
-from krl_data_connectors.mobility import OpportunityInsightsConnector
 
+from krl_data_connectors.mobility import OpportunityInsightsConnector
 
 # ============================================================
 # TEST DATA

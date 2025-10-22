@@ -12,16 +12,17 @@ Tests the Department of Veterans Affairs data connector functionality
 including facilities, benefits, disability ratings, claims, and healthcare data.
 """
 
-import pytest
-import pandas as pd
-from unittest.mock import patch, MagicMock
 from datetime import datetime
+from unittest.mock import MagicMock, patch
+
+import pandas as pd
+import pytest
 
 from krl_data_connectors.veterans.va_connector import (
-    VAConnector,
-    FACILITY_TYPES,
     BENEFIT_TYPES,
+    FACILITY_TYPES,
     HEALTHCARE_SERVICES,
+    VAConnector,
 )
 
 

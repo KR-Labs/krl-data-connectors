@@ -21,11 +21,13 @@ Tests cover:
 
 from pathlib import Path
 from unittest.mock import Mock, patch
+
 import pandas as pd
 import pytest
-from hypothesis import given, strategies as st, assume, settings, HealthCheck
-from krl_data_connectors.mobility import OpportunityInsightsConnector
+from hypothesis import HealthCheck, assume, given, settings
+from hypothesis import strategies as st
 
+from krl_data_connectors.mobility import OpportunityInsightsConnector
 
 # ============================================================
 # FIXTURES

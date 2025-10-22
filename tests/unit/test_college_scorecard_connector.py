@@ -27,7 +27,6 @@ from krl_data_connectors.education.college_scorecard_connector import (
     CollegeScorecardConnector,
 )
 
-
 # ============================================================================
 # Layer 8: Contract Tests
 # ============================================================================

@@ -17,11 +17,12 @@ These tests ensure the connector meets the interface contract defined by BaseCon
 and returns data in expected formats. They DO NOT validate data accuracy or business logic.
 """
 
-import pytest
-import pandas as pd
-import numpy as np
 from pathlib import Path
 from typing import Dict, List
+
+import numpy as np
+import pandas as pd
+import pytest
 
 from krl_data_connectors.housing.eviction_lab_connector import EvictionLabConnector
 

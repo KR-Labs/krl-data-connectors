@@ -16,12 +16,12 @@ API Documentation:
 - Earthquake API: https://earthquake.usgs.gov/fdsnws/event/1/
 """
 
-import pandas as pd
-from typing import Optional, Dict, Any, List
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
 
 from ..base_connector import BaseConnector
-
 
 # Water parameter codes (common measurements)
 WATER_PARAMETERS = {

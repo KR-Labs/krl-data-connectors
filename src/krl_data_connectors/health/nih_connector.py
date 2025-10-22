@@ -16,12 +16,12 @@ API Documentation:
 - RePORTER Documentation: https://api.reporter.nih.gov/documents/Data%20Elements%20for%20RePORTER%20Project%20API%20v2.pdf
 """
 
-import pandas as pd
-from typing import Optional, Dict, Any, List
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
 
 from ..base_connector import BaseConnector
-
 
 # Activity codes (grant types)
 ACTIVITY_CODES = {

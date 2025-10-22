@@ -15,12 +15,12 @@ natural gas, petroleum, coal, renewable energy, and more.
 API Documentation: https://www.eia.gov/opendata/
 """
 
-import pandas as pd
-from typing import Optional, Dict, Any, List
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
 
 from ..base_connector import BaseConnector
-
 
 # Energy source types
 ENERGY_SOURCES = {

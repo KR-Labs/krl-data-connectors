@@ -7,15 +7,16 @@
 
 """Tests for ACF Connector."""
 
-import pytest
-import pandas as pd
 from unittest.mock import MagicMock, patch
 
+import pandas as pd
+import pytest
+
 from krl_data_connectors.social.acf_connector import (
-    ACFConnector,
-    PROGRAM_TYPES,
     DATA_CATEGORIES,
+    PROGRAM_TYPES,
     WELFARE_INDICATORS,
+    ACFConnector,
 )
 
 

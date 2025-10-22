@@ -44,7 +44,6 @@ from .bls_connector import BLSConnector
 from .cbp_connector import CountyBusinessPatternsConnector
 from .census_connector import CensusConnector
 from .crime import BureauOfJusticeConnector, FBIUCRConnector, VictimsOfCrimeConnector
-from .mobility import OpportunityInsightsConnector
 from .economic import CensusBDSConnector, OECDConnector, WorldBankConnector
 from .education import CollegeScorecardConnector, IPEDSConnector, NCESConnector
 from .energy import EIAConnector
@@ -66,9 +65,10 @@ from .health import (
     NIHConnector,
     SAMHSAConnector,
 )
-from .housing import HUDFMRConnector, ZillowConnector, EvictionLabConnector
+from .housing import EvictionLabConnector, HUDFMRConnector, ZillowConnector
 from .labor import OSHAConnector
 from .lehd_connector import LEHDConnector
+from .mobility import OpportunityInsightsConnector
 from .political import FECConnector, MITElectionLabConnector
 from .science import NSFConnector, USGSConnector, USPTOConnector
 from .social import ACFConnector, IRS990Connector, SSAConnector

@@ -23,10 +23,11 @@ Mark as slow: pytest -m "not slow" to skip
 
 import time
 from pathlib import Path
+
 import pandas as pd
 import pytest
-from krl_data_connectors.mobility import OpportunityInsightsConnector
 
+from krl_data_connectors.mobility import OpportunityInsightsConnector
 
 # ============================================================
 # FIXTURES

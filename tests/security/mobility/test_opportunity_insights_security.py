@@ -21,10 +21,11 @@ Target: Prevent common attack vectors
 import os
 from pathlib import Path
 from unittest.mock import Mock, patch
+
 import pandas as pd
 import pytest
-from krl_data_connectors.mobility import OpportunityInsightsConnector
 
+from krl_data_connectors.mobility import OpportunityInsightsConnector
 
 # ============================================================
 # FIXTURES

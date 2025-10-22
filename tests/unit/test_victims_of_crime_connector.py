@@ -30,7 +30,6 @@ import pytest
 
 from krl_data_connectors.crime.victims_of_crime_connector import VictimsOfCrimeConnector
 
-
 # Fixtures
 
 

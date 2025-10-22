@@ -7,15 +7,16 @@
 
 """Tests for SSA Connector."""
 
-import pytest
-import pandas as pd
 from unittest.mock import MagicMock, patch
 
+import pandas as pd
+import pytest
+
 from krl_data_connectors.social.ssa_connector import (
-    SSAConnector,
-    PROGRAM_TYPES,
     BENEFICIARY_TYPES,
     PAYMENT_CATEGORIES,
+    PROGRAM_TYPES,
+    SSAConnector,
 )
 
 

@@ -12,16 +12,17 @@ Tests the National Science Foundation data connector functionality
 including research awards, funding, institutions, and investigators.
 """
 
-import pytest
-import pandas as pd
-from unittest.mock import patch, MagicMock
 from datetime import datetime
+from unittest.mock import MagicMock, patch
+
+import pandas as pd
+import pytest
 
 from krl_data_connectors.science.nsf_connector import (
-    NSFConnector,
     AWARD_TYPES,
     DIRECTORATES,
     FUNDING_INSTRUMENTS,
+    NSFConnector,
 )
 
 

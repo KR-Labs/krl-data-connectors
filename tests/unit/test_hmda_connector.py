@@ -18,9 +18,10 @@ These are contract tests, not comprehensive functional tests. They use mock/samp
 data to validate interfaces without requiring external API access.
 """
 
+from unittest.mock import MagicMock, patch
+
 import pandas as pd
 import pytest
-from unittest.mock import MagicMock, patch
 
 from krl_data_connectors.financial.hmda_connector import HMDAConnector
 

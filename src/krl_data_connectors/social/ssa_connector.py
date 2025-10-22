@@ -15,12 +15,12 @@ API Documentation:
 - SSA Open Data: https://www.ssa.gov/data/
 """
 
-import pandas as pd
-from typing import Optional, Dict, Any, List
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
 
 from ..base_connector import BaseConnector
-
 
 # Benefit program types
 PROGRAM_TYPES = {

@@ -25,7 +25,6 @@ import pytest
 
 from krl_data_connectors.agricultural.usda_nass_connector import USDANASSConnector
 
-
 # ============================================================================
 # Layer 8: Contract Tests
 # ============================================================================

@@ -7,8 +7,8 @@
 
 """Social services data connectors."""
 
-from .ssa_connector import SSAConnector
 from .acf_connector import ACFConnector
 from .irs990_connector import IRS990Connector
+from .ssa_connector import SSAConnector
 
 __all__ = ["SSAConnector", "ACFConnector", "IRS990Connector"]

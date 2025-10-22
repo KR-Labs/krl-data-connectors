@@ -31,10 +31,11 @@ API Documentation: https://www.fcc.gov/BroadbandData
 Data Portal: https://broadbandmap.fcc.gov/
 """
 
+from pathlib import Path
 from typing import Dict, List, Optional, Union
+
 import pandas as pd
 import requests
-from pathlib import Path
 
 from krl_data_connectors.base_connector import BaseConnector
 

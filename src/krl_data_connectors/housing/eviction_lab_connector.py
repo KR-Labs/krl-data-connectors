@@ -40,10 +40,11 @@ Data Downloads: https://evictionlab.org/get-the-data/
 Research: https://evictionlab.org/national-estimates/
 """
 
+from pathlib import Path
 from typing import Dict, List, Optional, Union
+
 import pandas as pd
 import requests
-from pathlib import Path
 
 from krl_data_connectors.base_connector import BaseConnector
 

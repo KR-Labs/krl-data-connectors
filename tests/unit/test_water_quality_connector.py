@@ -26,7 +26,6 @@ import pytest
 
 from krl_data_connectors.environment.water_quality_connector import WaterQualityConnector
 
-
 # Fixtures
 
 

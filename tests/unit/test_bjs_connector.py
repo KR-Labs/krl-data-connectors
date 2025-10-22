@@ -31,7 +31,6 @@ import pytest
 
 from krl_data_connectors.crime.bjs_connector import BureauOfJusticeConnector
 
-
 # Fixtures
 
 

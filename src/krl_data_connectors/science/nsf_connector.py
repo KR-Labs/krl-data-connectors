@@ -16,12 +16,12 @@ API Documentation:
 - NSF Public Access Repository: https://par.nsf.gov/
 """
 
-import pandas as pd
-from typing import Optional, Dict, Any, List
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
 
 from ..base_connector import BaseConnector
-
 
 # Award types
 AWARD_TYPES = {

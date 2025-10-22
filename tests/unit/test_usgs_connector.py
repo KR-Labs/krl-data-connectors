@@ -7,16 +7,17 @@
 
 """Tests for USGS Connector."""
 
-import pytest
-import pandas as pd
-from unittest.mock import MagicMock, patch
 from datetime import datetime
+from unittest.mock import MagicMock, patch
+
+import pandas as pd
+import pytest
 
 from krl_data_connectors.science.usgs_connector import (
-    USGSConnector,
-    WATER_PARAMETERS,
     MAGNITUDE_TYPES,
     SITE_TYPES,
+    WATER_PARAMETERS,
+    USGSConnector,
 )
 
 

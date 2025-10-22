@@ -22,8 +22,8 @@ Layer 8 (Contract): Type validation and structural correctness.
 
 import pandas as pd
 import pytest
-from krl_data_connectors.transportation import NHTSConnector
 
+from krl_data_connectors.transportation import NHTSConnector
 
 # ============================================================
 # TEST DATA

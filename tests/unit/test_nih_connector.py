@@ -12,16 +12,17 @@ Tests the National Institutes of Health data connector functionality
 including research projects, grants, publications, and clinical trials.
 """
 
-import pytest
-import pandas as pd
-from unittest.mock import patch, MagicMock
 from datetime import datetime
+from unittest.mock import MagicMock, patch
+
+import pandas as pd
+import pytest
 
 from krl_data_connectors.health.nih_connector import (
-    NIHConnector,
     ACTIVITY_CODES,
-    NIH_INSTITUTES,
     AWARD_TYPES,
+    NIH_INSTITUTES,
+    NIHConnector,
 )
 
 

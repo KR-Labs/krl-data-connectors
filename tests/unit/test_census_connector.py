@@ -26,7 +26,6 @@ import pytest
 
 from krl_data_connectors.census_connector import CensusConnector
 
-
 # ============================================================================
 # Layer 8: Contract Tests
 # ============================================================================

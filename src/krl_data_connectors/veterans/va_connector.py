@@ -16,12 +16,12 @@ API Documentation:
 - VA Facilities API: https://developer.va.gov/
 """
 
-import pandas as pd
-from typing import Optional, Dict, Any, List
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
 
 from ..base_connector import BaseConnector
-
 
 # Facility types
 FACILITY_TYPES = {

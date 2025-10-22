@@ -43,6 +43,7 @@ from typing import Dict, List, Optional, Union
 
 import pandas as pd
 import requests
+
 from krl_data_connectors.base_connector import BaseConnector
 
 
