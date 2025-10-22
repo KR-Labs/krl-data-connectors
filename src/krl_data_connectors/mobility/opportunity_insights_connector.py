@@ -619,7 +619,7 @@ Expected size: ~{self._get_expected_size(geography)}
 See docs/SOCIAL_CAPITAL_DATA_ACQUISITION.md for details.
 """
                 self.logger.error(
-                    f"HDX download blocked - manual download required",
+                    "HDX download blocked - manual download required",
                     extra={"geography": geography, "file": Path(sc_path).name},
                 )
                 raise FileNotFoundError(manual_msg)

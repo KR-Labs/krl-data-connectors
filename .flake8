@@ -3,6 +3,15 @@ max-line-length = 120
 extend-ignore = E203, W503, F841, F401
 per-file-ignores =
     __init__.py:F401
+    # Allow long lines in test data fixtures and URLs
+    tests/unit/test_mit_election_lab_connector.py:E501
+    tests/unit/test_cdc_connector.py:E501
+    tests/unit/test_lehd_connector.py:E501
+    src/krl_data_connectors/environment/water_quality_connector.py:E501
+    src/krl_data_connectors/health/nih_connector.py:E501
+    src/krl_data_connectors/mobility/opportunity_insights_connector.py:E501
+    # Allow redefinition in tests
+    tests/unit/test_faa_connector.py:F811
 exclude =
     .git,
     __pycache__,

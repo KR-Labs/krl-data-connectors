@@ -14,6 +14,9 @@ SPDX-License-Identifier: Apache-2.0
 [![Tests](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/tests.yml/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/tests.yml)
 [![Lint](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/lint.yml/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/lint.yml)
 [![Security](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/security-checks.yml/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/security-checks.yml)
+[![License Compliance](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/license-compliance.yml/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/license-compliance.yml)
+[![Build](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/build-and-sign.yml/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/build-and-sign.yml)
+[![Comprehensive Tests](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/comprehensive-testing.yml/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/comprehensive-testing.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 **Institutional-grade, production-ready connectors for socioeconomic and policy data infrastructure**

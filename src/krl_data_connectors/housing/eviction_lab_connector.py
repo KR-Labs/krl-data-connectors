@@ -241,8 +241,8 @@ class EvictionLabConnector(BaseConnector):
             if len(state_filter) == 2:
                 # Would need state FIPS mapping here
                 self.logger.warning(
-                    f"State filtering by abbreviation requires FIPS mapping. "
-                    f"Filter by GEOID prefix instead."
+                    "State filtering by abbreviation requires FIPS mapping. "
+                    "Filter by GEOID prefix instead."
                 )
 
         self._tract_data = df
@@ -290,8 +290,8 @@ class EvictionLabConnector(BaseConnector):
             state_filter = state_filter.upper()
             # Would need state FIPS mapping
             self.logger.warning(
-                f"State filtering by abbreviation requires FIPS mapping. "
-                f"Filter by GEOID prefix instead."
+                "State filtering by abbreviation requires FIPS mapping. "
+                "Filter by GEOID prefix instead."
             )
 
         self._county_data = df
