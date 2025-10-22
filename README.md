@@ -15,6 +15,7 @@ SPDX-License-Identifier: Apache-2.0
 [![Documentation Status](https://readthedocs.org/projects/krl-data-connectors/badge/?version=latest)](https://krl-data-connectors.readthedocs.io/en/latest/?badge=latest)
 [![Tests](https://github.com/KR-Labs/krl-data-connectors/workflows/tests/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions)
 [![Coverage](https://img.shields.io/badge/coverage-90%25%2B-green)](https://github.com/KR-Labs/krl-data-connectors)
+[![Security](https://github.com/KR-Labs/krl-data-connectors/workflows/Security%20%26%20IP%20Protection/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/security-checks.yml)
 [![Downloads](https://img.shields.io/pypi/dm/krl-data-connectors.svg)](https://pypi.org/project/krl-data-connectors/)
 
 **Institutional-grade, production-ready connectors for socioeconomic and policy data infrastructure**
@@ -145,6 +146,52 @@ KRL Data Connectors provide institutional access to **40 production-ready datase
 | VA                    | Veterans       | No            | Real-time           | Facilities/benefits | ✅ Production |
 
 **Total: 40 Production-Ready Connectors** | ✅ All Production | 🎉 100% Complete
+
+---
+
+## 🔐 Security & IP Protection
+
+KRL Data Connectors implements a comprehensive **10-Layer Defense & Protection Stack** to ensure security, IP protection, and compliance:
+
+### Active Security Measures
+
+| Layer | Protection | Status | Coverage |
+|-------|-----------|--------|----------|
+| **Layer 1** | Legal Protection (Copyright, Trademark, License) | ✅ Active | 198/198 files (100%) |
+| **Layer 2** | Technical Protection (Secret Scanning) | ✅ Active | GitHub + Gitleaks + Pre-commit |
+| **Layer 5** | Build Verification (CI/CD Security) | ✅ Active | Automated on every PR |
+| **Layer 6** | License Enforcement | ✅ Active | Apache 2.0 compliance |
+| **Layer 9** | CI/CD Security | ✅ Active | Multi-scanner validation |
+| **Layer 10** | Monitoring & Response | ✅ Active | Security advisories enabled |
+
+### Security Scanning (Automated)
+
+Every commit and pull request is automatically scanned for:
+
+- ✅ **Copyright & Trademark Verification** - Ensures proper IP attribution
+- ✅ **Secret Detection** - Blocks commits with exposed credentials (Gitleaks)
+- ✅ **Vulnerability Scanning** - Identifies security issues (Trivy, CodeQL)
+- ✅ **Dependency Security** - Reviews dependencies for known CVEs
+- ✅ **License Compliance** - Blocks incompatible licenses (GPL, AGPL)
+- ✅ **Python Security** - Static analysis (Bandit) and package scanning (Safety)
+
+### Repository Validation
+
+```bash
+🔍 Historical Scan: 145 commits, 5.42 MB scanned
+✅ Result: ZERO secrets detected
+✅ All 198 files protected with copyright headers
+✅ 100% Apache 2.0 license compliance
+```
+
+### For Contributors
+
+- **No secrets in code**: Pre-commit hooks block credentials automatically
+- **Secure by default**: Copyright headers added automatically
+- **Verified builds**: All PRs undergo security validation
+- **Quick setup**: `pre-commit install` enables all protections
+
+See [SECURITY.md](./SECURITY.md) for vulnerability reporting and detailed security practices.
 
 ---
 

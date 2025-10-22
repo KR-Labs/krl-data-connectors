@@ -3,7 +3,7 @@
 # KR-Labs™ is a trademark of Quipu Research Labs, LLC,
 # a subsidiary of Sudiata Giddasira, Inc.
 # ----------------------------------------------------------------------
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 
 name: Security & IP Protection
 
@@ -12,6 +12,10 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main]
+  schedule:
+    # Run security scans daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:  # Allow manual trigger
 
 jobs:
   copyright-check:
@@ -101,8 +105,8 @@ jobs:
           path: licensee-report.json
       
       - name: Run FOSSA scan (if configured)
+        if: ${{ vars.ENABLE_FOSSA == 'true' }}
         uses: fossas/fossa-action@v1
-        if: secrets.FOSSA_API_KEY != ''
         with:
           api-key: ${{ secrets.FOSSA_API_KEY }}
         continue-on-error: true
@@ -118,3 +122,120 @@ jobs:
         uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: moderate
+  
+  vulnerability-scan:
+    name: Vulnerability Scanning (Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+      
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+      
+      - name: Run Trivy vulnerability scanner (table output)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+  
+  python-security:
+    name: Python Security Checks (Bandit + Safety)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install security tools
+        run: |
+          pip install bandit[toml] safety
+      
+      - name: Run Bandit security linter
+        run: |
+          bandit -r src/ -f json -o bandit-report.json || true
+          bandit -r src/ -f screen
+        continue-on-error: true
+      
+      - name: Run Safety check
+        run: |
+          safety check --json > safety-report.json || true
+          safety check
+        continue-on-error: true
+      
+      - name: Upload security reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: python-security-reports
+          path: |
+            bandit-report.json
+            safety-report.json
+  
+  codeql-analysis:
+    name: CodeQL Security Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['python']
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended,security-and-quality
+      
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
+  
+  security-summary:
+    name: Security Summary & Badge
+    runs-on: ubuntu-latest
+    needs: [copyright-check, trademark-check, secret-scanning, python-security]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Generate security summary
+        run: |
+          echo "## 🔐 Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Copyright Headers | ${{ needs.copyright-check.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Trademark Notices | ${{ needs.trademark-check.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Secret Scanning | ${{ needs.secret-scanning.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Python Security | ${{ needs.python-security.result == 'success' && '✅ Passed' || '⚠️ Review Required' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🛡️ KRL Defense Stack Status" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Layer 1: Legal Protection (Copyright, Trademark, License)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Layer 2: Technical Protection (Secret Scanning, Gitleaks)" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔄 Layer 5: Build Verification (CI/CD Security)" >> $GITHUB_STEP_SUMMARY

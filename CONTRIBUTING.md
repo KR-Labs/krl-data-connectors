@@ -309,6 +309,180 @@ pytest -m integration   # Only integration tests
 pytest -m "not slow"    # Skip slow tests
 ```
 
+## Security Guidelines
+
+### 🔐 KRL Defense & Protection Stack
+
+All contributions must adhere to our 10-layer security architecture. Please review our [SECURITY.md](SECURITY.md) for complete details.
+
+### Critical Security Rules
+
+**❌ NEVER commit:**
+- API keys, tokens, or credentials
+- Private keys or certificates
+- Passwords or secrets
+- Real user data
+- Internal documentation patterns (INTERNAL, _SUMMARY, _ROADMAP, etc.)
+
+**✅ ALWAYS:**
+- Use environment variables for credentials
+- Add copyright headers to new files
+- Run pre-commit hooks before committing
+- Review `git diff` before committing
+- Test with demo/public API keys when possible
+
+### Pre-Commit Security Checks
+
+Our pre-commit hooks automatically:
+1. **Add copyright headers** to all files
+2. **Verify trademark notices** in README
+3. **Detect secrets** using Gitleaks
+4. **Run security scanners** (Bandit)
+5. **Block internal documents** from commits
+
+If a hook fails, fix the issue before committing.
+
+### Secret Management
+
+#### Using API Keys in Development
+
+```python
+# ❌ WRONG - Never hardcode secrets
+api_key = "sk_test_FAKE_EXAMPLE_KEY_DO_NOT_USE"
+
+# ✅ CORRECT - Use environment variables
+import os
+api_key = os.environ.get('FRED_API_KEY')
+
+# ✅ CORRECT - Use dotenv for local development
+from dotenv import load_dotenv
+load_dotenv()
+api_key = os.environ.get('FRED_API_KEY')
+```
+
+#### .env File (gitignored)
+
+```bash
+# .env - This file is NOT committed
+FRED_API_KEY=your_real_key_here
+CENSUS_API_KEY=your_real_key_here
+BLS_API_KEY=your_real_key_here
+```
+
+#### Example Code & Documentation
+
+When writing examples, use placeholder values:
+
+```python
+# ✅ Good - Obvious placeholder
+connector = FREDConnector(api_key='YOUR_FRED_API_KEY')
+
+# ✅ Good - Environment variable reference
+connector = FREDConnector(api_key=os.environ.get('FRED_API_KEY'))
+
+# ❌ Bad - Looks like a real key
+connector = FREDConnector(api_key='8ec3c8309e60d874eae960d407f15460')
+```
+
+### Copyright & License Headers
+
+All new files must include copyright headers:
+
+```python
+# ----------------------------------------------------------------------
+# © 2025 KR-Labs. All rights reserved.
+# KR-Labs™ is a trademark of Quipu Research Labs, LLC,
+# a subsidiary of Sudiata Giddasira, Inc.
+# ----------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
+"""Your module docstring here."""
+```
+
+For Markdown files:
+
+```markdown
+---
+© 2025 KR-Labs. All rights reserved.  
+KR-Labs™ is a trademark of Quipu Research Labs, LLC, a subsidiary of Sudiata Giddasira, Inc.
+
+SPDX-License-Identifier: Apache-2.0
+---
+
+# Document Title
+```
+
+**Note:** Pre-commit hooks will automatically add these headers, but you can add them manually if preferred.
+
+### Running Security Checks Locally
+
+Before submitting a PR:
+
+```bash
+# 1. Run all pre-commit hooks
+pre-commit run --all-files
+
+# 2. Scan for secrets with Gitleaks
+gitleaks detect --config .gitleaks.toml --verbose
+
+# 3. Run security linters
+bandit -r src/
+
+# 4. Check for vulnerable dependencies
+safety check
+
+# 5. Verify copyright headers
+python scripts/security/verify_copyright_headers.py
+```
+
+### Dependency Security
+
+When adding new dependencies:
+
+1. **Check for known vulnerabilities:**
+   ```bash
+   pip install safety
+   safety check --json
+   ```
+
+2. **Verify license compatibility:**
+   - ✅ Allowed: MIT, Apache-2.0, BSD, ISC
+   - ⚠️ Review needed: LGPL, MPL
+   - ❌ Prohibited: GPL, AGPL
+
+3. **Update requirements:**
+   ```bash
+   # Add to requirements_opensource.txt for public dependencies
+   # Add to requirements_full.txt for all dependencies
+   pip freeze > requirements_full.txt
+   ```
+
+### Security Incident Response
+
+If you discover a security vulnerability:
+
+1. **DO NOT** open a public GitHub issue
+2. **DO NOT** commit the vulnerability or exploit
+3. **DO** email security@kr-labs.org immediately
+4. **DO** include:
+   - Description of the vulnerability
+   - Steps to reproduce
+   - Potential impact
+   - Suggested fix (if any)
+
+We will respond within 48 hours and coordinate a fix.
+
+### IP Protection & Trade Secrets
+
+Some parts of the codebase contain proprietary algorithms or configurations:
+
+- **Do not share** internal documentation externally
+- **Do not discuss** proprietary methods in public forums
+- **Do ask** maintainers if unsure about IP status
+- **Do review** contributor license agreement (CLA)
+
+By contributing, you agree to assign copyright of your contributions to KR-Labs and license them under Apache 2.0.
+
 ## Pull Request Process
 
 ### 1. Create a Branch
