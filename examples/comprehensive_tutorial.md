@@ -1,3 +1,10 @@
+---
+© 2025 KR-Labs. All rights reserved.  
+KR-Labs™ is a trademark of Quipu Research Labs, LLC, a subsidiary of Sudiata Giddasira, Inc.
+
+SPDX-License-Identifier: Apache-2.0
+---
+
 # KRL Data Connectors - Comprehensive Tutorial
 
 This notebook demonstrates how to use all the data connectors in the KRL Data Connectors package.

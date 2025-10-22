@@ -7,7 +7,8 @@
 
 """Housing data connectors for KRL Data Connectors."""
 
+from krl_data_connectors.housing.eviction_lab_connector import EvictionLabConnector
 from krl_data_connectors.housing.hud_fmr_connector import HUDFMRConnector
 from krl_data_connectors.housing.zillow_connector import ZillowConnector
 
-__all__ = ["ZillowConnector", "HUDFMRConnector"]
+__all__ = ["ZillowConnector", "HUDFMRConnector", "EvictionLabConnector"]

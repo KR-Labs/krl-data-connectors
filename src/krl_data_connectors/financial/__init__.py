@@ -8,7 +8,8 @@
 """Financial data connectors for KRL Data Connectors."""
 
 from .fdic_connector import FDICConnector
+from .hmda_connector import HMDAConnector
 from .sec_connector import SECConnector
 from .treasury_connector import TreasuryConnector
 
-__all__ = ["FDICConnector", "SECConnector", "TreasuryConnector"]
+__all__ = ["FDICConnector", "HMDAConnector", "SECConnector", "TreasuryConnector"]

@@ -2,7 +2,8 @@
 Tests for HRSA (Health Resources and Services Administration) Connector
 
 © 2025 KR-Labs. All rights reserved.
-KR-Labs™ is a trademark of Quipu Research Labs, LLC.
+KR-Labs™ is a trademark of Quipu Research Labs, LLC,
+a subsidiary of Sudiata Giddasira, Inc.
 Licensed under the Apache License, Version 2.0.
 """
 

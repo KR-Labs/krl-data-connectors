@@ -1,3 +1,10 @@
+---
+© 2025 KR-Labs. All rights reserved.  
+KR-Labs™ is a trademark of Quipu Research Labs, LLC, a subsidiary of Sudiata Giddasira, Inc.
+
+SPDX-License-Identifier: Apache-2.0
+---
+
 # Testing Guide - 10-Layer Architecture
 
 This guide shows developers how to use the comprehensive testing stack in day-to-day development.

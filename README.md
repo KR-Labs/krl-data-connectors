@@ -1,3 +1,10 @@
+---
+© 2025 KR-Labs. All rights reserved.  
+KR-Labs™ is a trademark of Quipu Research Labs, LLC, a subsidiary of Sudiata Giddasira, Inc.
+
+SPDX-License-Identifier: Apache-2.0
+---
+
 # KRL Data Connectors
 
 <div align="center">
@@ -24,22 +31,23 @@
 
 ## Overview
 
-KRL Data Connectors provide standardized, robust interfaces for accessing a broad spectrum of socioeconomic, demographic, health, and environmental datasets. Designed for institutional workflows, these connectors ensure reproducibility, scalability, and operational reliability. KRL Data Connectors are a core component of the [KRL Analytics Suite](https://krlabs.dev), supporting high-impact economic analysis, causal inference, and policy evaluation at scale.
+KRL Data Connectors establish a unified, institutional-grade interface for accessing a comprehensive portfolio of socioeconomic, demographic, health, and environmental datasets. Engineered for reproducibility, scalability, and operational reliability, these connectors are foundational to the [KRL Analytics Suite](https://krlabs.dev), enabling robust economic analysis, causal inference, and policy evaluation at scale.
 
 ### Key Advantages
 
-- **Unified API**: Interact with diverse data sources via a consistent, type-safe interface.
-- **Production-Ready**: Engineered for operational resilience with structured logging, error handling, and retry logic.
-- **Type-Safe**: Full type hints and validation across all connectors.
-- **Smart Caching**: Minimize redundant API calls and optimize data retrieval.
-- **Rich Metadata**: Automatic metadata extraction and data profiling.
-- **Comprehensive Testing**: 2,800+ tests across 40 connectors, 80%+ coverage.
-- **Quickstart Notebooks**: Jupyter notebooks for rapid onboarding.
-- **Secure API Key Management**: Multiple secure credential resolution strategies.
+KRL Data Connectors deliver:
+- **Unified API**: Consistent, type-safe interfaces across heterogeneous data sources.
+- **Production-Grade Reliability**: Structured logging, robust error handling, and automated retry logic.
+- **Type Safety**: Comprehensive type hints and runtime validation.
+- **Intelligent Caching**: Efficient caching to optimize data retrieval and minimize redundant API calls.
+- **Rich Metadata**: Automated extraction and profiling of dataset metadata.
+- **Rigorous Testing**: Over 2,800 tests across 40 connectors; >80% code coverage.
+- **Quickstart Resources**: Jupyter notebooks for accelerated onboarding.
+- **Secure Credential Management**: Multiple credential resolution strategies to ensure institutional security.
 
 ### Supported Data Sources
 
-KRL Data Connectors deliver institutional access to **40 production-ready datasets** across 14 domains:
+KRL Data Connectors provide institutional access to **40 production-ready datasets** spanning 14 key domains:
 
 #### Economic & Financial Data (8 connectors)
 | Data Source           | Domain         | Auth Required | Update Frequency    | Coverage            | Status        |
@@ -142,7 +150,7 @@ KRL Data Connectors deliver institutional access to **40 production-ready datase
 
 ## Installation
 
-This section describes installation options for integrating KRL Data Connectors into institutional environments.
+To ensure seamless integration with institutional environments, KRL Data Connectors support multiple installation profiles tailored for production, development, and extended use cases.
 
 ```bash
 # Basic installation
@@ -159,7 +167,7 @@ pip install krl-data-connectors[dev]
 
 ## Quick Start
 
-The following examples illustrate initializing and using KRL Data Connectors for key data sources. All connectors are designed for direct integration into reproducible, scalable analytics pipelines.
+The following examples demonstrate initialization and usage of KRL Data Connectors for principal data sources. All connectors are architected for direct incorporation into reproducible, scalable analytics pipelines.
 
 ### County Business Patterns (CBP)
 
@@ -259,7 +267,7 @@ print(gdp_data.head())
 
 ### Caching and Base Connector
 
-All connectors inherit from `BaseConnector`, which provides standardized caching, configuration, and logging.
+All connectors inherit from `BaseConnector`, which standardizes caching, configuration, and logging to ensure consistent operational behavior.
 
 ```python
 from krl_data_connectors import FREDConnector
@@ -284,17 +292,16 @@ print(f"Hit rate: {stats['hit_rate']:.1f}%")
 
 ## Architecture
 
-KRL Data Connectors are engineered for extensibility and operational precision. Each connector extends a common `BaseConnector`, standardizing logging, configuration, caching, and request management.
+KRL Data Connectors are architected for extensibility, operational precision, and institutional scalability. Each connector extends a unified `BaseConnector`, ensuring standardized logging, configuration, caching, and request management.
 
 ### BaseConnector Capabilities
 
-The `BaseConnector` class implements:
-
-- **Structured Logging**: JSON logs with request and response metadata.
-- **Configuration Management**: Supports environment variables and YAML configuration.
-- **Intelligent Caching**: File-based and Redis caching with configurable TTL.
-- **Error Handling**: Automatic retries, API rate limiting, and timeouts.
-- **Request Management**: HTTP session pooling and connection reuse.
+The `BaseConnector` class provides:
+- **Structured Logging**: JSON-formatted logs with comprehensive request and response metadata.
+- **Configuration Management**: Flexible support for environment variables and YAML configuration files.
+- **Intelligent Caching**: File-based and Redis caching with configurable TTLs.
+- **Automated Error Handling**: Built-in retry logic, API rate limiting, and request timeouts.
+- **Efficient Request Management**: HTTP session pooling and optimized connection reuse.
 
 ```python
 from abc import ABC, abstractmethod
@@ -317,12 +324,13 @@ class BaseConnector(ABC):
 
 ## API Key Management
 
-KRL Data Connectors resolve API credentials securely and automatically, supporting multiple strategies for institutional and development environments. For comprehensive details, see [API_KEY_SETUP.md](./API_KEY_SETUP.md).
+KRL Data Connectors implement secure, automated API credential resolution, supporting institutional and development environments. For comprehensive procedures, refer to [API_KEY_SETUP.md](./API_KEY_SETUP.md).
 
 ### Credential Resolution Order
 
-1. **Environment Variables** (recommended for production)
-2. **Configuration file** at `~/.krl/apikeys` (recommended for development)
+Credentials are resolved in the following order to ensure security and reproducibility:
+1. **Environment Variables** (recommended for production deployments)
+2. **Configuration file** at `~/.krl/apikeys` (recommended for development and testing)
 3. **Direct assignment in code** (not recommended for production)
 
 #### Example: Environment Variables
@@ -361,7 +369,7 @@ chmod 600 ~/.krl/apikeys
 
 #### Configuration Utilities
 
-KRL Data Connectors provide utilities for automatic discovery of configuration files:
+KRL Data Connectors include utilities to facilitate automatic discovery and management of configuration files:
 
 ```python
 from krl_data_connectors import find_config_file, BEAConnector
@@ -377,7 +385,7 @@ bea = BEAConnector()
 
 ## Configuration
 
-KRL Data Connectors support flexible configuration via environment variables and YAML files, enabling precise control over credentials, caching, and logging.
+KRL Data Connectors support robust configuration via environment variables and YAML files, enabling precise control of credentials, caching, and logging for institutional deployments.
 
 ### Environment Variables
 
@@ -431,7 +439,7 @@ fred = FREDConnector(api_key=config.get("fred.api_key"))
 
 ## Connector Catalog
 
-KRL Data Connectors deliver reliable, scalable integration with the following data sources. All connectors are engineered for institutional-grade reliability and seamless analytics integration.
+KRL Data Connectors enable reliable, scalable integration with the following data sources. All connectors are engineered to institutional standards for reliability and seamless analytics integration.
 
 ### Production-Ready Connectors
 
@@ -453,30 +461,30 @@ KRL Data Connectors deliver reliable, scalable integration with the following da
 
 - **CDC WONDER:** Mortality and natality data (API non-functional; web interface recommended).
 - **USDA Food Environment Atlas:** Food access, insecurity, and local food systems.
-- **OECD, World Bank, College Scorecard, IPEDS, Superfund Sites, and more:** See [ROADMAP.md](ROADMAP.md) for the full development roadmap.
+- **OECD, World Bank, College Scorecard, IPEDS, Superfund Sites, and additional sources:** Refer to [ROADMAP.md](ROADMAP.md) for the complete development roadmap.
 
 ---
 
 ## Roadmap and Quality Standards
 
-KRL Data Connectors are developed according to a structured roadmap, targeting 40 connectors across all major institutional domains. Connectors are prioritized by institutional demand, API availability, and domain coverage.
+KRL Data Connectors are advanced in accordance with a structured roadmap, targeting 40 connectors across all major institutional domains. Prioritization is driven by institutional requirements, API availability, and domain coverage.
 
-**Quality controls:**
-- Minimum 90% test coverage with comprehensive unit tests
-- Full type hints and validation on all public methods
-- Robust error handling and informative error messages
+**Quality Standards:**
+- ≥90% test coverage with comprehensive unit tests
+- Full type hints and input validation on all public methods
+- Robust error handling with informative diagnostics
 - Intelligent, configurable caching
-- Structured JSON logging
-- Docstrings, usage examples, and quickstart notebooks
-- Secure API key management and input validation
+- Structured JSON logging for operational transparency
+- Comprehensive documentation, usage examples, and quickstart notebooks
+- Secure API key management and rigorous input validation
 
-For implementation schedules and API specifications, see [ROADMAP.md](ROADMAP.md).
+For implementation milestones and API specifications, consult [ROADMAP.md](ROADMAP.md).
 
 ---
 
 ## Testing
 
-KRL Data Connectors implement a **10-layer testing architecture** following industry best practices from FAANG, fintech, and defense sectors. All tooling is open-source (OSS).
+KRL Data Connectors employ a **10-layer testing architecture** aligned with best practices from leading technology and financial institutions. All testing tools are open source, ensuring full auditability and institutional transparency.
 
 ### Testing Stack
 
@@ -518,16 +526,16 @@ make help
 ### Coverage Goals
 
 - **Current**: 73.30% overall, 408 tests passing
-- **Target**: 90%+ line coverage, 85%+ branch coverage
-- **Mutation Goal**: 90%+ kill rate
+- **Target**: ≥90% line coverage, ≥85% branch coverage
+- **Mutation Goal**: ≥90% kill rate
 
-For detailed testing guide, see [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md).
+For detailed testing procedures and guidelines, refer to [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md).
 
 ---
 
 ## Development
 
-Establish a reproducible development environment and contribute to KRL Data Connectors using the following workflow:
+To ensure reproducibility and institutional-grade contribution standards, establish a local development environment and follow the workflow below:
 
 ```bash
 # Clone the repository
@@ -556,17 +564,17 @@ cd docs && make html
 
 ## Contributing
 
-KR-Labs welcomes contributions that advance the scalability, reliability, and coverage of KRL Data Connectors. Review the [CONTRIBUTING.md](CONTRIBUTING.md) guidelines prior to submitting changes.
+KR-Labs welcomes contributions that enhance the scalability, reliability, and domain coverage of KRL Data Connectors. All contributors are required to review [CONTRIBUTING.md](CONTRIBUTING.md) prior to submitting changes.
 
-All contributors must sign the [Contributor License Agreement (CLA)](https://krlabs.dev/cla) before code can be merged.
+A signed [Contributor License Agreement (CLA)](https://krlabs.dev/cla) is mandatory for all code contributions.
 
 ---
 
 ## License
 
-KRL Data Connectors are distributed under the **Apache License 2.0**. See the [LICENSE](LICENSE) file for full license text.
+KRL Data Connectors are distributed under the **Apache License 2.0**. For the full license text, refer to the [LICENSE](LICENSE) file.
 
-**License highlights:**
+**Key License Terms:**
 - Permits commercial use, modification, and redistribution
 - Patent grant included
 - Compatible with proprietary software
@@ -575,7 +583,7 @@ KRL Data Connectors are distributed under the **Apache License 2.0**. See the [L
 
 ## Support
 
-For technical support, institutional deployment, and community engagement:
+For technical support, institutional deployment, and community engagement, utilize the following channels:
 - **Documentation:** https://docs.krlabs.dev/data-connectors
 - **Issue Tracker:** https://github.com/KR-Labs/krl-data-connectors/issues
 - **Discussions:** https://github.com/KR-Labs/krl-data-connectors/discussions
@@ -585,7 +593,7 @@ For technical support, institutional deployment, and community engagement:
 
 ## Related Projects
 
-KRL Data Connectors are part of the KR-Labs analytics infrastructure ecosystem:
+KRL Data Connectors are a core component of the KR-Labs analytics infrastructure ecosystem:
 - **[krl-open-core](https://github.com/KR-Labs/krl-open-core):** Logging, configuration, and caching utilities
 - **[krl-model-zoo](https://github.com/KR-Labs/krl-model-zoo):** Causal inference and forecasting models
 - **[krl-dashboard](https://github.com/KR-Labs/krl-dashboard):** Interactive analytics and visualization platform
@@ -595,7 +603,7 @@ KRL Data Connectors are part of the KR-Labs analytics infrastructure ecosystem:
 
 ## Citation
 
-To cite KRL Data Connectors in research or institutional documentation, use:
+For institutional or research citation of KRL Data Connectors, use the following BibTeX entry:
 
 ```bibtex
 @software{krl_data_connectors,
@@ -609,7 +617,7 @@ To cite KRL Data Connectors in research or institutional documentation, use:
 
 ---
 
-**Built for reproducibility, scalability, and institutional trust by [KR-Labs](https://krlabs.dev)**
+**Engineered for reproducibility, scalability, and institutional trust by [KR-Labs](https://krlabs.dev)**
 
 *© 2025 KR-Labs. All rights reserved.*  
 *KR-Labs is a trademark of Quipu Research Labs, LLC, a subsidiary of Sudiata Giddasira, Inc.*

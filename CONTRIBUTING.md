@@ -1,3 +1,10 @@
+---
+© 2025 KR-Labs. All rights reserved.  
+KR-Labs™ is a trademark of Quipu Research Labs, LLC, a subsidiary of Sudiata Giddasira, Inc.
+
+SPDX-License-Identifier: Apache-2.0
+---
+
 # Contributing to KRL Data Connectors
 
 Thank you for your interest in contributing to KRL Data Connectors! This document provides guidelines and instructions for contributing to the project.
