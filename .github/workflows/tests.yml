@@ -45,7 +45,7 @@ jobs:
               test_get_provider_competition_return_type or test_init_with_cache or \
               test_state_code_validation or test_year_validation or \
               test_threshold_range_validation or test_rejects_whitespace_only_api_key or \
-              test_get_construction_complete_all_states or \
+              test_get_construction_complete_all_states or test_get_cws_no_state or \
               (TestCDCWonderConnector and (test_validate_connection or test_get_population_estimates)))"
     
     - name: Upload coverage to Codecov
