@@ -663,7 +663,7 @@ KRL Data Connectors are distributed under the **Apache License 2.0**. For the fu
 ## Support
 
 Use the following channels for verified support and communication:
-- **Documentation:** https://docs.krlabs.dev/data-connectors
+- **Documentation:** https://krlabs.dev/data-connectors
 - **Issue Tracker:** https://github.com/KR-Labs/krl-data-connectors/issues
 - **Discussions:** https://github.com/KR-Labs/krl-data-connectors/discussions
 - **Email:** support@krlabs.dev
