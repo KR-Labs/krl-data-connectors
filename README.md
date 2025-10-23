@@ -5,27 +5,37 @@ KR-Labs™ is a trademark of Quipu Research Labs, LLC, a subsidiary of Sudiata G
 SPDX-License-Identifier: Apache-2.0
 -->
 
+<div align="center">
+  <img src="docs/assets/KRLabs_WebLogo.png" alt="KR-Labs Logo" width="400"/>
+</div>
+
 # KRL Data Connectors
 
 <div align="center">
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![Tests](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/tests.yml/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/tests.yml)
-[![Lint](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/lint.yml/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/lint.yml)
-[![Security](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/security-checks.yml/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/security-checks.yml)
-[![License Compliance](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/license-compliance.yml/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/license-compliance.yml)
-[![Build](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/build-and-sign.yml/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/build-and-sign.yml)
-[![Comprehensive Tests](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/comprehensive-testing.yml/badge.svg)](https://github.com/KR-Labs/krl-data-connectors/actions/workflows/comprehensive-testing.yml)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+<p>
+<strong>Production-grade connectors for socioeconomic, demographic, and policy data infrastructure.</strong>
+</p>
 
-**Institutional-grade, production-ready connectors for socioeconomic and policy data infrastructure**
+<p>
+  <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"></a>
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="Python 3.9+"></a>
+  <a href="https://github.com/KR-Labs/krl-data-connectors/actions/workflows/build-and-sign.yml"><img src="https://github.com/KR-Labs/krl-data-connectors/actions/workflows/build-and-sign.yml/badge.svg" alt="Build"></a>
+  <a href="https://github.com/KR-Labs/krl-data-connectors/actions/workflows/tests.yml"><img src="https://github.com/KR-Labs/krl-data-connectors/actions/workflows/tests.yml/badge.svg" alt="Tests"></a>
+  <a href="https://github.com/KR-Labs/krl-data-connectors/actions/workflows/comprehensive-testing.yml"><img src="https://github.com/KR-Labs/krl-data-connectors/actions/workflows/comprehensive-testing.yml/badge.svg" alt="Comprehensive Tests"></a>
+  <a href="https://github.com/KR-Labs/krl-data-connectors/actions/workflows/lint.yml"><img src="https://github.com/KR-Labs/krl-data-connectors/actions/workflows/lint.yml/badge.svg" alt="Lint"></a>
+  <a href="https://github.com/KR-Labs/krl-data-connectors/actions/workflows/security-checks.yml"><img src="https://github.com/KR-Labs/krl-data-connectors/actions/workflows/security-checks.yml/badge.svg" alt="Security"></a>
+  <a href="https://github.com/KR-Labs/krl-data-connectors/actions/workflows/license-compliance.yml"><img src="https://github.com/KR-Labs/krl-data-connectors/actions/workflows/license-compliance.yml/badge.svg" alt="License Compliance"></a>
+  <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a>
+</p>
 
-[Installation](#installation) •
-[Quick Start](#quick-start) •
-[Documentation](https://krl-data-connectors.readthedocs.io) •
-[Examples](./examples/) •
-[Contributing](./CONTRIBUTING.md)
+<p>
+  <a href="#installation">Installation</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="https://krl-data-connectors.readthedocs.io">Documentation</a> •
+  <a href="./examples/">Examples</a> •
+  <a href="./CONTRIBUTING.md">Contributing</a>
+</p>
 
 </div>
 
@@ -33,166 +43,173 @@ SPDX-License-Identifier: Apache-2.0
 
 ## Overview
 
-KRL Data Connectors establish a unified, institutional-grade interface for accessing a comprehensive portfolio of socioeconomic, demographic, health, and environmental datasets. Engineered for reproducibility, scalability, and operational reliability, these connectors are foundational to the [KRL Analytics Suite](https://krlabs.dev), enabling robust economic analysis, causal inference, and policy evaluation at scale.
+KRL Data Connectors provide a unified, production-grade interface for institutional access to socioeconomic, demographic, health, and environmental datasets. Designed for operational discipline and engineered reliability, these connectors form the backbone of the [KRL Analytics Suite](https://krlabs.dev), supporting robust economic analysis, causal inference, and policy evaluation at scale.
 
-### Key Advantages
+### Infrastructure Guarantees
 
-KRL Data Connectors deliver:
-- **Unified API**: Consistent, type-safe interfaces across heterogeneous data sources.
-- **Production-Grade Reliability**: Structured logging, robust error handling, and automated retry logic.
-- **Type Safety**: Comprehensive type hints and runtime validation.
-- **Intelligent Caching**: Efficient caching to optimize data retrieval and minimize redundant API calls.
-- **Rich Metadata**: Automated extraction and profiling of dataset metadata.
-- **Rigorous Testing**: Over 2,800 tests across 40 connectors; >80% code coverage.
-- **Quickstart Resources**: Jupyter notebooks for accelerated onboarding.
-- **Secure Credential Management**: Multiple credential resolution strategies to ensure institutional security.
+KRL Data Connectors guarantee:
+- **Unified API Surface**: Consistent, type-safe interfaces across all supported data sources.
+- **Operational Reliability**: Structured logging, resilient error handling, and automated retry mechanisms.
+- **Type Safety and Validation**: Complete type hints and runtime input validation.
+- **Optimized Caching**: Intelligent caching to reduce redundant data access and improve throughput.
+- **Automated Metadata Extraction**: Standardized profiling of dataset metadata for downstream integration.
+- **Comprehensive Testing**: >2,800 automated tests across 40 connectors, maintaining >80% code coverage.
+- **Secure Credential Management**: Institutional-grade credential resolution and isolation.
 
 ### Supported Data Sources
 
-KRL Data Connectors provide institutional access to **40 production-ready datasets** spanning 14 key domains:
+KRL Data Connectors provide institutional-grade access to 40 production-ready datasets across 14 domains. Each domain is represented by connectors engineered for reliability and operational consistency.
 
 #### Economic & Financial Data (8 connectors)
 | Data Source           | Domain         | Auth Required | Update Frequency    | Coverage            | Status        |
 |----------------------|---------------|---------------|---------------------|---------------------|--------------|
-| FRED                  | Economics      | Yes           | Daily/Real-time     | 800K+ series        | ✅ Production |
-| BLS                   | Labor          | Recommended   | Monthly             | National/State      | ✅ Production |
-| BEA                   | Economics      | Yes           | Quarterly/Annual    | National/Regional   | ✅ Production |
-| OECD                  | International  | No            | Varies              | Country-level       | ✅ Production |
-| World Bank            | International  | No            | Annual              | Country-level       | ✅ Production |
-| SEC                   | Financial      | No            | Real-time           | Public filings      | ✅ Production |
-| Treasury              | Financial      | No            | Daily               | Federal finances    | ✅ Production |
-| FDIC                  | Banking        | No            | Quarterly           | Bank data           | ✅ Production |
+| FRED                  | Economics      | Yes           | Daily/Real-time     | 800K+ series        | Production   |
+| BLS                   | Labor          | Recommended   | Monthly             | National/State      | Production   |
+| BEA                   | Economics      | Yes           | Quarterly/Annual    | National/Regional   | Production   |
+| OECD                  | International  | No            | Varies              | Country-level       | Production   |
+| World Bank            | International  | No            | Annual              | Country-level       | Production   |
+| SEC                   | Financial      | No            | Real-time           | Public filings      | Production   |
+| Treasury              | Financial      | No            | Daily               | Federal finances    | Production   |
+| FDIC                  | Banking        | No            | Quarterly           | Bank data           | Production   |
 
 #### Demographic & Labor Data (3 connectors)
+Institutional connectors for core demographic and labor datasets.
 | Data Source           | Domain         | Auth Required | Update Frequency    | Coverage            | Status        |
 |----------------------|---------------|---------------|---------------------|---------------------|--------------|
-| Census ACS            | Demographics   | Optional      | Annual              | All US geographies  | ✅ Production |
-| Census CBP            | Business       | Optional      | Annual              | County-level        | ✅ Production |
-| Census LEHD           | Employment     | No            | Quarterly           | County-level        | ✅ Production |
+| Census ACS            | Demographics   | Optional      | Annual              | All US geographies  | Production   |
+| Census CBP            | Business       | Optional      | Annual              | County-level        | Production   |
+| Census LEHD           | Employment     | No            | Quarterly           | County-level        | Production   |
 
 #### Health & Wellbeing Data (5 connectors)
+Connectors for health outcomes, provider, and wellbeing datasets.
 | Data Source           | Domain         | Auth Required | Update Frequency    | Coverage            | Status        |
 |----------------------|---------------|---------------|---------------------|---------------------|--------------|
-| HRSA                  | Health         | No            | Annual              | HPSA/MUA/P          | ✅ Production |
-| CDC WONDER            | Health         | No            | Varies              | County-level        | ✅ Production |
-| County Health Rankings| Health         | No            | Annual              | County-level        | ✅ Production |
-| FDA                   | Health         | No            | Real-time           | Drugs/devices       | ✅ Production |
-| NIH                   | Research       | No            | Daily               | Grants/projects     | ✅ Production |
+| HRSA                  | Health         | No            | Annual              | HPSA/MUA/P          | Production   |
+| CDC WONDER            | Health         | No            | Varies              | County-level        | Production   |
+| County Health Rankings| Health         | No            | Annual              | County-level        | Production   |
+| FDA                   | Health         | No            | Real-time           | Drugs/devices       | Production   |
+| NIH                   | Research       | No            | Daily               | Grants/projects     | Production   |
 
 #### Environmental & Climate Data (5 connectors)
+Production connectors for environmental, air, and climate data.
 | Data Source           | Domain         | Auth Required | Update Frequency    | Coverage            | Status        |
 |----------------------|---------------|---------------|---------------------|---------------------|--------------|
-| EPA EJScreen          | Environment    | No            | Annual              | Block group         | ✅ Production |
-| EPA Air Quality       | Environment    | No            | Hourly/Real-time    | Station-level       | ✅ Production |
-| EPA Superfund         | Environment    | No            | Real-time           | Site-level          | ✅ Production |
-| EPA Water Quality     | Environment    | No            | Real-time           | Facility-level      | ✅ Production |
-| NOAA Climate          | Climate        | No            | Daily               | Station-level       | ✅ Production |
+| EPA EJScreen          | Environment    | No            | Annual              | Block group         | Production   |
+| EPA Air Quality       | Environment    | No            | Hourly/Real-time    | Station-level       | Production   |
+| EPA Superfund         | Environment    | No            | Real-time           | Site-level          | Production   |
+| EPA Water Quality     | Environment    | No            | Real-time           | Facility-level      | Production   |
+| NOAA Climate          | Climate        | No            | Daily               | Station-level       | Production   |
 
 #### Education Data (3 connectors)
+Institutional connectors for education and postsecondary data.
 | Data Source           | Domain         | Auth Required | Update Frequency    | Coverage            | Status        |
 |----------------------|---------------|---------------|---------------------|---------------------|--------------|
-| NCES                  | Education      | No            | Annual              | School-level        | ✅ Production |
-| College Scorecard     | Education      | Yes           | Annual              | Institution         | ✅ Production |
-| IPEDS                 | Education      | No            | Annual              | Institution         | ✅ Production |
+| NCES                  | Education      | No            | Annual              | School-level        | Production   |
+| College Scorecard     | Education      | Yes           | Annual              | Institution         | Production   |
+| IPEDS                 | Education      | No            | Annual              | Institution         | Production   |
 
 #### Housing & Urban Data (2 connectors)
+Production-ready connectors for housing and urban indicators.
 | Data Source           | Domain         | Auth Required | Update Frequency    | Coverage            | Status        |
 |----------------------|---------------|---------------|---------------------|---------------------|--------------|
-| HUD Fair Market Rent  | Housing        | Yes           | Annual              | Metro/County        | ✅ Production |
-| Zillow Research       | Housing        | No            | Monthly             | Metro/ZIP           | ✅ Production |
+| HUD Fair Market Rent  | Housing        | Yes           | Annual              | Metro/County        | Production   |
+| Zillow Research       | Housing        | No            | Monthly             | Metro/ZIP           | Production   |
 
 #### Agricultural Data (2 connectors)
+Connectors for agricultural and food environment data.
 | Data Source           | Domain         | Auth Required | Update Frequency    | Coverage            | Status        |
 |----------------------|---------------|---------------|---------------------|---------------------|--------------|
-| USDA Food Atlas       | Agricultural   | Yes           | Annual              | County-level        | ✅ Production |
-| USDA NASS             | Agricultural   | Yes           | Varies              | National/State      | ✅ Production |
+| USDA Food Atlas       | Agricultural   | Yes           | Annual              | County-level        | Production   |
+| USDA NASS             | Agricultural   | Yes           | Varies              | National/State      | Production   |
 
 #### Crime & Justice Data (3 connectors)
+Production connectors for crime and justice data.
 | Data Source           | Domain         | Auth Required | Update Frequency    | Coverage            | Status        |
 |----------------------|---------------|---------------|---------------------|---------------------|--------------|
-| FBI UCR               | Crime          | Recommended   | Annual              | Agency-level        | ✅ Production |
-| Bureau of Justice     | Justice        | No            | Annual              | National            | ✅ Production |
-| Victims of Crime      | Justice        | No            | Annual              | State-level         | ✅ Production |
+| FBI UCR               | Crime          | Recommended   | Annual              | Agency-level        | Production   |
+| Bureau of Justice     | Justice        | No            | Annual              | National            | Production   |
+| Victims of Crime      | Justice        | No            | Annual              | State-level         | Production   |
 
 #### Energy Data (1 connector)
+Institutional connector for energy datasets.
 | Data Source           | Domain         | Auth Required | Update Frequency    | Coverage            | Status        |
 |----------------------|---------------|---------------|---------------------|---------------------|--------------|
-| EIA                   | Energy         | Yes           | Real-time           | National/State      | ✅ Production |
+| EIA                   | Energy         | Yes           | Real-time           | National/State      | Production   |
 
 #### Science & Research Data (2 connectors)
+Connectors for geoscience and research awards data.
 | Data Source           | Domain         | Auth Required | Update Frequency    | Coverage            | Status        |
 |----------------------|---------------|---------------|---------------------|---------------------|--------------|
-| USGS                  | Geoscience     | No            | Real-time           | National            | ✅ Production |
-| NSF                   | Research       | No            | Daily               | Awards/grants       | ✅ Production |
+| USGS                  | Geoscience     | No            | Real-time           | National            | Production   |
+| NSF                   | Research       | No            | Daily               | Awards/grants       | Production   |
 
 #### Transportation Data (1 connector)
+Production connector for aviation and transportation data.
 | Data Source           | Domain         | Auth Required | Update Frequency    | Coverage            | Status        |
 |----------------------|---------------|---------------|---------------------|---------------------|--------------|
-| FAA                   | Aviation       | No            | Real-time           | Airport/flight      | ✅ Production |
+| FAA                   | Aviation       | No            | Real-time           | Airport/flight      | Production   |
 
 #### Labor Safety Data (1 connector)
+Connector for labor safety and inspection data.
 | Data Source           | Domain         | Auth Required | Update Frequency    | Coverage            | Status        |
 |----------------------|---------------|---------------|---------------------|---------------------|--------------|
-| OSHA                  | Safety         | No            | Real-time           | Inspections         | ✅ Production |
+| OSHA                  | Safety         | No            | Real-time           | Inspections         | Production   |
 
 #### Social Services Data (2 connectors)
+Connectors for social services and benefits data.
 | Data Source           | Domain         | Auth Required | Update Frequency    | Coverage            | Status        |
 |----------------------|---------------|---------------|---------------------|---------------------|--------------|
-| Social Security Admin | Social         | No            | Annual              | National            | ✅ Production |
-| ACF                   | Social         | No            | Annual              | State/County        | ✅ Production |
+| Social Security Admin | Social         | No            | Annual              | National            | Production   |
+| ACF                   | Social         | No            | Annual              | State/County        | Production   |
 
 #### Veterans Services Data (1 connector)
+Connector for veterans services and benefits data.
 | Data Source           | Domain         | Auth Required | Update Frequency    | Coverage            | Status        |
 |----------------------|---------------|---------------|---------------------|---------------------|--------------|
-| VA                    | Veterans       | No            | Real-time           | Facilities/benefits | ✅ Production |
+| VA                    | Veterans       | No            | Real-time           | Facilities/benefits | Production   |
 
-**Total: 40 Production-Ready Connectors** | ✅ All Production | 🎉 100% Complete
+**Total: 40 Production-Ready Connectors** | All connectors are maintained in production status.
 
 ---
 
-## 🔐 Security & IP Protection
+## Security & IP Protection
 
-KRL Data Connectors implements a comprehensive **10-Layer Defense & Protection Stack** to ensure security, IP protection, and compliance:
+KRL Data Connectors are developed and maintained under a comprehensive, audit-grade security and intellectual property (IP) protection framework. The repository implements a multi-layered defense strategy to ensure compliance, confidentiality, and operational integrity.
 
-### Active Security Measures
+### Compliance and Protection Layers
 
-| Layer | Protection | Status | Coverage |
-|-------|-----------|--------|----------|
-| **Layer 1** | Legal Protection (Copyright, Trademark, License) | ✅ Active | 198/198 files (100%) |
-| **Layer 2** | Technical Protection (Secret Scanning) | ✅ Active | GitHub + Gitleaks + Pre-commit |
-| **Layer 5** | Build Verification (CI/CD Security) | ✅ Active | Automated on every PR |
-| **Layer 6** | License Enforcement | ✅ Active | Apache 2.0 compliance |
-| **Layer 9** | CI/CD Security | ✅ Active | Multi-scanner validation |
-| **Layer 10** | Monitoring & Response | ✅ Active | Security advisories enabled |
+| Layer | Control Area | Status | Coverage |
+|-------|----------------|--------|----------|
+| 1 | Legal Protection (Copyright, Trademark, License) | Enforced | 100% of files |
+| 2 | Technical Protection (Secret Scanning) | Enforced | GitHub, Gitleaks, Pre-commit |
+| 3 | Build Verification (CI/CD Security) | Enforced | All pull requests |
+| 4 | License Compliance | Enforced | Apache 2.0, automated checks |
+| 5 | Continuous Monitoring & Response | Enforced | Security advisories, multi-scanner validation |
 
-### Security Scanning (Automated)
+### Automated Security Controls
 
-Every commit and pull request is automatically scanned for:
-
-- ✅ **Copyright & Trademark Verification** - Ensures proper IP attribution
-- ✅ **Secret Detection** - Blocks commits with exposed credentials (Gitleaks)
-- ✅ **Vulnerability Scanning** - Identifies security issues (Trivy, CodeQL)
-- ✅ **Dependency Security** - Reviews dependencies for known CVEs
-- ✅ **License Compliance** - Blocks incompatible licenses (GPL, AGPL)
-- ✅ **Python Security** - Static analysis (Bandit) and package scanning (Safety)
+All code contributions and repository changes are subject to:
+- Automated secret scanning (Gitleaks, pre-commit)
+- Vulnerability assessment (Trivy, CodeQL)
+- Dependency security review (CVE scanning)
+- License compatibility enforcement (GPL/AGPL blocklisting)
+- Static and dynamic code analysis (Bandit, Safety)
+- Copyright and trademark validation
 
 ### Repository Validation
 
-```bash
-🔍 Historical Scan: 145 commits, 5.42 MB scanned
-✅ Result: ZERO secrets detected
-✅ All 198 files protected with copyright headers
-✅ 100% Apache 2.0 license compliance
-```
+All commits are continuously validated for secrets, license compliance, and legal attribution. Historical scans confirm:
+- Zero secrets detected across repository history
+- 100% of files with copyright headers
+- Full adherence to Apache 2.0 licensing
 
-### For Contributors
+### Contributor Compliance
 
-- **No secrets in code**: Pre-commit hooks block credentials automatically
-- **Secure by default**: Copyright headers added automatically
-- **Verified builds**: All PRs undergo security validation
-- **Quick setup**: `pre-commit install` enables all protections
+- Credentials/secrets are automatically blocked at commit time
+- All pull requests are subject to security and compliance validation
+- Pre-commit hooks and automated tooling are required for all contributors
 
-See [SECURITY.md](./SECURITY.md) for vulnerability reporting and detailed security practices.
+For detailed security practices and vulnerability reporting, refer to [SECURITY.md](./SECURITY.md).
 
 ---
 
@@ -215,24 +232,24 @@ pip install krl-data-connectors[dev]
 
 ## Quick Start
 
-The following examples demonstrate initialization and usage of KRL Data Connectors for principal data sources. All connectors are architected for direct incorporation into reproducible, scalable analytics pipelines.
+The following examples demonstrate reproducible initialization and usage of KRL Data Connectors for primary data sources. All connectors are designed for direct integration into institutional analytics pipelines.
 
 ### County Business Patterns (CBP)
 
 ```python
 from krl_data_connectors import CountyBusinessPatternsConnector
 
-# Initialize connector (API key detected from environment: CENSUS_API_KEY)
+# Initialize connector using environment variable for API key
 cbp = CountyBusinessPatternsConnector()
 
-# Retrieve retail trade data for Rhode Island
+# Retrieve retail trade data for Rhode Island (FIPS 44, NAICS 44)
 retail_data = cbp.get_state_data(
     year=2021,
-    state='44',  # Rhode Island FIPS code
-    naics='44'   # Retail trade sector
+    state='44',
+    naics='44'
 )
 
-print(f"Retrieved {len(retail_data)} records")
+print(f"Records: {len(retail_data)}")
 print(retail_data[['NAICS2017', 'ESTAB', 'EMP', 'PAYANN']].head())
 ```
 
@@ -244,15 +261,15 @@ from krl_data_connectors import LEHDConnector
 # Initialize connector
 lehd = LEHDConnector()
 
-# Retrieve origin-destination employment flows
+# Retrieve origin-destination employment flows for RI, 2021
 od_data = lehd.get_od_data(
     state='ri',
     year=2021,
-    job_type='JT00',  # All jobs
-    segment='S000'    # All workers
+    job_type='JT00',
+    segment='S000'
 )
 
-print(f"Retrieved {len(od_data)} origin-destination pairs")
+print(f"Origin-destination pairs: {len(od_data)}")
 print(od_data[['w_geocode', 'h_geocode', 'S000', 'SA01']].head())
 ```
 
@@ -261,7 +278,7 @@ print(od_data[['w_geocode', 'h_geocode', 'S000', 'SA01']].head())
 ```python
 from krl_data_connectors import FREDConnector
 
-# Initialize connector (API key from FRED_API_KEY)
+# Initialize connector using FRED_API_KEY environment variable
 fred = FREDConnector()
 
 # Fetch unemployment rate time series
@@ -279,10 +296,10 @@ print(unemployment.head())
 ```python
 from krl_data_connectors import BLSConnector
 
-# Initialize connector (API key from BLS_API_KEY)
+# Initialize connector using BLS_API_KEY environment variable
 bls = BLSConnector()
 
-# Get unemployment rate for multiple states
+# Retrieve unemployment rate for selected states
 unemployment = bls.get_series(
     series_ids=['LASST060000000000003', 'LASST440000000000003'],
     start_year=2020,
@@ -297,10 +314,10 @@ print(unemployment.head())
 ```python
 from krl_data_connectors import BEAConnector
 
-# Initialize connector (API key from BEA_API_KEY)
+# Initialize connector using BEA_API_KEY environment variable
 bea = BEAConnector()
 
-# Get GDP by state
+# Retrieve GDP by state for 2021
 gdp_data = bea.get_data(
     dataset='Regional',
     method='GetData',
@@ -315,48 +332,48 @@ print(gdp_data.head())
 
 ### Caching and Base Connector
 
-All connectors inherit from `BaseConnector`, which standardizes caching, configuration, and logging to ensure consistent operational behavior.
+All connectors inherit from `BaseConnector`, which standardizes caching, configuration, and logging for operational consistency.
 
 ```python
 from krl_data_connectors import FREDConnector
 
-# Enable automatic caching
+# Enable file-based caching with 1-hour TTL
 fred = FREDConnector(
     api_key="your_api_key",
     cache_dir="/tmp/fred_cache",
-    cache_ttl=3600  # 1 hour
+    cache_ttl=3600
 )
 
-# Cached responses are automatic
-data1 = fred.get_series("UNRATE")  # Fetches from API
-data2 = fred.get_series("UNRATE")  # Returns from cache
+# Cached responses are handled automatically
+data1 = fred.get_series("UNRATE")  # API call
+data2 = fred.get_series("UNRATE")  # Served from cache
 
-# Access cache statistics
+# Retrieve cache statistics
 stats = fred.cache.get_stats()
-print(f"Hit rate: {stats['hit_rate']:.1f}%")
+print(f"Cache hit rate: {stats['hit_rate']:.1f}%")
 ```
 
 ---
 
 ## Architecture
 
-KRL Data Connectors are architected for extensibility, operational precision, and institutional scalability. Each connector extends a unified `BaseConnector`, ensuring standardized logging, configuration, caching, and request management.
+KRL Data Connectors are modular and auditable, supporting extensibility and institutional-scale deployment. All connectors derive from a unified `BaseConnector`, ensuring interface consistency and standardized operational controls.
 
 ### BaseConnector Capabilities
 
-The `BaseConnector` class provides:
-- **Structured Logging**: JSON-formatted logs with comprehensive request and response metadata.
-- **Configuration Management**: Flexible support for environment variables and YAML configuration files.
-- **Intelligent Caching**: File-based and Redis caching with configurable TTLs.
-- **Automated Error Handling**: Built-in retry logic, API rate limiting, and request timeouts.
-- **Efficient Request Management**: HTTP session pooling and optimized connection reuse.
+The `BaseConnector` class enforces:
+- **Structured Logging**: JSON-formatted logs with complete request and response metadata.
+- **Consistent Configuration**: Environment variable and YAML-based configuration for credentials, caching, and logging.
+- **Intelligent Caching**: File-based and Redis support with configurable TTL.
+- **Automated Error Handling**: Retry logic, API rate limiting, and request timeouts.
+- **Standardized Request Management**: HTTP session pooling and connection reuse.
 
 ```python
 from abc import ABC, abstractmethod
 from krl_core import get_logger, ConfigManager, FileCache
 
 class BaseConnector(ABC):
-    """Abstract base class for data connectors."""
+    """Abstract base class for all data connectors. Enforces interface and operational consistency."""
     def __init__(self, api_key=None, cache_dir=None, cache_ttl=3600):
         self.logger = get_logger(self.__class__.__name__)
         self.config = ConfigManager()
@@ -372,14 +389,14 @@ class BaseConnector(ABC):
 
 ## API Key Management
 
-KRL Data Connectors implement secure, automated API credential resolution, supporting institutional and development environments. For comprehensive procedures, refer to [API_KEY_SETUP.md](./API_KEY_SETUP.md).
+KRL Data Connectors implement secure, automated credential resolution for institutional and development use. The credential management system ensures operational consistency and auditability. See [API_KEY_SETUP.md](./API_KEY_SETUP.md) for procedural details.
 
 ### Credential Resolution Order
 
-Credentials are resolved in the following order to ensure security and reproducibility:
-1. **Environment Variables** (recommended for production deployments)
-2. **Configuration file** at `~/.krl/apikeys` (recommended for development and testing)
-3. **Direct assignment in code** (not recommended for production)
+API credentials are resolved in the following order:
+1. **Environment Variables** (preferred for production)
+2. **Configuration file** at `~/.krl/apikeys` (recommended for development/testing)
+3. **Direct assignment in code** (permitted for testing only)
 
 #### Example: Environment Variables
 
@@ -417,7 +434,7 @@ chmod 600 ~/.krl/apikeys
 
 #### Configuration Utilities
 
-KRL Data Connectors include utilities to facilitate automatic discovery and management of configuration files:
+Automatic discovery and management of configuration files are supported:
 
 ```python
 from krl_data_connectors import find_config_file, BEAConnector
@@ -425,7 +442,7 @@ from krl_data_connectors import find_config_file, BEAConnector
 config_path = find_config_file('apikeys')
 print(f"Config found at: {config_path}")
 
-# Connectors use config file or environment variables automatically
+# Connectors resolve credentials from configuration or environment
 bea = BEAConnector()
 ```
 
@@ -433,7 +450,7 @@ bea = BEAConnector()
 
 ## Configuration
 
-KRL Data Connectors support robust configuration via environment variables and YAML files, enabling precise control of credentials, caching, and logging for institutional deployments.
+KRL Data Connectors support robust, institution-ready configuration via environment variables and YAML files. This enables precise management of credentials, caching, and logging for reproducible deployments.
 
 ### Environment Variables
 
@@ -532,24 +549,24 @@ For implementation milestones and API specifications, consult [ROADMAP.md](ROADM
 
 ## Testing
 
-KRL Data Connectors employ a **10-layer testing architecture** aligned with best practices from leading technology and financial institutions. All testing tools are open source, ensuring full auditability and institutional transparency.
+KRL Data Connectors utilize a 10-layer, open-source testing architecture aligned with institutional best practices. All tests and validation tools are fully auditable and reproducible.
 
-### Testing Stack
+### Testing Model
 
 | Layer | Purpose | Tools | Status |
-|-------|---------|-------|--------|
-| **1. Unit Tests** | Individual function correctness | pytest, hypothesis | ✅ 408 tests, 73% coverage |
-| **2. Integration** | Component interactions | pytest, requests-mock | ✅ Implemented |
-| **3. E2E Tests** | Full workflow validation | playwright | 🔄 Planned |
-| **4. Performance** | Load & stress testing | locust, pytest-benchmark | 🔄 Planned |
-| **5. SAST** | Static security analysis | bandit, safety, mypy | ✅ Configured |
-| **6. DAST** | Runtime security testing | OWASP ZAP | 🔄 Planned |
-| **7. Mutation** | Test quality measurement | mutmut, hypothesis | 🔄 Planned |
-| **8. Contract** | Type & interface validation | pydantic, mypy | ✅ Configured |
-| **9. Penetration** | Ethical hacking assessment | metasploit, burp | 📅 Annual |
-| **10. Monitoring** | Continuous validation | GitHub Actions, Snyk | ✅ Active |
+|-------|--------|-------|--------|
+| 1. Unit Tests | Function correctness | pytest, hypothesis | Implemented (408 tests, 73% coverage) |
+| 2. Integration | Component interaction | pytest, requests-mock | Implemented |
+| 3. E2E Tests | Workflow validation | playwright | Planned |
+| 4. Performance | Load/stress testing | locust, pytest-benchmark | Planned |
+| 5. SAST | Static security analysis | bandit, safety, mypy | Configured |
+| 6. DAST | Runtime security testing | OWASP ZAP | Planned |
+| 7. Mutation | Test quality measurement | mutmut, hypothesis | Planned |
+| 8. Contract | Type/interface validation | pydantic, mypy | Configured |
+| 9. Penetration | Security assessment | metasploit, burp | Annual |
+| 10. Monitoring | Continuous validation | GitHub Actions, Snyk | Active |
 
-### Quick Test Commands
+### Test Execution
 
 ```bash
 # Run all tests
@@ -564,26 +581,26 @@ make security
 # Run type checking
 make type-check
 
-# Full CI simulation
+# Simulate full CI pipeline
 make ci
 
-# See all available commands
+# List available commands
 make help
 ```
 
-### Coverage Goals
+### Coverage Objectives
 
-- **Current**: 73.30% overall, 408 tests passing
-- **Target**: ≥90% line coverage, ≥85% branch coverage
-- **Mutation Goal**: ≥90% kill rate
+- Current: 73.30% overall, 408 tests passing
+- Target: ≥90% line coverage, ≥85% branch coverage
+- Mutation: ≥90% kill rate
 
-For detailed testing procedures and guidelines, refer to [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md).
+For detailed procedures, see [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md).
 
 ---
 
 ## Development
 
-To ensure reproducibility and institutional-grade contribution standards, establish a local development environment and follow the workflow below:
+All development must ensure reproducibility and full compliance with institutional contribution standards. Establish a local environment and follow the verified workflow:
 
 ```bash
 # Clone the repository
@@ -597,7 +614,7 @@ source .venv/bin/activate  # or `.venv\Scripts\activate` on Windows
 # Install development and test dependencies
 pip install -e ".[dev,test]"
 
-# Run pre-commit hooks
+# Run pre-commit hooks for code compliance
 pre-commit install
 pre-commit run --all-files
 
@@ -612,9 +629,7 @@ cd docs && make html
 
 ## Contributing
 
-KR-Labs welcomes contributions that enhance the scalability, reliability, and domain coverage of KRL Data Connectors. All contributors are required to review [CONTRIBUTING.md](CONTRIBUTING.md) prior to submitting changes.
-
-A signed [Contributor License Agreement (CLA)](https://krlabs.dev/cla) is mandatory for all code contributions.
+All contributions must maintain reproducibility, compliance, and operational reliability. Review [CONTRIBUTING.md](CONTRIBUTING.md) before submitting changes. A signed [Contributor License Agreement (CLA)](https://krlabs.dev/cla) is required for all code contributions.
 
 ---
 
@@ -631,7 +646,7 @@ KRL Data Connectors are distributed under the **Apache License 2.0**. For the fu
 
 ## Support
 
-For technical support, institutional deployment, and community engagement, utilize the following channels:
+Use the following channels for verified support and communication:
 - **Documentation:** https://docs.krlabs.dev/data-connectors
 - **Issue Tracker:** https://github.com/KR-Labs/krl-data-connectors/issues
 - **Discussions:** https://github.com/KR-Labs/krl-data-connectors/discussions
@@ -667,5 +682,5 @@ For institutional or research citation of KRL Data Connectors, use the following
 
 **Engineered for reproducibility, scalability, and institutional trust by [KR-Labs](https://krlabs.dev)**
 
-*© 2025 KR-Labs. All rights reserved.*  
-*KR-Labs is a trademark of Quipu Research Labs, LLC, a subsidiary of Sudiata Giddasira, Inc.*
+© 2025 KR-Labs. All rights reserved.  
+KR-Labs is a trademark of Quipu Research Labs, LLC, a subsidiary of Sudiata Giddasira, Inc.
