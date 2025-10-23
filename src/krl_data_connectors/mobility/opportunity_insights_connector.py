@@ -139,7 +139,7 @@ class OpportunityInsightsConnector(BaseConnector):
         )
 
         self.data_version = data_version
-        self._atlas_data: Optional[pd.DataFrame] = None
+        self._atlas_data: dict[str, pd.DataFrame] = {}  # Cache keyed by geography level
         self._social_capital_data: Optional[pd.DataFrame] = None
 
         self.logger.info(
@@ -434,8 +434,8 @@ class OpportunityInsightsConnector(BaseConnector):
                 f"Invalid geography: {geography}. " f"Must be one of {valid_geographies}"
             )
 
-        # Download Opportunity Atlas data if not cached
-        if self._atlas_data is None or force_download:
+        # Download Opportunity Atlas data if not cached for this geography level
+        if geography not in self._atlas_data or force_download:
             # Select the appropriate geography file (STATA format)
             url_map = {
                 "tract": (self.ATLAS_TRACT_URL, "tract_outcomes_simple.dta"),
@@ -452,38 +452,41 @@ class OpportunityInsightsConnector(BaseConnector):
 
             self.logger.info(f"Loading Opportunity Atlas {geography}-level data from STATA file")
             # Read STATA file - pandas handles .dta format natively
-            self._atlas_data = pd.read_stata(
+            atlas_df = pd.read_stata(
                 atlas_path, convert_categoricals=True, preserve_dtypes=False
             )
 
             # Normalize column names (STATA files use different naming convention)
-            self._atlas_data = self._normalize_column_names(self._atlas_data)
+            atlas_df = self._normalize_column_names(atlas_df)
 
             # Convert geographic identifiers to strings for filtering
             # STATA files store these as floats, need to convert to int first, then string
-            if "state" in self._atlas_data.columns:
+            if "state" in atlas_df.columns:
                 # State is 2 digits
-                self._atlas_data["state"] = (
-                    self._atlas_data["state"].fillna(0).astype(int).astype(str).str.zfill(2)
+                atlas_df["state"] = (
+                    atlas_df["state"].fillna(0).astype(int).astype(str).str.zfill(2)
                 )
 
-            if "county" in self._atlas_data.columns and "state" in self._atlas_data.columns:
+            if "county" in atlas_df.columns and "state" in atlas_df.columns:
                 # County in STATA file is only 3 digits (county suffix)
                 # Need to combine with state to get 5-digit FIPS code
                 county_suffix = (
-                    self._atlas_data["county"].fillna(0).astype(int).astype(str).str.zfill(3)
+                    atlas_df["county"].fillna(0).astype(int).astype(str).str.zfill(3)
                 )
-                self._atlas_data["county"] = self._atlas_data["state"] + county_suffix
+                atlas_df["county"] = atlas_df["state"] + county_suffix
 
-            if geography == "tract" and "tract" in self._atlas_data.columns:
+            if geography == "tract" and "tract" in atlas_df.columns:
                 # Tract in STATA file is only 6 digits (tract suffix)
                 # Need to combine with county to get full 11-digit code
                 tract_suffix = (
-                    self._atlas_data["tract"].fillna(0).astype(int).astype(str).str.zfill(6)
+                    atlas_df["tract"].fillna(0).astype(int).astype(str).str.zfill(6)
                 )
-                self._atlas_data["tract"] = self._atlas_data["county"] + tract_suffix
+                atlas_df["tract"] = atlas_df["county"] + tract_suffix
 
-        df = self._atlas_data.copy()
+            # Cache the data keyed by geography level
+            self._atlas_data[geography] = atlas_df
+
+        df = self._atlas_data[geography].copy()
 
         # Filter by state if specified
         if state is not None:
