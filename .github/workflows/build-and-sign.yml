@@ -54,6 +54,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     environment: pypi
     permissions:
+      contents: write  # Required for creating releases
       id-token: write  # Required for trusted publishing
     
     steps:
