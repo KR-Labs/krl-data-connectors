@@ -492,24 +492,34 @@ class OpportunityInsightsConnector(BaseConnector):
 
         df = self._atlas_data[geography].copy()
 
-        # Filter by state if specified
-        if state is not None:
-            df = df[df["state"] == str(state).zfill(2)]
+        # For state-level geography, aggregation creates the state column
+        # So we need to aggregate first, then filter
+        if geography == "state":
+            df = self._aggregate_atlas(df, geography)
+            
+            # Now filter by state if specified
+            if state is not None:
+                df = df[df["state"] == str(state).zfill(2)]
+        else:
+            # For other geographies, filter before aggregation for efficiency
+            # Filter by state if specified
+            if state is not None and "state" in df.columns:
+                df = df[df["state"] == str(state).zfill(2)]
 
-        # Filter by county if specified
-        if county is not None:
-            df = df[df["county"] == str(county).zfill(5)]
+            # Filter by county if specified
+            if county is not None and "county" in df.columns:
+                df = df[df["county"] == str(county).zfill(5)]
 
-        # Select metrics if specified
+            # Aggregate to requested geography if not tract
+            if geography != "tract":
+                df = self._aggregate_atlas(df, geography)
+
+        # Select metrics if specified (after aggregation to avoid losing group columns)
         if metrics is not None:
             # Always include geographic identifiers
             geo_cols = ["tract", "county", "state", "cz", "czname"]
             cols_to_keep = [col for col in geo_cols if col in df.columns] + metrics
             df = df[cols_to_keep]
-
-        # Aggregate to requested geography if not tract
-        if geography != "tract":
-            df = self._aggregate_atlas(df, geography)
 
         self.logger.info(
             "Fetched Opportunity Atlas data",
