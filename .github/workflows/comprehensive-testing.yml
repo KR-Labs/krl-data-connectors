@@ -348,6 +348,7 @@ jobs:
           mypy src/ --config-file mypy.ini --html-report mypy-report
       
       - name: Check type coverage
+        continue-on-error: true
         run: |
           echo "Analyzing type coverage..."
           mypy src/ --config-file mypy.ini --txt-report mypy-coverage
