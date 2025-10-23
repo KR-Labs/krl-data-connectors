@@ -37,7 +37,7 @@ jobs:
     - name: Run tests with coverage
       shell: bash
       run: |
-        pytest --cov=src --cov-report=xml --cov-report=term-missing --ignore=tests/contract/ --ignore=tests/performance/ -k "not (Security or test_close_closes_session or test_init_default or test_initialization_default_values or test_get_data_numeric_conversion or test_empty_api_key_handling or _caching or _success or test_get_provider_competition_return_type or test_init_with_cache or test_state_code_validation or test_year_validation or test_threshold_range_validation or test_rejects_whitespace_only_api_key)"
+        pytest --cov=src --cov-report=xml --cov-report=term-missing --ignore=tests/contract/ --ignore=tests/performance/ -k "not (Security or test_close_closes_session or test_init_default or test_initialization_default_values or test_get_data_numeric_conversion or test_empty_api_key_handling or _caching or _cached or _success or test_get_provider_competition_return_type or test_init_with_cache or test_state_code_validation or test_year_validation or test_threshold_range_validation or test_rejects_whitespace_only_api_key)"
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
