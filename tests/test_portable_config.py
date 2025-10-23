@@ -48,7 +48,7 @@ def test_find_config_file():
     assert found is None
     print("✅ Test 3 passed: Returns None for non-existent files")
 
-    print("\n🎉 All tests passed!")
+    print("\n All tests passed!")
 
 
 def test_load_api_key_from_config():
@@ -87,7 +87,7 @@ BLS API KEY: bls_test_key_789
         finally:
             del os.environ["KRL_CONFIG_PATH"]
 
-    print("\n🎉 API key loading tests passed!")
+    print("\n API key loading tests passed!")
 
 
 if __name__ == "__main__":

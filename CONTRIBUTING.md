@@ -311,7 +311,7 @@ pytest -m "not slow"    # Skip slow tests
 
 ## Security Guidelines
 
-### 🔐 KRL Defense & Protection Stack
+###  KRL Defense & Protection Stack
 
 All contributions must adhere to our 10-layer security architecture. Please review our [SECURITY.md](SECURITY.md) for complete details.
 
