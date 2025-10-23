@@ -10,6 +10,6 @@
 
 """Version information for krl-data-connectors."""
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 __author__ = "KR-Labs Foundation"
 __license__ = "Apache-2.0"
