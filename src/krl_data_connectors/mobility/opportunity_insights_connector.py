@@ -441,14 +441,15 @@ class OpportunityInsightsConnector(BaseConnector):
         
         if geography not in self._atlas_data or force_download:
             # Select the appropriate geography file (STATA format)
+            # For state-level, use county data and aggregate up (CZ data doesn't have state column)
             url_map = {
                 "tract": (self.ATLAS_TRACT_URL, "tract_outcomes_simple.dta"),
                 "county": (self.ATLAS_COUNTY_URL, "county_outcomes_simple.dta"),
                 "cz": (self.ATLAS_CZ_URL, "cz_outcomes_simple.dta"),
                 "state": (
-                    self.ATLAS_CZ_URL,
-                    "cz_outcomes_simple.dta",
-                ),  # Use CZ file, will aggregate
+                    self.ATLAS_COUNTY_URL,
+                    "county_outcomes_simple.dta",
+                ),  # Use county file, will aggregate to state
             }
 
             url, filename = url_map[geography]
