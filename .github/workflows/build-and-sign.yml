@@ -67,18 +67,24 @@ jobs:
       
       - name: Import GPG key
         continue-on-error: true
-        if: secrets.GPG_PRIVATE_KEY != ''
         run: |
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --import
-          gpg --list-secret-keys
+          if [ -n "${{ secrets.GPG_PRIVATE_KEY }}" ]; then
+            echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --import
+            gpg --list-secret-keys
+          else
+            echo "No GPG key configured, skipping signing"
+          fi
       
       - name: Sign packages with GPG
         continue-on-error: true
-        if: secrets.GPG_PRIVATE_KEY != ''
         run: |
-          for file in dist/*; do
-            gpg --detach-sign --armor "$file"
-          done
+          if gpg --list-secret-keys 2>/dev/null | grep -q "sec"; then
+            for file in dist/*; do
+              gpg --detach-sign --armor "$file"
+            done
+          else
+            echo "No GPG key available, skipping package signing"
+          fi
       
       - name: Publish to PyPI
         # Skip if already published by publish-pypi.yml workflow
