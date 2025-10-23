@@ -435,6 +435,10 @@ class OpportunityInsightsConnector(BaseConnector):
             )
 
         # Download Opportunity Atlas data if not cached for this geography level
+        # Ensure _atlas_data is initialized (defensive check for backwards compatibility)
+        if not hasattr(self, '_atlas_data') or self._atlas_data is None:
+            self._atlas_data = {}
+        
         if geography not in self._atlas_data or force_download:
             # Select the appropriate geography file (STATA format)
             url_map = {
