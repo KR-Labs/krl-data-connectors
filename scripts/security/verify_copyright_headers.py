@@ -92,7 +92,7 @@ def check_copyright(file_path: Path) -> bool:
         first_lines = "\n".join(content.split("\n")[:50])
         return any(pattern in first_lines for pattern in COPYRIGHT_PATTERNS)
     except Exception as e:
-        print(f"⚠️  Warning: Could not read {file_path}: {e}", file=sys.stderr)
+        print(f"  Warning: Could not read {file_path}: {e}", file=sys.stderr)
         return True  # Don't fail on read errors
 
 
@@ -128,21 +128,21 @@ def main():
 
     root_path = args.path.resolve()
     if args.verbose:
-        print(f"🔍 Checking copyright headers in: {root_path}")
+        print(f" Checking copyright headers in: {root_path}")
 
     missing = find_files_missing_copyright(root_path)
 
     if missing:
-        print(f"❌ Found {len(missing)} file(s) missing copyright headers:\n")
+        print(f" Found {len(missing)} file(s) missing copyright headers:\n")
         for file_path in sorted(missing):
             rel_path = file_path.relative_to(root_path)
             print(f"  - {rel_path}")
         print(
-            "\n💡 Tip: Run scripts/security/add_copyright_headers.py to add headers automatically"
+            "\n Tip: Run scripts/security/add_copyright_headers.py to add headers automatically"
         )
         sys.exit(1)
     else:
-        print("✅ All source files have copyright headers!")
+        print(" All source files have copyright headers!")
         sys.exit(0)
 
 

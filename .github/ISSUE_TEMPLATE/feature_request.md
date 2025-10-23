@@ -13,26 +13,26 @@ labels: enhancement
 assignees: ''
 ---
 
-## 🚀 Feature Description
+## Feature Description
 
 A clear and concise description of the feature you'd like to see.
 
-## 🎯 Problem / Use Case
+## Problem / Use Case
 
 What problem does this feature solve? What use case does it enable?
 
 **Is your feature request related to a problem? Please describe.**
 A clear description of what the problem is. Ex. I'm always frustrated when [...]
 
-## 💡 Proposed Solution
+## Proposed Solution
 
 Describe the solution you'd like to see implemented.
 
-## 🔄 Alternatives Considered
+## Alternatives Considered
 
 Have you considered any alternative solutions or features?
 
-## 📊 Data Source Information (if applicable)
+## Data Source Information (if applicable)
 
 If this feature involves a new data connector:
 
@@ -42,15 +42,15 @@ If this feature involves a new data connector:
 - **Authentication Required:** [Yes/No, type of auth]
 - **Update Frequency:** [e.g., daily, monthly, annual]
 
-## 📝 Additional Context
+## Additional Context
 
 Add any other context, mockups, or screenshots about the feature request here.
 
-## 🎓 Academic / Research Value
+## Academic / Research Value
 
 How would this feature benefit researchers, policy analysts, or data scientists?
 
-## 🏷️ Category
+## Category
 
 Which KRL repository does this feature belong to?
 

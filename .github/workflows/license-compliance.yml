@@ -39,7 +39,7 @@ jobs:
         
       - name: Check licenses
         run: |
-          echo "## 📜 License Compliance Report" >> $GITHUB_STEP_SUMMARY
+          echo "## License Compliance Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # Get all package licenses
@@ -67,12 +67,12 @@ jobs:
           pip-licenses | while read line; do
             # Simple verification that no GPL or AGPL licenses
             if echo "$line" | grep -iE "(GPL|AGPL|SSPL)" > /dev/null; then
-              echo "❌ Incompatible license found: $line"
+              echo "Incompatible license found: $line"
               exit 1
             fi
           done
           
-          echo "✅ All licenses are compatible"
+          echo "All licenses are compatible"
           
       - name: Generate SBOM
         run: |

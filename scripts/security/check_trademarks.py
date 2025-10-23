@@ -89,7 +89,7 @@ def check_trademark(file_path: Path) -> bool:
         first_lines = "\n".join(content.split("\n")[:50])
         return any(pattern in first_lines for pattern in TRADEMARK_PATTERNS)
     except Exception as e:
-        print(f"⚠️  Warning: Could not read {file_path}: {e}", file=sys.stderr)
+        print(f"  Warning: Could not read {file_path}: {e}", file=sys.stderr)
         return True  # Don't fail on read errors
 
 
@@ -125,23 +125,23 @@ def main():
 
     root_path = args.path.resolve()
     if args.verbose:
-        print(f"🔍 Checking trademark notices in: {root_path}")
+        print(f" Checking trademark notices in: {root_path}")
 
     missing = find_files_missing_trademark(root_path)
 
     if missing:
-        print(f"❌ Found {len(missing)} file(s) missing trademark notices:\n")
+        print(f" Found {len(missing)} file(s) missing trademark notices:\n")
         for file_path in sorted(missing):
             rel_path = file_path.relative_to(root_path)
             print(f"  - {rel_path}")
         print(
-            "\n💡 Tip: Add trademark notice to file headers:\n"
+            "\n Tip: Add trademark notice to file headers:\n"
             "KR-Labs™ is a trademark of Quipu Research Labs, LLC,\n"
             "a subsidiary of Sudiata Giddasira, Inc."
         )
         sys.exit(1)
     else:
-        print("✅ All checked files have trademark notices!")
+        print(" All checked files have trademark notices!")
         sys.exit(0)
 
 

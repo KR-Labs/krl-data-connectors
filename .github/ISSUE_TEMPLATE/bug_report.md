@@ -13,45 +13,45 @@ labels: bug
 assignees: ''
 ---
 
-## 🐛 Bug Description
+## Bug Description
 
 A clear and concise description of what the bug is.
 
-## 📋 Steps to Reproduce
+## Steps to Reproduce
 
 1. Go to '...'
 2. Run '...'
 3. See error
 
-## ✅ Expected Behavior
+## Expected Behavior
 
 A clear description of what you expected to happen.
 
-## ❌ Actual Behavior
+## Actual Behavior
 
 What actually happened instead.
 
-## 📸 Screenshots
+## Screenshots
 
 If applicable, add screenshots to help explain your problem.
 
-## 💻 Environment
+## Environment
 
 - **OS:** [e.g., macOS 14.0, Ubuntu 22.04, Windows 11]
 - **Python Version:** [e.g., 3.11.5]
 - **Package Version:** [e.g., krl-data-connectors 0.1.0]
 - **Installation Method:** [e.g., pip, conda, source]
 
-## 📝 Additional Context
+## Additional Context
 
 Add any other context about the problem here.
 
-## 🔍 Error Messages / Logs
+## Error Messages / Logs
 
 ```
 Paste any relevant error messages or logs here
 ```
 
-## 🤔 Possible Solution
+## Possible Solution
 
 If you have an idea of how to fix this, please share it here.

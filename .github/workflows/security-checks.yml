@@ -229,18 +229,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Generate security summary
+      - name: Create Security Report Summary
+        if: always()
         run: |
-          echo "## 🔐 Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## Security Scan Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Copyright Headers | ${{ needs.copyright-check.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Trademark Notices | ${{ needs.trademark-check.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Secret Scanning | ${{ needs.secret-scanning.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Python Security | ${{ needs.python-security.result == 'success' && '✅ Passed' || '⚠️ Review Required' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "### Completed Scans" >> $GITHUB_STEP_SUMMARY
+          echo "- License Compliance (REUSE)" >> $GITHUB_STEP_SUMMARY
+          echo "- Secret Scanning (Gitleaks)" >> $GITHUB_STEP_SUMMARY
+          echo "- Trademark Verification" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 🛡️ KRL Defense Stack Status" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Layer 1: Legal Protection (Copyright, Trademark, License)" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Layer 2: Technical Protection (Secret Scanning, Gitleaks)" >> $GITHUB_STEP_SUMMARY
-          echo "- 🔄 Layer 5: Build Verification (CI/CD Security)" >> $GITHUB_STEP_SUMMARY
+          echo "### KRL Defense Stack Status" >> $GITHUB_STEP_SUMMARY
+          echo "- Layer 1: Legal Protection (Copyright + License + Trademarks)" >> $GITHUB_STEP_SUMMARY
+          echo "- Layer 2: Technical Protection (Secret Scanning)" >> $GITHUB_STEP_SUMMARY
+          echo "- Layer 5: Build Verification (CI/CD Security)" >> $GITHUB_STEP_SUMMARY

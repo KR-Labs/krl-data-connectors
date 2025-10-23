@@ -40,12 +40,12 @@ def test_initialization():
     
     try:
         oi = OpportunityInsightsConnector()
-        print(f"✅ Connector initialized: {oi}")
+        print(f" Connector initialized: {oi}")
         print(f"   Cache directory: {oi.cache.cache_dir}")
         print(f"   API key required: {oi.api_key is not None}")
         return oi
     except Exception as e:
-        print(f"❌ Initialization failed: {e}")
+        print(f" Initialization failed: {e}")
         raise
 
 
@@ -57,11 +57,11 @@ def test_connection(oi):
     
     try:
         oi.connect()
-        print(f"✅ Connected successfully")
+        print(f" Connected successfully")
         print(f"   Session initialized: {oi.session is not None}")
         return True
     except Exception as e:
-        print(f"❌ Connection failed: {e}")
+        print(f" Connection failed: {e}")
         return False
 
 
@@ -84,7 +84,7 @@ def test_small_dataset(oi):
         
         elapsed = time.time() - start_time
         
-        print(f"✅ Downloaded Rhode Island data")
+        print(f" Downloaded Rhode Island data")
         print(f"   Rows: {len(ri_data)}")
         print(f"   Columns: {ri_data.columns.tolist()}")
         print(f"   Time: {elapsed:.2f} seconds")
@@ -94,7 +94,7 @@ def test_small_dataset(oi):
         return ri_data
         
     except Exception as e:
-        print(f"❌ Download failed: {e}")
+        print(f" Download failed: {e}")
         import traceback
         traceback.print_exc()
         return None
@@ -129,20 +129,20 @@ def test_caching(oi):
         
         speedup = time1 / time2 if time2 > 0 else float('inf')
         
-        print(f"\n✅ Cache test complete")
+        print(f"\n Cache test complete")
         print(f"   First fetch: {time1:.2f}s")
         print(f"   Second fetch: {time2:.2f}s")
         print(f"   Speedup: {speedup:.1f}x")
         
         if time2 < time1 * 0.1:  # Should be much faster
-            print(f"   ✅ Cache is working effectively!")
+            print(f"    Cache is working effectively!")
         else:
-            print(f"   ⚠️  Cache may not be working optimally")
+            print(f"     Cache may not be working optimally")
         
         return True
         
     except Exception as e:
-        print(f"❌ Cache test failed: {e}")
+        print(f" Cache test failed: {e}")
         return False
 
 
@@ -167,20 +167,20 @@ def test_state_filtering(oi):
                 metrics=["kfr_pooled_p25"]
             )
             
-            print(f"✅ {name} (FIPS {fips}): {len(data)} tracts")
+            print(f" {name} (FIPS {fips}): {len(data)} tracts")
             
             # Verify all rows have correct state FIPS
             if 'state' in data.columns:
                 unique_states = data['state'].unique()
                 if len(unique_states) == 1 and unique_states[0] == fips.zfill(2):
-                    print(f"   ✅ State filter working correctly")
+                    print(f"    State filter working correctly")
                 else:
-                    print(f"   ❌ State filter error: Found states {unique_states}")
+                    print(f"    State filter error: Found states {unique_states}")
         
         return True
         
     except Exception as e:
-        print(f"❌ State filtering test failed: {e}")
+        print(f" State filtering test failed: {e}")
         return False
 
 
@@ -198,16 +198,16 @@ def test_county_filtering(oi):
             metrics=["kfr_pooled_p25", "jail_pooled_p25"]
         )
         
-        print(f"✅ Providence County, RI: {len(county_data)} tracts")
+        print(f" Providence County, RI: {len(county_data)} tracts")
         print(f"   Columns: {county_data.columns.tolist()}")
         
         # Verify all rows have correct county FIPS
         if 'county' in county_data.columns:
             unique_counties = county_data['county'].unique()
             if len(unique_counties) == 1 and unique_counties[0] == "44007":
-                print(f"   ✅ County filter working correctly")
+                print(f"    County filter working correctly")
             else:
-                print(f"   ❌ County filter error: Found counties {unique_counties}")
+                print(f"    County filter error: Found counties {unique_counties}")
         
         print(f"\nSample data:")
         print(county_data.head())
@@ -215,7 +215,7 @@ def test_county_filtering(oi):
         return county_data
         
     except Exception as e:
-        print(f"❌ County filtering test failed: {e}")
+        print(f" County filtering test failed: {e}")
         import traceback
         traceback.print_exc()
         return None
@@ -241,21 +241,21 @@ def test_metric_selection(oi):
             metrics=selected_metrics
         )
         
-        print(f"\n✅ Selected {len(selected_metrics)} metrics")
+        print(f"\n Selected {len(selected_metrics)} metrics")
         print(f"   Requested: {selected_metrics}")
         print(f"   Columns in data: {data.columns.tolist()}")
         
         # Verify columns
         for metric in selected_metrics:
             if metric in data.columns:
-                print(f"   ✅ {metric} present")
+                print(f"    {metric} present")
             else:
-                print(f"   ❌ {metric} missing")
+                print(f"    {metric} missing")
         
         return True
         
     except Exception as e:
-        print(f"❌ Metric selection test failed: {e}")
+        print(f" Metric selection test failed: {e}")
         return False
 
 
@@ -277,19 +277,19 @@ def test_aggregation(oi):
         
         # Aggregate to county
         county_data = oi.aggregate_to_county(tract_data)
-        print(f"✅ County aggregation: {len(county_data)} rows")
+        print(f" County aggregation: {len(county_data)} rows")
         
         # Aggregate to state
         state_data = oi.aggregate_to_state(tract_data)
-        print(f"✅ State aggregation: {len(state_data)} rows")
+        print(f" State aggregation: {len(state_data)} rows")
         
         # Verify aggregation reduced row count
         if len(county_data) < len(tract_data) and len(state_data) < len(county_data):
-            print(f"   ✅ Aggregation working correctly")
+            print(f"    Aggregation working correctly")
             print(f"   Tract → County: {len(tract_data)} → {len(county_data)}")
             print(f"   County → State: {len(county_data)} → {len(state_data)}")
         else:
-            print(f"   ⚠️  Aggregation may have issues")
+            print(f"     Aggregation may have issues")
         
         print(f"\nCounty-level sample:")
         print(county_data.head())
@@ -297,7 +297,7 @@ def test_aggregation(oi):
         return True
         
     except Exception as e:
-        print(f"❌ Aggregation test failed: {e}")
+        print(f" Aggregation test failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -318,20 +318,20 @@ def test_geography_levels(oi):
                 state="44",
                 metrics=["kfr_pooled_p25"]
             )
-            print(f"✅ Geography '{geo}': {len(data)} rows")
+            print(f" Geography '{geo}': {len(data)} rows")
         
         return True
         
     except Exception as e:
-        print(f"❌ Geography levels test failed: {e}")
+        print(f" Geography levels test failed: {e}")
         return False
 
 
 def run_all_tests():
     """Run all manual tests."""
-    print("\n" + "🔬"*30)
+    print("\n" + ""*30)
     print("OPPORTUNITY INSIGHTS CONNECTOR - MANUAL TEST SUITE")
-    print("🔬"*30)
+    print(""*30)
     
     try:
         # Initialize
@@ -339,7 +339,7 @@ def run_all_tests():
         
         # Connect
         if not test_connection(oi):
-            print("\n❌ Connection failed, aborting tests")
+            print("\n Connection failed, aborting tests")
             return False
         
         # Run tests
@@ -352,7 +352,7 @@ def run_all_tests():
         test_geography_levels(oi)
         
         print("\n" + "="*60)
-        print("✅ ALL MANUAL TESTS COMPLETED")
+        print(" ALL MANUAL TESTS COMPLETED")
         print("="*60)
         print(f"\nCache location: {oi.cache.cache_dir}")
         print(f"Check the cache directory to verify file storage.")
@@ -360,7 +360,7 @@ def run_all_tests():
         return True
         
     except Exception as e:
-        print(f"\n❌ Test suite failed: {e}")
+        print(f"\n Test suite failed: {e}")
         import traceback
         traceback.print_exc()
         return False

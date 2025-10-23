@@ -50,7 +50,7 @@ jobs:
           
       - name: Create release summary
         run: |
-          echo "## 📦 Package Published to PyPI" >> $GITHUB_STEP_SUMMARY
+          echo "## Package Published to PyPI" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Package:** krl-data-connectors" >> $GITHUB_STEP_SUMMARY
           echo "**Version:** ${{ github.event.release.tag_name }}" >> $GITHUB_STEP_SUMMARY
