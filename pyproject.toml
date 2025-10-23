@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "krl-data-connectors"
-version = "0.3.2"
+version = "0.3.3"
 description = "Production-ready data connectors for 52 government and research data sources with 2,098 automated tests"
 readme = "README.md"
 requires-python = ">=3.9"
