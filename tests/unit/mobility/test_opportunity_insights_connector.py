@@ -577,7 +577,8 @@ class TestEdgeCases:
         empty_df = pd.DataFrame(columns=["state", "county", "tract"])
 
         # Should handle empty data gracefully
-        connector._atlas_data = empty_df
+        # _atlas_data is now a dict keyed by geography level
+        connector._atlas_data = {"tract": empty_df}
         result = connector.fetch_opportunity_atlas(geography="tract", state="44")
 
         assert len(result) == 0
