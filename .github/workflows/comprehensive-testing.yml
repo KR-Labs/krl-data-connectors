@@ -99,12 +99,12 @@ jobs:
           pip install requests-mock responses
       
       - name: Run integration tests
+        shell: bash
         run: |
           pytest tests/integration/ \
             -v \
             --tb=short \
-            --timeout=120 \
-            -m integration
+            --timeout=120
       
       - name: Upload integration test results
         if: always()
