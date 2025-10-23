@@ -5,7 +5,7 @@ KR-Labs™ is a trademark of Quipu Research Labs, LLC, a subsidiary of Sudiata G
 SPDX-License-Identifier: Apache-2.0
 -->
 
-<div align="Left">
+<div align="center">
   <img src="docs/assets/KRLabs_WebLogo.png" alt="KR-Labs Logo" width="400"/>
 </div>
 
