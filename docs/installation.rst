@@ -21,7 +21,7 @@ Install from PyPI using pip:
 
    pip install krl-data-connectors
 
-This installs the core package with all 14 production connectors.
+This installs the core package with all 52 production-ready connector implementations across 14 domains.
 
 Verify Installation
 -------------------

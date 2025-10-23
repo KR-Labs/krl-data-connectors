@@ -86,7 +86,7 @@ KRL Data Connectors implement a **10-layer testing architecture** following indu
    * - 1
      - Unit Tests
      - pytest, hypothesis
-     - ✅ 408 tests, 73% coverage
+     - ✅ 2,098 tests, 78%+ coverage
    * - 2
      - Integration Tests
      - pytest, requests-mock
@@ -102,7 +102,7 @@ KRL Data Connectors implement a **10-layer testing architecture** following indu
    * - 5
      - SAST Security
      - bandit, safety, mypy
-     - ✅ Configured
+     - ✅ Active in CI
    * - 6
      - DAST Security
      - OWASP ZAP
@@ -113,15 +113,15 @@ KRL Data Connectors implement a **10-layer testing architecture** following indu
      - 🔄 Planned
    * - 8
      - Contract Testing
-     - pydantic, mypy
-     - ✅ Configured
+     - pydantic, mypy strict
+     - ✅ Active in CI
    * - 9
      - Penetration Testing
      - metasploit, burp
      - 📅 Annual
    * - 10
      - Continuous Monitoring
-     - GitHub Actions, Snyk
+     - GitHub Actions (6 workflows), Snyk
      - ✅ Active
 
 Layer 1: Unit Tests
@@ -339,17 +339,21 @@ Coverage Goals
      - Target
      - Status
    * - Line Coverage
-     - 73.30%
+     - 78%+
      - 90%
      - 🟡 In Progress
    * - Branch Coverage
-     - ~70%
+     - ~75%
      - 85%
      - 🟡 In Progress
    * - Mutation Score
      - TBD
      - 90%
      - ⚪ Not Started
+   * - Total Tests
+     - 2,098
+     - Expanding
+     - ✅ Active Development
 
 Common Commands
 ---------------
