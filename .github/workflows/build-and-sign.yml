@@ -66,17 +66,23 @@ jobs:
           path: dist/
       
       - name: Import GPG key
+        continue-on-error: true
+        if: secrets.GPG_PRIVATE_KEY != ''
         run: |
           echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --import
           gpg --list-secret-keys
       
       - name: Sign packages with GPG
+        continue-on-error: true
+        if: secrets.GPG_PRIVATE_KEY != ''
         run: |
           for file in dist/*; do
             gpg --detach-sign --armor "$file"
           done
       
       - name: Publish to PyPI
+        # Skip if already published by publish-pypi.yml workflow
+        continue-on-error: true
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/
