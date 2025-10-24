@@ -219,7 +219,7 @@ class EJScreenConnector(BaseConnector):
         # Validate input
         if not state or not state.strip():
             raise ValueError("State code cannot be empty")
-        
+
         if state_column not in data.columns:
             raise ValueError(f"State column '{state_column}' not found in data")
 
@@ -285,10 +285,10 @@ class EJScreenConnector(BaseConnector):
             threshold = float(threshold)
         except (TypeError, ValueError):
             raise TypeError("Threshold must be numeric")
-        
+
         if threshold < 0 or threshold > 100:
             raise ValueError("Threshold must be between 0 and 100 (percentile)")
-        
+
         if indicator not in data.columns:
             raise ValueError(f"Indicator '{indicator}' not found in data")
 

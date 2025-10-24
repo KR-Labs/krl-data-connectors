@@ -263,7 +263,7 @@ class CountyBusinessPatternsConnector(BaseConnector):
             year = int(year)
         except (TypeError, ValueError):
             raise TypeError("Year must be numeric")
-        
+
         if variables is None:
             variables = ["ESTAB", "EMP", "PAYANN", "NAICS2017", "NAME"]
 

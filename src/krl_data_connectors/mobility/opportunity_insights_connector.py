@@ -137,7 +137,7 @@ class OpportunityInsightsConnector(BaseConnector):
             raise TypeError(f"data_version must be str, got {type(data_version).__name__}")
         if cache_dir is not None and not isinstance(cache_dir, str):
             raise TypeError(f"cache_dir must be str or None, got {type(cache_dir).__name__}")
-        
+
         # Set default cache directory for mobility data
         if cache_dir is None:
             cache_dir = str(Path.home() / ".krl_cache" / "mobility")
@@ -450,7 +450,7 @@ class OpportunityInsightsConnector(BaseConnector):
         # Ensure _atlas_data is initialized (defensive check for backwards compatibility)
         if not hasattr(self, '_atlas_data') or self._atlas_data is None:
             self._atlas_data = {}
-        
+
         if geography not in self._atlas_data or force_download:
             # Select the appropriate geography file (STATA format)
             # For state-level, use county data and aggregate up (CZ data doesn't have state column)
@@ -509,7 +509,7 @@ class OpportunityInsightsConnector(BaseConnector):
         # So we need to aggregate first, then filter
         if geography == "state":
             df = self._aggregate_atlas(df, geography)
-            
+
             # Now filter by state if specified
             if state is not None:
                 df = df[df["state"] == str(state).zfill(2)]
