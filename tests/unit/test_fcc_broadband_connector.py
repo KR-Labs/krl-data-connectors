@@ -182,17 +182,17 @@ class TestFCCBroadbandConnectorContracts:
         # Check monopoly block
         monopoly_block = result[result["block_geoid"] == "060011001001000"].iloc[0]
         assert monopoly_block["provider_count"] == 1, "Monopoly block should have 1 provider"
-        assert monopoly_block["monopoly"] is True, "Should flag monopoly"
+        assert monopoly_block["monopoly"] == True, "Should flag monopoly"  # Use == for numpy bool
 
         # Check duopoly block
         duopoly_block = result[result["block_geoid"] == "060011001001001"].iloc[0]
         assert duopoly_block["provider_count"] == 2, "Duopoly block should have 2 providers"
-        assert duopoly_block["duopoly"] is True, "Should flag duopoly"
+        assert duopoly_block["duopoly"] == True, "Should flag duopoly"  # Use == for numpy bool
 
         # Check competitive block
         competitive_block = result[result["block_geoid"] == "060011001001002"].iloc[0]
         assert competitive_block["provider_count"] == 3, "Competitive block should have 3 providers"
-        assert competitive_block["competitive"] is True, "Should flag competitive"
+        assert competitive_block["competitive"] == True, "Should flag competitive"  # Use == for numpy bool
 
     def test_get_speed_tier_distribution_return_type(self, connector, tmp_path):
         """

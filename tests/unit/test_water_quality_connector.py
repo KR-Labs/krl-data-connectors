@@ -29,6 +29,15 @@ from krl_data_connectors.environment.water_quality_connector import WaterQuality
 # Fixtures
 
 
+@pytest.fixture(autouse=True)
+def clear_connector_cache():
+    """Clear connector cache before and after each test."""
+    temp_conn = WaterQualityConnector()
+    temp_conn.cache.clear()
+    yield
+    temp_conn.cache.clear()
+
+
 @pytest.fixture
 def sample_water_system():
     """Sample water system data."""
@@ -117,7 +126,7 @@ class TestWaterQualityConnectorInit:
 
     def test_init_with_cache(self):
         """Test initialization with cache enabled."""
-        connector = WaterQualityConnector(cache_enabled=True, cache_ttl=1800)
+        connector = WaterQualityConnector(cache_ttl=1800)
         assert connector.cache is not None
 
     def test_get_api_key_returns_none(self):
@@ -205,7 +214,7 @@ class TestWaterQualityConnectorGetSystemsByState:
         """Test that cached data is returned on second call."""
         mock_fetch.return_value = [sample_water_system]
 
-        connector = WaterQualityConnector(cache_enabled=True)
+        connector = WaterQualityConnector()
 
         # First call - should fetch
         result1 = connector.get_water_systems_by_state("CA")

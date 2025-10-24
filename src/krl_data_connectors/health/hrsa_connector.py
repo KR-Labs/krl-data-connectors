@@ -308,6 +308,10 @@ class HRSAConnector(BaseConnector):
         Example:
             >>> ri_hpsas = hrsa.get_state_data(hpsa_data, 'RI')
         """
+        # Validate state parameter
+        if not state or not state.strip():
+            raise ValueError("State code cannot be empty")
+        
         state = state.upper()
 
         if state_column not in data.columns:
@@ -439,6 +443,15 @@ class HRSAConnector(BaseConnector):
         Example:
             >>> critical = hrsa.get_high_need_areas(hpsa_data, score_threshold=20)
         """
+        # Validate score threshold
+        try:
+            score_threshold = int(score_threshold)
+        except (TypeError, ValueError):
+            raise TypeError("Score threshold must be numeric")
+        
+        if score_threshold < 0 or score_threshold > 26:
+            raise ValueError("Score threshold must be between 0 and 26 (HPSA score range)")
+        
         if score_column not in data.columns:
             raise ValueError(f"Score column '{score_column}' not found in data")
 

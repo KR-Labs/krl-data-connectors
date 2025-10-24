@@ -311,6 +311,21 @@ class CDCWonderConnector(BaseConnector):
             ...     states=['06', '36']
             ... )
         """
+        # Validate years parameter
+        if years is not None:
+            validated_years = []
+            for year in years:
+                try:
+                    validated_years.append(int(year))
+                except (TypeError, ValueError, AttributeError):
+                    raise TypeError("All years must be numeric")
+            years = validated_years
+        
+        # Validate geo_level parameter
+        valid_geo_levels = ["national", "state", "county"]
+        if geo_level not in valid_geo_levels:
+            raise ValueError(f"geo_level must be one of {valid_geo_levels}, got '{geo_level}'")
+        
         if years is None:
             years = [2020]
 

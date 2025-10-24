@@ -51,6 +51,7 @@ class CensusConnector(BaseConnector):
         **kwargs: Any,
     ):
         self.base_url = base_url
+        self.connector_name = "Census"
         super().__init__(api_key=api_key, cache_dir=cache_dir, cache_ttl=cache_ttl, **kwargs)
 
     def _get_api_key(self) -> Optional[str]:
@@ -169,7 +170,14 @@ class CensusConnector(BaseConnector):
         # Convert numeric columns
         for col in df.columns:
             if col not in ["NAME", "state", "county", "tract", "block group"]:
-                df[col] = pd.to_numeric(df[col], errors="coerce")
+                numeric_series = pd.to_numeric(df[col], errors="coerce")
+                # Convert numpy types to Python types for compatibility
+                if pd.api.types.is_integer_dtype(numeric_series):
+                    python_ints = [int(x) if pd.notna(x) else None for x in numeric_series]
+                    df[col] = pd.Series(python_ints, dtype=object, index=df.index)
+                elif pd.api.types.is_float_dtype(numeric_series):
+                    python_floats = [float(x) if pd.notna(x) else None for x in numeric_series]
+                    df[col] = pd.Series(python_floats, dtype=object, index=df.index)
 
         self.logger.info(
             "Census data fetched", extra={"dataset": dataset, "year": year, "rows": len(df)}

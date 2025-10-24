@@ -136,6 +136,7 @@ class VictimsOfCrimeConnector(BaseConnector):
             >>> connector = VictimsOfCrimeConnector(timeout=60)
         """
         super().__init__(timeout=timeout, **kwargs)
+        self.base_url = self.BASE_URL
         self.api_url = self.API_BASE_URL
         logger.info("VictimsOfCrimeConnector initialized (no API key required)")
 

@@ -151,7 +151,7 @@ class OpportunityInsightsConnector(BaseConnector):
         )
 
         self.data_version = data_version
-        self._atlas_data: dict[str, pd.DataFrame] = {}  # Cache keyed by geography level
+        self._atlas_data: Optional[dict[str, pd.DataFrame]] = None  # Lazy-loaded cache
         self._social_capital_data: Optional[pd.DataFrame] = None
 
         self.logger.info(

@@ -200,6 +200,17 @@ class HUDFMRConnector(BaseConnector):
         Example:
             >>> ri_fmr = connector.get_state_fmrs('RI', year=2025)
         """
+        # Validate state parameter
+        if not state or not state.strip():
+            raise ValueError("State code cannot be empty")
+        
+        # Validate year parameter if provided
+        if year is not None:
+            try:
+                year = int(year)
+            except (TypeError, ValueError):
+                raise TypeError("Year must be numeric")
+        
         if use_api and self.api_key:
             return self._api_get_state_fmrs(state, year)
         else:

@@ -258,6 +258,12 @@ class CountyBusinessPatternsConnector(BaseConnector):
             >>> # Get manufacturing in all states
             >>> mfg = cbp.get_state_data(year=2021, naics='31-33')
         """
+        # Validate year parameter
+        try:
+            year = int(year)
+        except (TypeError, ValueError):
+            raise TypeError("Year must be numeric")
+        
         if variables is None:
             variables = ["ESTAB", "EMP", "PAYANN", "NAICS2017", "NAME"]
 

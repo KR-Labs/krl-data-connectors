@@ -73,6 +73,7 @@ class TestSECConnectorConnection:
     def test_connect_success(self, mock_init_session):
         """Test successful connection."""
         mock_session = MagicMock()
+        mock_session.headers = {}  # Use real dict for headers
         mock_init_session.return_value = mock_session
 
         connector = SECConnector()

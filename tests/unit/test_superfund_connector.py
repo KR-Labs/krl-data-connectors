@@ -15,6 +15,17 @@ import pytest
 from krl_data_connectors.environment import SuperfundConnector
 
 
+@pytest.fixture(autouse=True)
+def clear_connector_cache():
+    """Clear connector cache before each test."""
+    # Create a temporary connector just to clear the cache
+    temp_conn = SuperfundConnector()
+    temp_conn.cache.clear()
+    yield
+    # Clear after test as well
+    temp_conn.cache.clear()
+
+
 @pytest.fixture
 def sample_site_response():
     """Sample site response from EPA Envirofacts API."""
@@ -37,7 +48,10 @@ def sample_site_response():
 @pytest.fixture
 def connector():
     """Create connector instance (no API key needed)."""
-    return SuperfundConnector()
+    conn = SuperfundConnector()
+    # Clear cache to ensure tests don't interfere with each other
+    conn.cache.clear()
+    return conn
 
 
 @pytest.fixture

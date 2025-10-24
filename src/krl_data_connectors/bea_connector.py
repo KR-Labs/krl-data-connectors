@@ -83,6 +83,12 @@ class BEAConnector(BaseConnector):
             raise ValueError(
                 "BEA API key is required. Register at https://apps.bea.gov/api/signup/"
             )
+        
+        # Validate API key is not just whitespace (security)
+        if not self.api_key.strip():
+            raise ValueError(
+                "BEA API key cannot be whitespace only. Register at https://apps.bea.gov/api/signup/"
+            )
 
         self.logger.info("Initialized BEA connector")
 

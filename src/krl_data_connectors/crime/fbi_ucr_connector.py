@@ -206,6 +206,16 @@ class FBIUCRConnector(BaseConnector):
         Example:
             >>> ri_crime = connector.get_state_crime_data('RI', 2023)
         """
+        # Validate inputs
+        if not state or not state.strip():
+            raise ValueError("State code cannot be empty")
+        
+        # Validate year is numeric
+        try:
+            year = int(year)
+        except (TypeError, ValueError):
+            raise TypeError("Year must be numeric")
+        
         if use_api:
             return self._api_get_state_crime(state, year)
         else:

@@ -174,6 +174,7 @@ class TestNOAAClimateConnectorConnection:
     def test_connect_success(self, mock_init_session):
         """Test successful connection."""
         mock_session = MagicMock()
+        mock_session.headers = {}  # Use real dict for headers
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"results": []}

@@ -220,6 +220,16 @@ class NCESConnector(BaseConnector):
         Example:
             >>> ri_schools = connector.get_state_schools('RI', 2023)
         """
+        # Validate state parameter
+        if not state or not state.strip():
+            raise ValueError("State code cannot be empty")
+        
+        # Validate year parameter
+        try:
+            year = int(year)
+        except (TypeError, ValueError):
+            raise TypeError("Year must be numeric")
+        
         if use_api:
             return self._api_get_state_schools(state, year)
         else:

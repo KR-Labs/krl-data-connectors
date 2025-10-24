@@ -216,6 +216,10 @@ class EJScreenConnector(BaseConnector):
             >>> data = ejs.load_data('ejscreen.csv')
             >>> ri_data = ejs.get_state_data(data, 'RI')
         """
+        # Validate input
+        if not state or not state.strip():
+            raise ValueError("State code cannot be empty")
+        
         if state_column not in data.columns:
             raise ValueError(f"State column '{state_column}' not found in data")
 
@@ -276,6 +280,15 @@ class EJScreenConnector(BaseConnector):
             >>> # Get tracts in top 20% for PM2.5
             >>> high_pm25 = ejs.filter_by_threshold(data, 'P_PM25', 80, above=True)
         """
+        # Validate threshold range (percentiles are 0-100)
+        try:
+            threshold = float(threshold)
+        except (TypeError, ValueError):
+            raise TypeError("Threshold must be numeric")
+        
+        if threshold < 0 or threshold > 100:
+            raise ValueError("Threshold must be between 0 and 100 (percentile)")
+        
         if indicator not in data.columns:
             raise ValueError(f"Indicator '{indicator}' not found in data")
 

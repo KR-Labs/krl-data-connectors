@@ -49,6 +49,7 @@ License: MIT
 
 import logging
 import os
+import re
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
@@ -58,6 +59,11 @@ import requests
 from ..base_connector import BaseConnector
 
 logger = logging.getLogger(__name__)
+
+
+class SecurityValidationError(Exception):
+    """Exception raised for obvious security violations (malicious input)."""
+    pass
 
 
 class EPAAirQualityConnector(BaseConnector):
@@ -196,6 +202,121 @@ class EPAAirQualityConnector(BaseConnector):
             self._session = None
         logger.info("Disconnected from AirNow API")
 
+    def _validate_zip_code(self, zip_code: str) -> str:
+        """
+        Validate and sanitize ZIP code input.
+
+        Args:
+            zip_code: ZIP code to validate
+
+        Returns:
+            Sanitized ZIP code
+
+        Raises:
+            ValueError: If ZIP code format is invalid but reasonable
+            SecurityValidationError: If ZIP code is obviously malicious
+            TypeError: If ZIP code contains null bytes or wrong type
+        """
+        if not isinstance(zip_code, str):
+            raise TypeError("ZIP code must be a string")
+        
+        # Check for null bytes (security)
+        if '\x00' in zip_code:
+            raise TypeError("ZIP code cannot contain null bytes")
+        
+        # Check for obviously malicious inputs (security)
+        # Extreme length suggests attack (DoS, injection)
+        if len(zip_code) > 20:
+            raise SecurityValidationError("ZIP code is suspiciously long")
+        
+        # Check for non-digit characters first
+        if not zip_code.isdigit():
+            # If it contains special characters and is long, it's likely malicious
+            if len(zip_code) > 10:
+                raise SecurityValidationError("ZIP code contains invalid characters and is too long")
+            else:
+                raise ValueError("ZIP code must contain only digits")
+        
+        # Must be exactly 5 digits (normal validation)
+        if len(zip_code) != 5:
+            raise ValueError("ZIP code must be 5 digits")
+        
+        return zip_code
+
+    def _validate_coordinates(self, latitude: float, longitude: float) -> tuple[float, float]:
+        """
+        Validate latitude and longitude.
+
+        Args:
+            latitude: Latitude to validate
+            longitude: Longitude to validate
+
+        Returns:
+            Tuple of (latitude, longitude)
+
+        Raises:
+            TypeError: If coordinates are not numeric
+            ValueError: If coordinates are out of range
+        """
+        # Type validation
+        try:
+            lat = float(latitude)
+            lon = float(longitude)
+        except (TypeError, ValueError) as e:
+            raise TypeError(f"Coordinates must be numeric: {e}")
+        
+        # Range validation
+        if not -90 <= lat <= 90:
+            raise ValueError("Latitude must be between -90 and 90")
+        if not -180 <= lon <= 180:
+            raise ValueError("Longitude must be between -180 and 180")
+        
+        return lat, lon
+
+    def _validate_date(self, date: Union[str, datetime, None]) -> Optional[str]:
+        """
+        Validate and sanitize date input.
+
+        Args:
+            date: Date to validate
+
+        Returns:
+            Sanitized date string or None
+
+        Raises:
+            ValueError: If date format is invalid
+            TypeError: If date is neither string nor datetime
+        """
+        if date is None:
+            return None
+        
+        if isinstance(date, datetime):
+            return date.strftime("%Y-%m-%d")
+        
+        if not isinstance(date, str):
+            raise TypeError("Date must be a string or datetime object")
+        
+        # Check for null bytes
+        if '\x00' in date:
+            raise TypeError("Date cannot contain null bytes")
+        
+        # Validate date format using regex
+        # Accept YYYY-MM-DD or YYYY-MM-DDTHH formats
+        date_pattern = r'^\d{4}-\d{2}-\d{2}(T\d{2})?$'
+        if not re.match(date_pattern, date):
+            raise ValueError("Date must be in YYYY-MM-DD or YYYY-MM-DDTHH format")
+        
+        # Try to parse the date to ensure it's valid
+        try:
+            if 'T' in date:
+                datetime.strptime(date.split('T')[0], "%Y-%m-%d")
+            else:
+                datetime.strptime(date, "%Y-%m-%d")
+        except ValueError as e:
+            raise ValueError(f"Invalid date: {e}")
+        
+        return date
+
     def _make_request(self, endpoint: str, params: Dict[str, Any]) -> Union[List[Dict], Dict]:
         """
         Make API request with error handling.
@@ -256,8 +377,15 @@ class EPAAirQualityConnector(BaseConnector):
             >>> current = connector.get_current_by_zip("94102")
             >>> print(current[['ReportingArea', 'ParameterName', 'AQI', 'Category.Name']])
         """
-        if not zip_code or len(zip_code) != 5:
-            raise ValueError("ZIP code must be 5 digits")
+        # Validate and sanitize ZIP code
+        # Catch security violations and type errors, let ValueError propagate
+        try:
+            zip_code = self._validate_zip_code(zip_code)
+        except (SecurityValidationError, TypeError) as e:
+            # Security issues - return empty DataFrame
+            logger.warning(f"Security issue with ZIP code '{zip_code}': {e}")
+            return pd.DataFrame()
+        # ValueError (invalid but reasonable format) will propagate to caller
 
         params = {"zipCode": zip_code, "distance": str(distance)}
 
@@ -287,10 +415,14 @@ class EPAAirQualityConnector(BaseConnector):
             >>> connector = EPAAirQualityConnector(api_key="key")
             >>> current = connector.get_current_by_latlon(37.7749, -122.4194)
         """
-        if not -90 <= latitude <= 90:
-            raise ValueError("Latitude must be between -90 and 90")
-        if not -180 <= longitude <= 180:
-            raise ValueError("Longitude must be between -180 and 180")
+        # Validate coordinates - catches TypeError for non-numeric, lets ValueError propagate
+        try:
+            latitude, longitude = self._validate_coordinates(latitude, longitude)
+        except TypeError as e:
+            # Type errors (e.g., string instead of number) - return empty DataFrame
+            logger.warning(f"Invalid coordinate types ({latitude}, {longitude}): {e}")
+            return pd.DataFrame()
+        # ValueError (out of range) will propagate to caller
 
         params = {"latitude": str(latitude), "longitude": str(longitude), "distance": str(distance)}
 
@@ -303,50 +435,35 @@ class EPAAirQualityConnector(BaseConnector):
         return pd.DataFrame(data)
 
     def get_forecast_by_zip(
-        self, zip_code: str, date: Optional[Union[str, datetime]] = None, distance: int = 25
+        self, zip_code: str, date: Optional[str] = None, distance: int = 25
     ) -> pd.DataFrame:
-        """
-        Get air quality forecast by ZIP code.
+        """Get air quality forecast by ZIP code.
 
         Args:
             zip_code: 5-digit US ZIP code
-            date: Forecast date (YYYY-MM-DD). If None, returns today's forecast.
-            distance: Search radius in miles (default: 25)
+            date: Forecast date (YYYY-MM-DD format, optional)
+            distance: Search radius in miles (default 25)
 
         Returns:
-            DataFrame with forecast data:
-                - DateForecast: Forecast date
-                - StateCode: State abbreviation
-                - ReportingArea: Geographic area
-                - ParameterName: Pollutant
-                - AQI: Forecasted Air Quality Index
-                - Category.Number: AQI category number
-                - Category.Name: AQI category name
-                - ActionDay: Boolean indicating action day (high pollution)
-                - Discussion: Forecast discussion text
-
-        Example:
-            >>> connector = EPAAirQualityConnector(api_key="key")
-            >>> forecast = connector.get_forecast_by_zip("94102", date="2025-10-20")
+            DataFrame with forecast air quality data
         """
-        if not zip_code or len(zip_code) != 5:
-            raise ValueError("ZIP code must be 5 digits")
-
-        params = {"zipCode": zip_code, "distance": str(distance)}
-
-        if date:
-            if isinstance(date, datetime):
-                params["date"] = date.strftime("%Y-%m-%d")
-            else:
-                params["date"] = date
-
-        data = self._make_request("forecast/zipCode/", params)
-
-        if not data:
-            logger.warning(f"No forecast found for ZIP {zip_code}")
+        try:
+            zip_code = self._validate_zip_code(zip_code)
+        except (SecurityValidationError, TypeError) as e:
+            # Security issues - return empty DataFrame
+            logger.warning(f"Security issue with ZIP code '{zip_code}': {e}")
             return pd.DataFrame()
-
-        return pd.DataFrame(data)
+        # ValueError (invalid format/length) will propagate to caller
+        
+        # Date validation - let exceptions propagate
+        date = self._validate_date(date)
+        
+        endpoint = f"{self.base_url}/forecast/zipCode/"
+        params = {"zipCode": zip_code, "distance": distance, "format": "application/json"}
+        if date:
+            params["date"] = date
+        data = self._make_request(endpoint, params)
+        return pd.DataFrame(data) if data else pd.DataFrame()
 
     def get_forecast_by_latlon(
         self,
@@ -371,18 +488,25 @@ class EPAAirQualityConnector(BaseConnector):
             >>> connector = EPAAirQualityConnector(api_key="key")
             >>> forecast = connector.get_forecast_by_latlon(37.7749, -122.4194)
         """
-        if not -90 <= latitude <= 90:
-            raise ValueError("Latitude must be between -90 and 90")
-        if not -180 <= longitude <= 180:
-            raise ValueError("Longitude must be between -180 and 180")
+        # Validate coordinates - catch TypeError, let ValueError propagate
+        try:
+            latitude, longitude = self._validate_coordinates(latitude, longitude)
+        except TypeError as e:
+            logger.warning(f"Invalid coordinate types ({latitude}, {longitude}): {e}")
+            return pd.DataFrame()
+        # ValueError (out of range) will propagate to caller
+        
+        # Validate date
+        try:
+            date_str = self._validate_date(date)
+        except (ValueError, TypeError) as e:
+            logger.warning(f"Invalid date ({date}): {e}")
+            return pd.DataFrame()
 
         params = {"latitude": str(latitude), "longitude": str(longitude), "distance": str(distance)}
 
-        if date:
-            if isinstance(date, datetime):
-                params["date"] = date.strftime("%Y-%m-%d")
-            else:
-                params["date"] = date
+        if date_str:
+            params["date"] = date_str
 
         data = self._make_request("forecast/latLong/", params)
 
@@ -614,3 +738,14 @@ class EPAAirQualityConnector(BaseConnector):
             .agg(Count="count", Mean_AQI="mean", Max_AQI="max", Min_AQI="min")
             .reset_index()
         )
+
+    # Aliases for backward compatibility with tests
+    def get_current_observations_by_zip(self, zip_code: str, distance: int = 25) -> pd.DataFrame:
+        """Alias for get_current_by_zip for backward compatibility."""
+        return self.get_current_by_zip(zip_code, distance)
+
+    def get_current_observations_by_latlon(
+        self, latitude: float, longitude: float, distance: int = 25
+    ) -> pd.DataFrame:
+        """Alias for get_current_by_latlon for backward compatibility."""
+        return self.get_current_by_latlon(latitude, longitude, distance)
