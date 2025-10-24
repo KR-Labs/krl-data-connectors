@@ -456,12 +456,13 @@ class TestNOAAClimateConnectorClose:
 
     def test_close_closes_session(self):
         """Test that close properly closes session."""
-        connector = NOAAClimateConnector(api_key="test_token")
-        connector.session = MagicMock()
+        connector = NOAAClimateConnector()
+        mock_session = MagicMock()
+        connector.session = mock_session
 
         connector.close()
 
-        connector.session.close.assert_called_once()
+        mock_session.close.assert_called_once()
         assert connector.session is None
 
     def test_close_when_no_session(self):

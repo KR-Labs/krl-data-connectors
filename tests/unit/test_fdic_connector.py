@@ -439,11 +439,12 @@ class TestFDICConnectorClose:
 
     def test_close_closes_session(self, fdic_connector):
         """Test that close() closes the session."""
-        fdic_connector.session = MagicMock()
+        mock_session = MagicMock()
+        fdic_connector.session = mock_session
 
         fdic_connector.close()
 
-        fdic_connector.session.close.assert_called_once()
+        mock_session.close.assert_called_once()
         assert fdic_connector.session is None
 
     def test_close_no_session(self, fdic_connector):

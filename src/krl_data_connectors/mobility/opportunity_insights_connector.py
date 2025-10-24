@@ -126,6 +126,18 @@ class OpportunityInsightsConnector(BaseConnector):
         data_version: str = "latest",
     ):
         """Initialize Opportunity Insights connector."""
+        # Validate parameter types
+        if not isinstance(cache_ttl, int):
+            raise TypeError(f"cache_ttl must be int, got {type(cache_ttl).__name__}")
+        if not isinstance(timeout, int):
+            raise TypeError(f"timeout must be int, got {type(timeout).__name__}")
+        if not isinstance(max_retries, int):
+            raise TypeError(f"max_retries must be int, got {type(max_retries).__name__}")
+        if not isinstance(data_version, str):
+            raise TypeError(f"data_version must be str, got {type(data_version).__name__}")
+        if cache_dir is not None and not isinstance(cache_dir, str):
+            raise TypeError(f"cache_dir must be str or None, got {type(cache_dir).__name__}")
+        
         # Set default cache directory for mobility data
         if cache_dir is None:
             cache_dir = str(Path.home() / ".krl_cache" / "mobility")

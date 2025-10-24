@@ -197,24 +197,24 @@ make security-scan  # If Makefile exists
 
 **Common Issues & Fixes**:
 ```python
-# ❌ Bad: Using eval with user input
+#  Bad: Using eval with user input
 result = eval(user_input)
 
-# ✅ Good: Parse safely
+#  Good: Parse safely
 import ast
 result = ast.literal_eval(user_input)
 
-# ❌ Bad: SQL injection risk
+#  Bad: SQL injection risk
 query = f"SELECT * FROM data WHERE state = '{state}'"
 
-# ✅ Good: Parameterized query
+#  Good: Parameterized query
 query = "SELECT * FROM data WHERE state = ?"
 cursor.execute(query, (state,))
 
-# ❌ Bad: Insecure request
+#  Bad: Insecure request
 response = requests.get(url, verify=False)
 
-# ✅ Good: Verify SSL
+#  Good: Verify SSL
 response = requests.get(url, verify=True)
 ```
 
@@ -240,8 +240,8 @@ mutmut run 42
 ```
 
 **Understanding Mutation Results**:
-- **Killed**: Test caught the mutation ✅
-- **Survived**: Test missed the mutation ❌
+- **Killed**: Test caught the mutation 
+- **Survived**: Test missed the mutation 
 - **Incompetent**: Mutation created invalid syntax
 - **Timeout**: Mutation caused infinite loop
 
@@ -363,21 +363,21 @@ def test_state_query_properties(state, year):
 ### What Runs When
 
 **On Every Commit (PR)**:
-- ✅ Unit tests (all Python versions)
-- ✅ Integration tests
-- ✅ SAST security scan
-- ✅ Type checking
-- ✅ Dependency vulnerability scan
-- ✅ Coverage report
+-  Unit tests (all Python versions)
+-  Integration tests
+-  SAST security scan
+-  Type checking
+-  Dependency vulnerability scan
+-  Coverage report
 
 **Nightly (Scheduled)**:
-- ✅ Full test suite
-- ✅ Performance benchmarks
-- ✅ DAST security scan
-- ✅ Load testing
+-  Full test suite
+-  Performance benchmarks
+-  DAST security scan
+-  Load testing
 
 **Weekly (Sunday 2 AM)**:
-- ✅ Mutation testing
+-  Mutation testing
 
 ### Viewing CI Results
 
@@ -392,7 +392,7 @@ def test_state_query_properties(state, year):
 |--------|---------|--------|--------|
 | Line Coverage | 73.30% | 90% | 🟡 In Progress |
 | Branch Coverage | ~70% | 85% | 🟡 In Progress |
-| Mutation Score | TBD | 90% | ⚪ Not Started |
+| Mutation Score | TBD | 90% |  Not Started |
 
 ## Common Commands
 

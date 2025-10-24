@@ -409,11 +409,12 @@ class TestTreasuryConnectorClose:
 
     def test_close_closes_session(self, treasury_connector):
         """Test that close() closes the session."""
-        treasury_connector.session = MagicMock()
+        mock_session = MagicMock()
+        treasury_connector.session = mock_session
 
         treasury_connector.close()
 
-        treasury_connector.session.close.assert_called_once()
+        mock_session.close.assert_called_once()
         assert treasury_connector.session is None
 
     def test_close_no_session(self, treasury_connector):

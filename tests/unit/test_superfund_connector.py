@@ -7,7 +7,7 @@ KR-Labs™ is a trademark of Quipu Research Labs, LLC, a subsidiary of Sudiata G
 SPDX-License-Identifier: Apache-2.0
 """
 
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import pandas as pd
 import pytest
@@ -381,13 +381,14 @@ class TestSuperfundConnectorClose:
     """Test close method."""
 
     def test_close_closes_session(self):
-        """Test that close properly closes the session."""
+        """Test that close properly closes session."""
         connector = SuperfundConnector()
-        connector.session = Mock()
+        mock_session = MagicMock()
+        connector.session = mock_session
 
         connector.close()
 
-        connector.session.close.assert_called_once()
+        mock_session.close.assert_called_once()
         assert connector.session is None
 
     def test_close_no_session(self):

@@ -443,13 +443,14 @@ class TestWaterQualityConnectorClose:
     """Test close method."""
 
     def test_close_closes_session(self):
-        """Test that close properly closes session."""
+        """Test that close() closes the session."""
         connector = WaterQualityConnector()
-        connector.session = MagicMock()
+        mock_session = MagicMock()
+        connector.session = mock_session
 
         connector.close()
 
-        connector.session.close.assert_called_once()
+        mock_session.close.assert_called_once()
         assert connector.session is None
 
     def test_close_when_no_session(self):

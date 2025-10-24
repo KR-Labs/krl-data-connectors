@@ -465,11 +465,12 @@ class TestFDAConnectorClose:
 
     def test_close_closes_session(self, fda_connector):
         """Test that close() closes the session."""
-        fda_connector.session = MagicMock()
+        mock_session = MagicMock()
+        fda_connector.session = mock_session
 
         fda_connector.close()
 
-        fda_connector.session.close.assert_called_once()
+        mock_session.close.assert_called_once()
         assert fda_connector.session is None
 
     def test_close_no_session(self, fda_connector):

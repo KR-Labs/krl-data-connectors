@@ -581,7 +581,7 @@ keys = {
 
 print("\n=== API Keys ===")
 for key, value in keys.items():
-    status = "✓ SET" if value else "✗ NOT SET"
+    status = " SET" if value else " NOT SET"
     print(f"{key}: {status}")
 
 # Check network
@@ -597,9 +597,9 @@ endpoints = {
 for name, url in endpoints.items():
     try:
         r = requests.get(url, timeout=5)
-        print(f"{name}: ✓ REACHABLE (status {r.status_code})")
+        print(f"{name}:  REACHABLE (status {r.status_code})")
     except Exception as e:
-        print(f"{name}: ✗ UNREACHABLE ({e})")
+        print(f"{name}:  UNREACHABLE ({e})")
 
 print("\n=== Diagnostics Complete ===")
 ```

@@ -64,7 +64,7 @@ Multi-layered secret detection:
 
 3. **Historical Validation**
    - Full repository history scanned: 145 commits, 5.42 MB
-   - Result: ✅ Zero secrets detected
+   - Result:  Zero secrets detected
 
 **Usage:**
 ```bash
