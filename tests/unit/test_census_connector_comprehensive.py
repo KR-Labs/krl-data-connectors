@@ -327,7 +327,7 @@ class TestCensusConnectorSecurity:
     def test_empty_api_key_handling(self):
         """Test that empty API key is handled properly."""
         # Mock _get_api_key to return empty string (no config fallback)
-        with patch.object(CensusConnector, '_get_api_key', return_value=""):
+        with patch.object(CensusConnector, "_get_api_key", return_value=""):
             census = CensusConnector(api_key="")
 
             # Empty string falls back to _get_api_key(), which returns ""
@@ -336,7 +336,7 @@ class TestCensusConnectorSecurity:
     def test_none_api_key_handling(self):
         """Test that None API key is handled properly."""
         # Mock _get_api_key to return None (no config fallback)
-        with patch.object(CensusConnector, '_get_api_key', return_value=None):
+        with patch.object(CensusConnector, "_get_api_key", return_value=None):
             census = CensusConnector(api_key=None)
 
             # Should not raise during initialization

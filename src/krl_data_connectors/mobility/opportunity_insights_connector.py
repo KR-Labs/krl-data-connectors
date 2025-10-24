@@ -448,7 +448,7 @@ class OpportunityInsightsConnector(BaseConnector):
 
         # Download Opportunity Atlas data if not cached for this geography level
         # Ensure _atlas_data is initialized (defensive check for backwards compatibility)
-        if not hasattr(self, '_atlas_data') or self._atlas_data is None:
+        if not hasattr(self, "_atlas_data") or self._atlas_data is None:
             self._atlas_data = {}
 
         if geography not in self._atlas_data or force_download:
@@ -469,9 +469,7 @@ class OpportunityInsightsConnector(BaseConnector):
 
             self.logger.info(f"Loading Opportunity Atlas {geography}-level data from STATA file")
             # Read STATA file - pandas handles .dta format natively
-            atlas_df = pd.read_stata(
-                atlas_path, convert_categoricals=True, preserve_dtypes=False
-            )
+            atlas_df = pd.read_stata(atlas_path, convert_categoricals=True, preserve_dtypes=False)
 
             # Normalize column names (STATA files use different naming convention)
             atlas_df = self._normalize_column_names(atlas_df)
@@ -480,24 +478,18 @@ class OpportunityInsightsConnector(BaseConnector):
             # STATA files store these as floats, need to convert to int first, then string
             if "state" in atlas_df.columns:
                 # State is 2 digits
-                atlas_df["state"] = (
-                    atlas_df["state"].fillna(0).astype(int).astype(str).str.zfill(2)
-                )
+                atlas_df["state"] = atlas_df["state"].fillna(0).astype(int).astype(str).str.zfill(2)
 
             if "county" in atlas_df.columns and "state" in atlas_df.columns:
                 # County in STATA file is only 3 digits (county suffix)
                 # Need to combine with state to get 5-digit FIPS code
-                county_suffix = (
-                    atlas_df["county"].fillna(0).astype(int).astype(str).str.zfill(3)
-                )
+                county_suffix = atlas_df["county"].fillna(0).astype(int).astype(str).str.zfill(3)
                 atlas_df["county"] = atlas_df["state"] + county_suffix
 
             if geography == "tract" and "tract" in atlas_df.columns:
                 # Tract in STATA file is only 6 digits (tract suffix)
                 # Need to combine with county to get full 11-digit code
-                tract_suffix = (
-                    atlas_df["tract"].fillna(0).astype(int).astype(str).str.zfill(6)
-                )
+                tract_suffix = atlas_df["tract"].fillna(0).astype(int).astype(str).str.zfill(6)
                 atlas_df["tract"] = atlas_df["county"] + tract_suffix
 
             # Cache the data keyed by geography level

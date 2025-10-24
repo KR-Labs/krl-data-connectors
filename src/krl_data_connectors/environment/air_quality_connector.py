@@ -63,6 +63,7 @@ logger = logging.getLogger(__name__)
 
 class SecurityValidationError(Exception):
     """Exception raised for obvious security violations (malicious input)."""
+
     pass
 
 
@@ -221,7 +222,7 @@ class EPAAirQualityConnector(BaseConnector):
             raise TypeError("ZIP code must be a string")
 
         # Check for null bytes (security)
-        if '\x00' in zip_code:
+        if "\x00" in zip_code:
             raise TypeError("ZIP code cannot contain null bytes")
 
         # Check for obviously malicious inputs (security)
@@ -233,7 +234,9 @@ class EPAAirQualityConnector(BaseConnector):
         if not zip_code.isdigit():
             # If it contains special characters and is long, it's likely malicious
             if len(zip_code) > 10:
-                raise SecurityValidationError("ZIP code contains invalid characters and is too long")
+                raise SecurityValidationError(
+                    "ZIP code contains invalid characters and is too long"
+                )
             else:
                 raise ValueError("ZIP code must contain only digits")
 
@@ -297,19 +300,19 @@ class EPAAirQualityConnector(BaseConnector):
             raise TypeError("Date must be a string or datetime object")
 
         # Check for null bytes
-        if '\x00' in date:
+        if "\x00" in date:
             raise TypeError("Date cannot contain null bytes")
 
         # Validate date format using regex
         # Accept YYYY-MM-DD or YYYY-MM-DDTHH formats
-        date_pattern = r'^\d{4}-\d{2}-\d{2}(T\d{2})?$'
+        date_pattern = r"^\d{4}-\d{2}-\d{2}(T\d{2})?$"
         if not re.match(date_pattern, date):
             raise ValueError("Date must be in YYYY-MM-DD or YYYY-MM-DDTHH format")
 
         # Try to parse the date to ensure it's valid
         try:
-            if 'T' in date:
-                datetime.strptime(date.split('T')[0], "%Y-%m-%d")
+            if "T" in date:
+                datetime.strptime(date.split("T")[0], "%Y-%m-%d")
             else:
                 datetime.strptime(date, "%Y-%m-%d")
         except ValueError as e:
